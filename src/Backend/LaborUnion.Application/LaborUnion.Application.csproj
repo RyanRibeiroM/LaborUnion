@@ -6,4 +6,17 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\LaborUnion.Communication\LaborUnion.Communication.csproj" />
+    <ProjectReference Include="..\..\Shared\LaborUnion.Exceptions\LaborUnion.Exceptions.csproj" />
+    <ProjectReference Include="..\LaborUnion.Domain\LaborUnion.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="UseCases\" />
+    <Folder Include="Services\Configuration\" />
+    <Folder Include="Services\Mapper\" />
+    <Folder Include="Shared\Validators\" />
+  </ItemGroup>
+
 </Project>

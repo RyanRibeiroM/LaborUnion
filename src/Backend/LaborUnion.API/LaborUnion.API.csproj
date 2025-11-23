@@ -10,4 +10,15 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Filters\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Shared\LaborUnion.Communication\LaborUnion.Communication.csproj" />
+    <ProjectReference Include="..\..\Shared\LaborUnion.Exceptions\LaborUnion.Exceptions.csproj" />
+    <ProjectReference Include="..\LaborUnion.Application\LaborUnion.Application.csproj" />
+  </ItemGroup>
+
 </Project>

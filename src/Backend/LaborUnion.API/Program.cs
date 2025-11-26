@@ -1,3 +1,9 @@
+using LaborUnion.API.Extensions;
+using LaborUnion.API.Filters;
+using LaborUnion.Application;
+using LaborUnion.Infrastructe;
+using LaborUnion.Infrastructe.Migrations;
+using LaborUnion.Infrastructure.Extensions;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,8 +39,15 @@ builder.Services.AddSwaggerGen(option =>
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddMvc(options => options.Filters.Add(typeof(ExceptionFilter)));
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
+
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
@@ -47,8 +60,18 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllers();
 
+MigrateDatabase();
+
 app.Run();
+void MigrateDatabase()
+{
+    var connectionString = builder.Configuration.ConnectionString();
+    var serviceProvider = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+    DatabaseMigration.Migrate(connectionString, serviceProvider.ServiceProvider);
+}

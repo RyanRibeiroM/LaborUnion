@@ -138,6 +138,9 @@
   <data name="INVALID_LOGIN" xml:space="preserve">
     <value>Login inválido. Verifique suas credenciais.</value>
   </data>
+  <data name="NAME_EMPTY" xml:space="preserve">
+    <value>O nome é obrigatório.</value>
+  </data>
   <data name="PASSWORD_EMPTY" xml:space="preserve">
     <value>A senha não pode ser vazia.</value>
   </data>

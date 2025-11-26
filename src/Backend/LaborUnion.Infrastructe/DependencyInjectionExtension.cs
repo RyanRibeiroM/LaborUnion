@@ -1,6 +1,79 @@
-﻿namespace LaborUnion.Infrastructe
+﻿using FluentMigrator.Runner;
+using LaborUnion.Domain.Repositories;
+using LaborUnion.Domain.Repositories.User;
+using LaborUnion.Domain.Security.Criptography;
+using LaborUnion.Domain.Security.Tokens;
+using LaborUnion.Domain.Services.LoggedUser;
+using LaborUnion.Infrastructe.DataAccess;
+using LaborUnion.Infrastructure.DataAccess;
+using LaborUnion.Infrastructure.DataAccess.Repositories;
+using LaborUnion.Infrastructure.Extensions;
+using LaborUnion.Infrastructure.Security.Criptography;
+using LaborUnion.Infrastructure.Security.Tokens;
+using LaborUnion.Infrastructure.Services.LoggedUser;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+
+namespace LaborUnion.Infrastructe
 {
-    internal class DependencyInjectionExtension
+    public static class DependencyInjectionExtension
     {
+        public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        {
+            AddPasswordEncript(services);
+            AddDbContext(services, configuration);
+            AddRepositories(services);
+            AddFluentMigrator(services, configuration);
+            AddTokens(services, configuration);
+            AddLoggedUser(services);
+
+        }
+        public static void AddDbContext(IServiceCollection services, IConfiguration configuration)
+        {
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            services.AddDbContext<LaborUnionDbContext>(options => options.UseSqlServer(connectionString));
+        }
+
+        private static void AddFluentMigrator(IServiceCollection services, IConfiguration configuration)
+        {
+            var connectionString = configuration.ConnectionString();
+
+            services.AddFluentMigratorCore().ConfigureRunner(options =>
+            {
+                options
+                .AddSqlServer()
+                .WithGlobalConnectionString(connectionString)
+                .ScanIn(typeof(LaborUnionDbContext).Assembly).For.All();
+            });
+        }
+
+        public static void AddRepositories(IServiceCollection services)
+        {
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IUserReadOnlyRepository, UserRepository>();
+            services.AddScoped<IUserWriteOnlyRepository, UserRepository>();
+        }
+
+        private static void AddPasswordEncript(IServiceCollection services)
+        {
+            services.AddScoped<IPasswordEncrypter, BCryptPasswordEncrypter>();
+        }
+
+        private static void AddTokens(IServiceCollection services, IConfiguration configuration)
+        {
+            var expirationInMinutes = uint.Parse(configuration.GetSection("Jwt:ExpirationInMinutes").Value!);
+            var securityKey = configuration.GetSection("Jwt:Secret").Value!;
+
+            services.AddScoped<IAccessTokenGenerate>(option => new JwtTokenGenerator(expirationInMinutes, securityKey));
+            services.AddScoped<IActivationTokenGenerator, ActivationTokenGenerator>();
+        }
+
+        private static void AddLoggedUser(IServiceCollection services)
+        {
+            services.AddScoped<ILoggedUser, LoggedUser>();
+        }
+
     }
 }

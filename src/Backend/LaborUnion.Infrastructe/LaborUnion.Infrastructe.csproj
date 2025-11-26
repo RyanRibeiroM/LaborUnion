@@ -11,14 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DataAccess\Repositories\" />
-    <Folder Include="Extensions\" />
-    <Folder Include="Migrations\Versions\" />
-    <Folder Include="Services\" />
-    <Folder Include="Security\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="FluentMigrator" Version="7.1.0" />

@@ -1,6 +1,6 @@
 ﻿namespace LaborUnion.Domain.Repositories
 {
-    public interface UnitOfWork
+    public interface IUnitOfWork
     {
         public Task Commit();
     }

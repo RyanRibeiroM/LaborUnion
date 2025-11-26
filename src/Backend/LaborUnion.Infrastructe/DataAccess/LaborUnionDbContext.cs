@@ -5,6 +5,7 @@ namespace LaborUnion.Infrastructe.DataAccess
 {
     public class LaborUnionDbContext : DbContext
     {
+        public LaborUnionDbContext(DbContextOptions<LaborUnionDbContext> options) : base(options) { }
         public DbSet<User> Users { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

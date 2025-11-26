@@ -7,18 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.19" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
-    <Folder Include="Filters\" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\LaborUnion.Communication\LaborUnion.Communication.csproj" />
     <ProjectReference Include="..\..\Shared\LaborUnion.Exceptions\LaborUnion.Exceptions.csproj" />
     <ProjectReference Include="..\LaborUnion.Application\LaborUnion.Application.csproj" />
+    <ProjectReference Include="..\LaborUnion.Infrastructe\LaborUnion.Infrastructe.csproj" />
   </ItemGroup>
 
 </Project>

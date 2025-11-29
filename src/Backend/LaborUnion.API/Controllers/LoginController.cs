@@ -1,5 +1,5 @@
 ﻿using LaborUnion.Application.UseCases.Login.DoLogin;
-using LaborUnion.Communication.Reponses;
+using LaborUnion.Communication.Responses;
 using LaborUnion.Communication.Requests;
 using Microsoft.AspNetCore.Mvc;
 

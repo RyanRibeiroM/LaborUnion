@@ -1,10 +1,12 @@
 ﻿using FluentMigrator.Runner;
 using LaborUnion.Domain.Repositories;
+using LaborUnion.Domain.Repositories.Farmer;
 using LaborUnion.Domain.Repositories.User;
 using LaborUnion.Domain.Security.Criptography;
 using LaborUnion.Domain.Security.Tokens;
 using LaborUnion.Domain.Services.LoggedUser;
 using LaborUnion.Infrastructe.DataAccess;
+using LaborUnion.Infrastructe.DataAccess.Repositories;
 using LaborUnion.Infrastructure.DataAccess;
 using LaborUnion.Infrastructure.DataAccess.Repositories;
 using LaborUnion.Infrastructure.Extensions;
@@ -14,7 +16,6 @@ using LaborUnion.Infrastructure.Services.LoggedUser;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace LaborUnion.Infrastructe
 {
@@ -54,6 +55,9 @@ namespace LaborUnion.Infrastructe
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IUserReadOnlyRepository, UserRepository>();
             services.AddScoped<IUserWriteOnlyRepository, UserRepository>();
+            services.AddScoped<IFarmerReadOnlyRepository, FarmerRepository>();
+            services.AddScoped<IFarmerWriteOnlyRepository, FarmerRepository>();
+            services.AddScoped<IFarmerUpdateOnlyRepository, FarmerRepository>();
         }
 
         private static void AddPasswordEncript(IServiceCollection services)

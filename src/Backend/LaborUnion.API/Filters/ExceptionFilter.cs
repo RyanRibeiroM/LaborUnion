@@ -1,4 +1,4 @@
-﻿using LaborUnion.Communication.Reponses;
+﻿using LaborUnion.Communication.Responses;
 using LaborUnion.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;

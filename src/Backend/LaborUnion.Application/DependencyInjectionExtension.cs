@@ -1,4 +1,5 @@
 ﻿using LaborUnion.Application.Services.Mapper;
+using LaborUnion.Application.UseCases.Farmer.Register;
 using LaborUnion.Application.UseCases.Login.DoLogin;
 using LaborUnion.Application.UseCases.User.Register;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,7 @@ namespace LaborUnion.Application
         {
             services.AddScoped<IDoLoginUseCase, DoLoginUseCase>();
             services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
+            services.AddScoped<IRegisterFarmerUseCase, RegisterFarmerUseCase>();
         }
     }
 }

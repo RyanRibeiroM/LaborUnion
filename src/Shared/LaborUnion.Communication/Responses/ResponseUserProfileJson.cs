@@ -1,4 +1,4 @@
-﻿namespace LaborUnion.Communication.Reponses
+﻿namespace LaborUnion.Communication.Responses
 {
     public class ResponseUserProfileJson
     {

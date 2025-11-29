@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using LaborUnion.Communication.Reponses;
 using LaborUnion.Communication.Requests;
+using LaborUnion.Communication.Responses;
 using LaborUnion.Domain.Repositories;
 using LaborUnion.Domain.Repositories.User;
 using LaborUnion.Domain.Security.Criptography;

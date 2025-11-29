@@ -117,14 +117,23 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ADDRESS_WITH_SPECIAL_CHARACTERS" xml:space="preserve">
+    <value>O Endereço não pode conter caracteres especiais.</value>
+  </data>
   <data name="CPF_ALREADY_EXISTS" xml:space="preserve">
     <value>O CPF informado já está em uso.</value>
+  </data>
+  <data name="CPF_ALREADY_REGISTERED" xml:space="preserve">
+    <value>CPF já registrado.</value>
   </data>
   <data name="CPF_EMPTY" xml:space="preserve">
     <value>O CPF do aluno é obrigatório.</value>
   </data>
   <data name="CPF_INVALID" xml:space="preserve">
     <value>O CPF informado não é válido.</value>
+  </data>
+  <data name="CPF_NOT_EXIST" xml:space="preserve">
+    <value>Não foi possível encontrar um usuário com esse CPF.</value>
   </data>
   <data name="EMAIL_ALREADY_EXISTS" xml:space="preserve">
     <value>O Email informado já está em uso.</value>
@@ -135,11 +144,38 @@
   <data name="EMAIL_INVALID" xml:space="preserve">
     <value>O e-mail informado não é válido.</value>
   </data>
+  <data name="INVALID_ADDRESS_CEP" xml:space="preserve">
+    <value>O CEP do endereço é inválido.</value>
+  </data>
+  <data name="INVALID_ADDRESS_CITY" xml:space="preserve">
+    <value>A cidade do endereço é inválido.</value>
+  </data>
+  <data name="INVALID_ADDRESS_NEIGHBORHOOD" xml:space="preserve">
+    <value>O Bairro do endereço é inválido.</value>
+  </data>
+  <data name="INVALID_ADDRESS_NUMBER" xml:space="preserve">
+    <value>O numero do endereço é inválido.</value>
+  </data>
+  <data name="INVALID_ADDRESS_UF" xml:space="preserve">
+    <value>A UF do endereço é inválida.</value>
+  </data>
+  <data name="INVALID_CPF" xml:space="preserve">
+    <value>O CPF  está inválido.</value>
+  </data>
   <data name="INVALID_LOGIN" xml:space="preserve">
     <value>Login inválido. Verifique suas credenciais.</value>
   </data>
+  <data name="INVALID_NAME" xml:space="preserve">
+    <value>O nome está inválido.</value>
+  </data>
+  <data name="INVALID_PHONE_NUMBER" xml:space="preserve">
+    <value>O número de telefone é inválido.</value>
+  </data>
   <data name="NAME_EMPTY" xml:space="preserve">
     <value>O nome é obrigatório.</value>
+  </data>
+  <data name="NAME_WITH_SPECIAL_CHARACTERS" xml:space="preserve">
+    <value>O nome não pode ter caracteres especiais.</value>
   </data>
   <data name="PASSWORD_EMPTY" xml:space="preserve">
     <value>A senha não pode ser vazia.</value>
@@ -158,6 +194,12 @@
   </data>
   <data name="PASSWORD_MUST_CONTAIN_UPPERCASE" xml:space="preserve">
     <value>A senha deve conter pelo menos uma letra maiúscula.</value>
+  </data>
+  <data name="REGISTRATION_ALREADY_EXISTS" xml:space="preserve">
+    <value>Matrícula já registrada.</value>
+  </data>
+  <data name="REGISTRATION_EMPTY" xml:space="preserve">
+    <value>A matrícula é obrigatória.</value>
   </data>
   <data name="UNAUTHORIZED_ACCESS" xml:space="preserve">
     <value>Acesso não autorizado.</value>

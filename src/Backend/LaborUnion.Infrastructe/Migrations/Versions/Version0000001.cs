@@ -32,6 +32,35 @@ namespace GymManager.Infrastructure.Migrations.Versions
                   .Ascending()
                   .WithOptions().Unique();
 
+
+            CreateTable("Farmers")
+                .WithColumn("Name").AsString(200).NotNullable()
+                .WithColumn("Email").AsString(150).Nullable()
+                .WithColumn("Cpf").AsString(14).NotNullable()
+                .WithColumn("Registration").AsString(50).NotNullable()
+                .WithColumn("Phone").AsString(20).Nullable()
+                .WithColumn("AddressNumber").AsString(20).NotNullable()
+                .WithColumn("AddressNeighborhood").AsString(100).NotNullable()
+                .WithColumn("AddressCity").AsString(100).NotNullable()
+                .WithColumn("AddressUf").AsString(2).NotNullable()
+                .WithColumn("AddressCep").AsString(10).NotNullable()
+                .WithColumn("AddressReference").AsString(200).NotNullable()
+
+                .WithColumn("RegisteredBy").AsInt32().NotNullable()
+                    .ForeignKey("FK_Farmers_Users", "Users", "Id");
+
+            Create.Index("IX_Farmers_Cpf")
+                .OnTable("Farmers")
+                .OnColumn("Cpf")
+                .Ascending()
+                .WithOptions().Unique();
+
+            Create.Index("IX_Farmers_Registration")
+                .OnTable("Farmers")
+                .OnColumn("Registration")
+                .Ascending()
+                .WithOptions().Unique();
+
         }
     }
 }

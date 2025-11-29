@@ -1,4 +1,4 @@
-﻿using LaborUnion.Communication.Reponses;
+﻿using LaborUnion.Communication.Responses;
 using LaborUnion.Communication.Requests;
 using LaborUnion.Domain.Repositories.User;
 using LaborUnion.Domain.Security.Criptography;

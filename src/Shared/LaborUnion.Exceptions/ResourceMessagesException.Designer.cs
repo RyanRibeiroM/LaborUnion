@@ -61,11 +61,29 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O Endereço não pode conter caracteres especiais..
+        /// </summary>
+        public static string ADDRESS_WITH_SPECIAL_CHARACTERS {
+            get {
+                return ResourceManager.GetString("ADDRESS_WITH_SPECIAL_CHARACTERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a O CPF informado já está em uso..
         /// </summary>
         public static string CPF_ALREADY_EXISTS {
             get {
                 return ResourceManager.GetString("CPF_ALREADY_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a CPF já registrado..
+        /// </summary>
+        public static string CPF_ALREADY_REGISTERED {
+            get {
+                return ResourceManager.GetString("CPF_ALREADY_REGISTERED", resourceCulture);
             }
         }
         
@@ -84,6 +102,15 @@ namespace LaborUnion.Exceptions {
         public static string CPF_INVALID {
             get {
                 return ResourceManager.GetString("CPF_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Não foi possível encontrar um usuário com esse CPF..
+        /// </summary>
+        public static string CPF_NOT_EXIST {
+            get {
+                return ResourceManager.GetString("CPF_NOT_EXIST", resourceCulture);
             }
         }
         
@@ -115,6 +142,60 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O CEP do endereço é inválido..
+        /// </summary>
+        public static string INVALID_ADDRESS_CEP {
+            get {
+                return ResourceManager.GetString("INVALID_ADDRESS_CEP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a A cidade do endereço é inválido..
+        /// </summary>
+        public static string INVALID_ADDRESS_CITY {
+            get {
+                return ResourceManager.GetString("INVALID_ADDRESS_CITY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O Bairro do endereço é inválido..
+        /// </summary>
+        public static string INVALID_ADDRESS_NEIGHBORHOOD {
+            get {
+                return ResourceManager.GetString("INVALID_ADDRESS_NEIGHBORHOOD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O numero do endereço é inválido..
+        /// </summary>
+        public static string INVALID_ADDRESS_NUMBER {
+            get {
+                return ResourceManager.GetString("INVALID_ADDRESS_NUMBER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a A UF do endereço é inválida..
+        /// </summary>
+        public static string INVALID_ADDRESS_UF {
+            get {
+                return ResourceManager.GetString("INVALID_ADDRESS_UF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O CPF  está inválido..
+        /// </summary>
+        public static string INVALID_CPF {
+            get {
+                return ResourceManager.GetString("INVALID_CPF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a Login inválido. Verifique suas credenciais..
         /// </summary>
         public static string INVALID_LOGIN {
@@ -124,11 +205,38 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O nome está inválido..
+        /// </summary>
+        public static string INVALID_NAME {
+            get {
+                return ResourceManager.GetString("INVALID_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O número de telefone é inválido..
+        /// </summary>
+        public static string INVALID_PHONE_NUMBER {
+            get {
+                return ResourceManager.GetString("INVALID_PHONE_NUMBER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a O nome é obrigatório..
         /// </summary>
         public static string NAME_EMPTY {
             get {
                 return ResourceManager.GetString("NAME_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O nome não pode ter caracteres especiais..
+        /// </summary>
+        public static string NAME_WITH_SPECIAL_CHARACTERS {
+            get {
+                return ResourceManager.GetString("NAME_WITH_SPECIAL_CHARACTERS", resourceCulture);
             }
         }
         
@@ -183,6 +291,24 @@ namespace LaborUnion.Exceptions {
         public static string PASSWORD_MUST_CONTAIN_UPPERCASE {
             get {
                 return ResourceManager.GetString("PASSWORD_MUST_CONTAIN_UPPERCASE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Matrícula já registrada..
+        /// </summary>
+        public static string REGISTRATION_ALREADY_EXISTS {
+            get {
+                return ResourceManager.GetString("REGISTRATION_ALREADY_EXISTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a A matrícula é obrigatória..
+        /// </summary>
+        public static string REGISTRATION_EMPTY {
+            get {
+                return ResourceManager.GetString("REGISTRATION_EMPTY", resourceCulture);
             }
         }
         

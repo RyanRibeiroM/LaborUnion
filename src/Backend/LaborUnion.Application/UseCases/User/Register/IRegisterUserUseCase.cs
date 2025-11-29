@@ -1,4 +1,4 @@
-﻿using LaborUnion.Communication.Reponses;
+﻿using LaborUnion.Communication.Responses;
 using LaborUnion.Communication.Requests;
 
 namespace LaborUnion.Application.UseCases.User.Register

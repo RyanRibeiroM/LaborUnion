@@ -1,6 +1,6 @@
 /* Aumenta um pouco o texto do lado esquerdo para ficar igual ao design */
 .recovery-side-text h2 {
-    font-size: 2.2rem;
+    font-size: 2.1rem;
     /* Maior que o padrão do login (2rem) */
     line-height: 1.1;
 }
@@ -11,5 +11,13 @@
     /* Largura fixa menor */
     align-self: center;
     /* Centraliza no flex container do form */
+    margin-top: 45px;
+}
+
+.form-ajust {
     margin-top: 20px;
+}
+
+.btn-ajust {
+    margin-top: 40px;
 }

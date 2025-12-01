@@ -1,12 +1,13 @@
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import Login from './pages/Login'
+import RecuperarSenha from './pages/RecuperarSenha'
+import RedefinirSenha from './pages/RedefinirSenha'
 import PaginaBase from './pages/PaginaBase'
 import Dashboard from './pages/Dashboard'
 import Agricultores from './pages/Agricultores'
 import Atendimentos from './pages/Atendimentos'
 import Relatorio from './pages/Relatorio'
 import Configuracao from './pages/Configuracao'
-import RecuperarSenha from './pages/RecuperarSenha'
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/recuperar-senha" element={<RecuperarSenha />} />
+        <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         <Route element={<PaginaBase />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/agricultores" element={<Agricultores />} />

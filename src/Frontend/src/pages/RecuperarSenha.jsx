@@ -28,7 +28,7 @@ function RecuperarSenha() {
                         </span>
                     </div>
 
-                    <form onSubmit={handleRecovery} className="login-form">
+                    <form onSubmit={handleRecovery} className="login-form form-ajust">
                         
                         <div className="input-group">
                             <Mail className="input-icon" size={20} />

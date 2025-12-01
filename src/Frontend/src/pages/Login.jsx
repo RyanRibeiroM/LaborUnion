@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock } from 'lucide-react';
 import '../assets/css/Login.css';
-// import logo from '../assets/logo_sindicato.png'; 
+import logo from '../assets/img/logo-straaf.svg';
 
 function Login() {
     const navigate = useNavigate();
@@ -17,17 +17,17 @@ function Login() {
     return (
         <div className="login-container">
             <div className="login-card">
-                
+
                 {/* Lado Esquerdo - Decorativo */}
                 <div className="login-left">
                     <div className="login-logo-area">
                         {/* Placeholder para a Logo do Sindicato */}
                         <div className="logo-placeholder">
-                            <img 
-                                src="https://placehold.co/150x150/png?text=Logo+Sindicato&font=roboto" 
-                                alt="Sindicato Logo" 
+                            <img
+                                src={logo}
+                                alt="Sindicato Logo"
                                 className="logo-img"
-                            /> 
+                            />
                         </div>
                     </div>
                     <h2>Bem vindo!</h2>
@@ -42,22 +42,22 @@ function Login() {
                     </div>
 
                     <form onSubmit={handleLogin} className="login-form">
-                        
+
                         <div className="input-group">
                             <Mail className="input-icon" size={20} />
-                            <input 
-                                type="email" 
-                                placeholder="Email" 
-                                required 
+                            <input
+                                type="email"
+                                placeholder="Email"
+                                required
                             />
                         </div>
 
                         <div className="input-group">
                             <Lock className="input-icon" size={20} />
-                            <input 
-                                type="password" 
-                                placeholder="Senha" 
-                                required 
+                            <input
+                                type="password"
+                                placeholder="Senha"
+                                required
                             />
                         </div>
 

@@ -62,8 +62,8 @@ body {
 
 .logo-img {
     mix-blend-mode: multiply;
-    /* Truque simples se a logo tiver fundo branco */
     opacity: 0.8;
+    width: 100%;
 }
 
 /* Lado Direito (Branco) */

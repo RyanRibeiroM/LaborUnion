@@ -1,0 +1,15 @@
+/* Aumenta um pouco o texto do lado esquerdo para ficar igual ao design */
+.recovery-side-text h2 {
+    font-size: 2.2rem;
+    /* Maior que o padrão do login (2rem) */
+    line-height: 1.1;
+}
+
+/* Ajuste específico para o botão ficar menor centralizado (se desejar igual a imagem) */
+.btn-recovery {
+    width: 300px;
+    /* Largura fixa menor */
+    align-self: center;
+    /* Centraliza no flex container do form */
+    margin-top: 20px;
+}

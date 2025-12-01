@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail } from 'lucide-react';
 import '../assets/css/Login.css';
+import '../assets/css/RecuperarSenha.css'
 // import './RecuperarSenha.css'; 
 
 function RecuperarSenha() {
@@ -19,13 +20,7 @@ function RecuperarSenha() {
                 
                 {/* Lado Esquerdo */}
                 {/* Adicionei a classe 'recovery-side-text' para ajustar o tamanho da fonte */}
-                <div className="login-left recovery-side-text"> 
-                    <h2>Não se <br/>preocupe!</h2>
-                    <p>Vamos recuperá-la.</p>
-                </div>
-
-                {/* Lado Direito */}
-                <div className="login-right">
+                <div className="login-right recovery-side-text"> 
                     <div className="login-header">
                         <h2>Esqueceu a senha?</h2>
                         <span className="subtitle">
@@ -44,11 +39,16 @@ function RecuperarSenha() {
                             />
                         </div>
 
-                        {/* Reaproveita o estilo do botão, mas com largura fixa ajustada no CSS extra */}
                         <button type="submit" className="btn-login btn-recovery">
                             CONTINUAR
                         </button>
                     </form>
+                </div>
+
+                {/* Lado Direito */}
+                <div className="login-left">
+                    <h2>Não se preocupe!</h2>
+                    <p>Vamos recuperá-la.</p>
                 </div>
             </div>
         </div>

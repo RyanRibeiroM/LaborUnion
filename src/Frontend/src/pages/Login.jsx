@@ -22,7 +22,7 @@ function Login() {
                 <div className="login-left">
                     <div className="login-logo-area">
                         {/* Placeholder para a Logo do Sindicato */}
-                        <div className="logo-placeholder">
+                        <div>
                             <img
                                 src={logo}
                                 alt="Sindicato Logo"

@@ -55,15 +55,11 @@ body {
     opacity: 0.9;
 }
 
-.logo-placeholder {
-    margin-bottom: 20px;
-    /* Aqui você ajusta o tamanho da sua logo real */
-}
-
 .logo-img {
     mix-blend-mode: multiply;
     opacity: 0.8;
-    width: 100%;
+    width: 60%;
+    
 }
 
 /* Lado Direito (Branco) */

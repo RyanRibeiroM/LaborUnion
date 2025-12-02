@@ -36,7 +36,7 @@ function RedefinirSenha() {
                             <Lock className="input-icon" size={20} />
                             <input 
                                 type="password" 
-                                placeholder="Senha" 
+                                placeholder="Nova Senha" 
                                 required 
                             />
                         </div>

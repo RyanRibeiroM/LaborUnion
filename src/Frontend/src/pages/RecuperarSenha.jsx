@@ -2,8 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mail } from 'lucide-react';
 import '../assets/css/Login.css';
-import '../assets/css/RecuperarSenha.css'
-// import './RecuperarSenha.css'; 
 
 function RecuperarSenha() {
     const navigate = useNavigate();

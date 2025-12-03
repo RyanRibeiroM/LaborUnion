@@ -227,7 +227,16 @@
 }
 
 .half-width {
-    width: 50%;
+    flex: 1;
+}
+
+.third-width {
+    flex: 1;
+}
+
+.sixth-width {
+    flex: 0 0 150px;
+    max-width: 150px;
 }
 
 .form-group label {
@@ -236,7 +245,8 @@
     font-weight: 500;
 }
 
-.form-input {
+.form-input,
+.form-select {
     background-color: var(--input-bg);
     border: 1px solid transparent;
     border-radius: 8px;
@@ -248,7 +258,8 @@
     transition: all 0.2s;
 }
 
-.form-input:focus {
+.form-input:focus,
+.form-select:focus {
     background-color: var(--color-white);
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(74, 139, 88, 0.1);
@@ -264,6 +275,11 @@
     background-color: #f8fffb !important;
 }
 
+.input-loading {
+    border-color: #ffc107 !important;
+    background-color: #fffbf0 !important;
+}
+
 .error-msg {
     color: #dc3545;
     font-size: 0.75rem;
@@ -276,6 +292,25 @@
     font-size: 0.75rem;
     margin-top: 4px;
     font-weight: 500;
+}
+
+.cep-loading-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.2rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: translateY(-50%) rotate(0deg);
+    }
+
+    to {
+        transform: translateY(-50%) rotate(360deg);
+    }
 }
 
 .form-footer {
@@ -324,6 +359,12 @@
     animation: fadeIn 0.3s ease-in-out;
 }
 
+.half-width,
+.sixth-width {
+    width: 100%;
+}
+
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -355,7 +396,7 @@
     }
 
     .tab-btn {
-        width: 100%;
+        width: 100%px;
         padding: 15px;
         font-size: 1rem;
         display: flex;
@@ -413,51 +454,15 @@
 
     .farmers-table td:last-child {
         border-bottom: none;
-        justify-content: center;
-        padding-left: 0;
-        margin-top: 10px;
     }
 
-    .farmers-table td:nth-of-type(1):before {
-        content: "Nome";
-        font-weight: bold;
-        color: #4a8b58;
-    }
-
-    .farmers-table td:nth-of-type(2):before {
-        content: "CPF";
+    .farmers-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 10px;
         font-weight: 600;
+        text-align: left;
         color: #666;
-    }
-
-    .farmers-table td:nth-of-type(3):before {
-        content: "Cidade";
-        font-weight: 600;
-        color: #666;
-    }
-
-    .farmers-table td:nth-of-type(4):before {
-        content: "Status";
-        font-weight: 600;
-        color: #666;
-    }
-
-    .farmers-table td:nth-of-type(1) {
-        font-size: 1.1rem;
-        color: #333;
-        text-align: right;
-    }
-
-    .action-buttons-row {
-        width: 100%;
-        justify-content: space-around;
-        background-color: #f9f9f9;
-        padding: 10px;
-        border-radius: 8px;
-    }
-
-    .icon-btn {
-        padding: 10px;
     }
 
     .form-row {
@@ -465,18 +470,20 @@
         gap: 0;
     }
 
-    .half-width {
+    .half-width,
+    .third-width,
+    .sixth-width {
         width: 100%;
     }
 
     .form-footer {
-        flex-direction: column-reverse;
+        flex-direction: column;
         gap: 10px;
     }
 
     .btn-outline-gray,
     .btn-solid-green {
         width: 100%;
-        padding: 15px;
+        text-align: center;
     }
 }

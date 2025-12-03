@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Edit, Trash2, Eye, Save, Eraser } from 'lucide-react';
+import { Edit, Trash2, Eye, Save, Eraser, Loader2 } from 'lucide-react';
 import '../assets/css/Agricultores.css';
 
 const Agricultores = () => {
@@ -12,16 +12,69 @@ const Agricultores = () => {
     const [formData, setFormData] = useState({
         nome: '',
         cpf: '',
+        rg: '',
         dataNascimento: '',
+        cidadeNascimento: '',
+        ufNascimento: '',
+        estadoCivil: '',
+        profissao: '',
         matricula: '',
-        dataCadastro: '',
+        telefone: '',
+        email: '',
+        dataCadastro: new Date().toISOString().split('T')[0],
         cep: '',
         rua: '',
+        numero: '',
+        complemento: '',
+        pontoReferencia: '',
         bairro: '',
-        cidade: ''
+        cidade: '',
+        estado: ''
     });
 
+    const [conjuge, setConjuge] = useState({
+        nome: '',
+        cpf: '',
+        rg: '',
+        cidadeNascimento: '',
+        ufNascimento: '',
+        profissao: ''
+    });
+
+    const estadosBrasileiros = [
+        { sigla: 'AC', nome: 'Acre' },
+        { sigla: 'AL', nome: 'Alagoas' },
+        { sigla: 'AP', nome: 'Amapá' },
+        { sigla: 'AM', nome: 'Amazonas' },
+        { sigla: 'BA', nome: 'Bahia' },
+        { sigla: 'CE', nome: 'Ceará' },
+        { sigla: 'DF', nome: 'Distrito Federal' },
+        { sigla: 'ES', nome: 'Espírito Santo' },
+        { sigla: 'GO', nome: 'Goiás' },
+        { sigla: 'MA', nome: 'Maranhão' },
+        { sigla: 'MT', nome: 'Mato Grosso' },
+        { sigla: 'MS', nome: 'Mato Grosso do Sul' },
+        { sigla: 'MG', nome: 'Minas Gerais' },
+        { sigla: 'PA', nome: 'Pará' },
+        { sigla: 'PB', nome: 'Para íba' },
+        { sigla: 'PR', nome: 'Paraná' },
+        { sigla: 'PE', nome: 'Pernambuco' },
+        { sigla: 'PI', nome: 'Piauí' },
+        { sigla: 'RJ', nome: 'Rio de Janeiro' },
+        { sigla: 'RN', nome: 'Rio Grande do Norte' },
+        { sigla: 'RS', nome: 'Rio Grande do Sul' },
+        { sigla: 'RO', nome: 'Rondônia' },
+        { sigla: 'RR', nome: 'Roraima' },
+        { sigla: 'SC', nome: 'Santa Catarina' },
+        { sigla: 'SP', nome: 'São Paulo' },
+        { sigla: 'SE', nome: 'Sergipe' },
+        { sigla: 'TO', nome: 'Tocantins' }
+    ];
+
     const [cpfError, setCpfError] = useState(null);
+    const [cpfConjugeError, setCpfConjugeError] = useState(null);
+    const [cepError, setCepError] = useState(null);
+    const [loadingCep, setLoadingCep] = useState(false);
 
     const dadosAgricultores = [
         { id: 1, nome: 'Francisco Antônio da Silva', cpf: '123.456.789-00', cidade: 'Crateús', status: 'Regular' },
@@ -46,6 +99,13 @@ const Agricultores = () => {
             .replace(/(-\d{3})\d+?$/, '$1');
     };
 
+    const mascaraTelefone = (value) => {
+        return value
+            .replace(/\D/g, '')
+            .replace(/^(\d{2})(\d)/g, '($1) $2')
+            .replace(/(\d)(\d{4})$/, '$1-$2');
+    };
+
     const validarCPF = (cpf) => {
         cpf = cpf.replace(/[^\d]+/g, '');
         if (cpf === '' || cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) return false;
@@ -66,23 +126,126 @@ const Agricultores = () => {
         return true;
     };
 
+    const buscarCEP = async (cep) => {
+        const cepLimpo = cep.replace(/\D/g, '');
+
+        if (cepLimpo.length !== 8) {
+            setCepError(null);
+            return;
+        }
+
+        setLoadingCep(true);
+        setCepError(null);
+
+        try {
+            const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+            const data = await response.json();
+
+            if (data.erro) {
+                setCepError('CEP não encontrado');
+                setFormData(prev => ({
+                    ...prev,
+                    rua: '',
+                    bairro: '',
+                    cidade: '',
+                    estado: ''
+                }));
+            } else {
+                setCepError('valido');
+                setFormData(prev => ({
+                    ...prev,
+                    rua: data.logradouro || '',
+                    bairro: data.bairro || '',
+                    cidade: data.localidade || '',
+                    estado: data.uf || ''
+                }));
+            }
+        } catch (error) {
+            console.error('Erro ao buscar CEP:', error);
+            setCepError('Erro ao buscar CEP');
+        } finally {
+            setLoadingCep(false);
+        }
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         let novoValor = value;
 
         if (name === 'cpf') novoValor = mascaraCPF(value);
-        if (name === 'cep') novoValor = mascaraCEP(value);
+        if (name === 'telefone') novoValor = mascaraTelefone(value);
+        if (name === 'cep') {
+            novoValor = mascaraCEP(value);
+            if (novoValor.length === 9) {
+                buscarCEP(novoValor);
+            } else {
+                setCepError(null);
+            }
+        }
 
         if (name === 'cpf') {
-            if (novoValor.length === 14) { // 14 é o tamanho do CPF com pontuação
+            if (novoValor.length === 14) {
                 const ehValido = validarCPF(novoValor);
                 setCpfError(ehValido ? 'valido' : 'invalido');
             } else {
-                setCpfError(null); // Limpa status se estiver digitando
+                setCpfError(null);
             }
         }
 
         setFormData({ ...formData, [name]: novoValor });
+    };
+
+    const handleConjugeChange = (e) => {
+        const { name, value } = e.target;
+        let novoValor = value;
+
+        if (name === 'cpf') {
+            novoValor = mascaraCPF(value);
+            if (novoValor.length === 14) {
+                const ehValido = validarCPF(novoValor);
+                setCpfConjugeError(ehValido ? 'valido' : 'invalido');
+            } else {
+                setCpfConjugeError(null);
+            }
+        }
+
+        setConjuge({ ...conjuge, [name]: novoValor });
+    };
+
+    const limparFormulario = () => {
+        setFormData({
+            nome: '',
+            cpf: '',
+            rg: '',
+            dataNascimento: '',
+            cidadeNascimento: '',
+            ufNascimento: '',
+            estadoCivil: '',
+            profissao: '',
+            matricula: '',
+            telefone: '',
+            email: '',
+            dataCadastro: new Date().toISOString().split('T')[0],
+            cep: '',
+            rua: '',
+            numero: '',
+            complemento: '',
+            pontoReferencia: '',
+            bairro: '',
+            cidade: '',
+            estado: ''
+        });
+        setConjuge({
+            nome: '',
+            cpf: '',
+            rg: '',
+            cidadeNascimento: '',
+            ufNascimento: '',
+            profissao: ''
+        });
+        setCpfError(null);
+        setCpfConjugeError(null);
+        setCepError(null);
     };
 
     const agricultoresFiltrados = dadosAgricultores.filter((agricultor) =>
@@ -90,7 +253,6 @@ const Agricultores = () => {
         agricultor.cpf.includes(busca)
     );
 
-    // Simula carregamento de dados
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsLoading(false);
@@ -98,7 +260,6 @@ const Agricultores = () => {
         return () => clearTimeout(timer);
     }, []);
 
-    // Verifica se veio do Dashboard com indicação para abrir cadastro
     useEffect(() => {
         if (location.state?.openCadastro) {
             setActiveTab('cadastro');
@@ -214,63 +375,356 @@ const Agricultores = () => {
                                             onChange={handleChange}
                                             maxLength={14}
                                         />
-                                        {/* Mensagem de Feedback do CPF */}
                                         {cpfError === 'invalido' && <span className="error-msg">CPF Inválido</span>}
                                         {cpfError === 'valido' && <span className="success-msg">CPF Válido</span>}
                                     </div>
                                     <div className="form-group half-width">
-                                        <label>Data Nascimento</label>
-                                        <input type="date" name="dataNascimento" className="form-input" onChange={handleChange} />
+                                        <label>RG</label>
+                                        <input
+                                            type="text"
+                                            name="rg"
+                                            className="form-input"
+                                            placeholder="0000000-0"
+                                            value={formData.rg}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label>Data de Nascimento</label>
+                                        <input
+                                            type="date"
+                                            name="dataNascimento"
+                                            className="form-input"
+                                            value={formData.dataNascimento}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="form-group half-width">
+                                        <label>Matrícula</label>
+                                        <input
+                                            type="text"
+                                            name="matricula"
+                                            className="form-input"
+                                            value={formData.matricula}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label>Cidade de Nascimento</label>
+                                        <input
+                                            type="text"
+                                            name="cidadeNascimento"
+                                            className="form-input"
+                                            placeholder="Ex: Crateús"
+                                            value={formData.cidadeNascimento}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="form-group half-width">
+                                        <label>UF de Nascimento</label>
+                                        <select
+                                            name="ufNascimento"
+                                            className="form-input form-select"
+                                            value={formData.ufNascimento}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="">Selecione...</option>
+                                            {estadosBrasileiros.map((est) => (
+                                                <option key={est.sigla} value={est.sigla}>
+                                                    {est.sigla} - {est.nome}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label>Estado Civil</label>
+                                        <select
+                                            name="estadoCivil"
+                                            className="form-input form-select"
+                                            value={formData.estadoCivil}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="">Selecione...</option>
+                                            <option value="Solteiro(a)">Solteiro(a)</option>
+                                            <option value="Casado(a)">Casado(a)</option>
+                                            <option value="Divorciado(a)">Divorciado(a)</option>
+                                            <option value="Viúvo(a)">Viúvo(a)</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group half-width">
+                                        <label>Profissão</label>
+                                        <input
+                                            type="text"
+                                            name="profissao"
+                                            className="form-input"
+                                            placeholder="Ex: Agricultor Familiar"
+                                            value={formData.profissao}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="form-row">
+                                        <div className="form-group full-width">
+                                            <label>Data de Cadastro</label>
+                                            <input
+                                                type="date"
+                                                name="dataCadastro"
+                                                className="form-input"
+                                                value={formData.dataCadastro}
+                                                readOnly
+                                                disabled
+                                                style={{ backgroundColor: '#f5f5f5' }}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Seção do Cônjuge - Condicional */}
+                            {formData.estadoCivil === 'Casado(a)' && (
+                                <div className="form-section">
+                                    <h3 className="section-title">Dados do Cônjuge</h3>
+
+                                    <div className="form-group full-width">
+                                        <label>Nome Completo do Cônjuge</label>
+                                        <input
+                                            type="text"
+                                            name="nome"
+                                            className="form-input"
+                                            value={conjuge.nome}
+                                            onChange={handleConjugeChange}
+                                        />
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group half-width">
+                                            <label>CPF do Cônjuge</label>
+                                            <input
+                                                type="text"
+                                                name="cpf"
+                                                className={`form-input ${cpfConjugeError === 'valido' ? 'input-success' : cpfConjugeError === 'invalido' ? 'input-error' : ''}`}
+                                                placeholder="000.000.000-00"
+                                                value={conjuge.cpf}
+                                                onChange={handleConjugeChange}
+                                                maxLength={14}
+                                            />
+                                            {cpfConjugeError === 'invalido' && <span className="error-msg">CPF Inválido</span>}
+                                            {cpfConjugeError === 'valido' && <span className="success-msg">CPF Válido</span>}
+                                        </div>
+                                        <div className="form-group half-width">
+                                            <label>RG do Cônjuge</label>
+                                            <input
+                                                type="text"
+                                                name="rg"
+                                                className="form-input"
+                                                placeholder="0000000-0"
+                                                value={conjuge.rg}
+                                                onChange={handleConjugeChange}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group half-width">
+                                            <label>Cidade de Nascimento do Cônjuge</label>
+                                            <input
+                                                type="text"
+                                                name="cidadeNascimento"
+                                                className="form-input"
+                                                placeholder="Ex: Crateús"
+                                                value={conjuge.cidadeNascimento}
+                                                onChange={handleConjugeChange}
+                                            />
+                                        </div>
+                                        <div className="form-group half-width">
+                                            <label>UF de Nascimento do Cônjuge</label>
+                                            <select
+                                                name="ufNascimento"
+                                                className="form-input form-select"
+                                                value={conjuge.ufNascimento}
+                                                onChange={handleConjugeChange}
+                                            >
+                                                <option value="">Selecione...</option>
+                                                {estadosBrasileiros.map((est) => (
+                                                    <option key={est.sigla} value={est.sigla}>
+                                                        {est.sigla} - {est.nome}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group full-width">
+                                        <label>Profissão do Cônjuge</label>
+                                        <input
+                                            type="text"
+                                            name="profissao"
+                                            className="form-input"
+                                            placeholder="Ex: Agricultora Familiar"
+                                            value={conjuge.profissao}
+                                            onChange={handleConjugeChange}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
                             <div className="form-section">
                                 <h3 className="section-title">Dados de Contato</h3>
                                 <div className="form-row">
                                     <div className="form-group half-width">
-                                        <label>Matrícula</label>
-                                        <input type="text" name="matricula" className="form-input" onChange={handleChange} />
+                                        <label>Telefone</label>
+                                        <input
+                                            type="text"
+                                            name="telefone"
+                                            className="form-input"
+                                            placeholder="(00) 00000-0000"
+                                            value={formData.telefone}
+                                            onChange={handleChange}
+                                            maxLength={15}
+                                        />
                                     </div>
                                     <div className="form-group half-width">
-                                        <label>Data Cadastro</label>
-                                        <input type="date" name="dataCadastro" className="form-input" onChange={handleChange} />
+                                        <label>Email</label>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            className="form-input"
+                                            placeholder="exemplo@email.com"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                        />
                                     </div>
                                 </div>
                             </div>
+
                             <div className="form-section no-border">
                                 <h3 className="section-title">Endereço</h3>
-                                <div className="form-group half-width">
-                                    <label>CEP</label>
-                                    <input
-                                        type="text"
-                                        name="cep"
-                                        className="form-input"
-                                        placeholder="00000-000"
-                                        value={formData.cep}
-                                        onChange={handleChange}
-                                        maxLength={9}
-                                    />
-                                </div>
 
-                                <div className="form-group full-width">
-                                    <label>Rua / Localidade</label>
-                                    <input type="text" name="rua" className="form-input" onChange={handleChange} />
-                                </div>
-
+                                {/* Linha 1: CEP | Endereço | Número */}
                                 <div className="form-row">
-                                    <div className="form-group half-width">
-                                        <label>Bairro</label>
-                                        <input type="text" name="bairro" className="form-input" onChange={handleChange} />
+                                    <div className="form-group">
+                                        <label>CEP</label>
+                                        <div style={{ position: 'relative' }}>
+                                            <input
+                                                type="text"
+                                                name="cep"
+                                                className={`form-input ${loadingCep ? 'input-loading' :
+                                                    cepError === 'valido' ? 'input-success' :
+                                                        cepError ? 'input-error' : ''
+                                                    }`}
+                                                placeholder="00000-000"
+                                                value={formData.cep}
+                                                onChange={handleChange}
+                                                maxLength={9}
+                                            />
+                                            {loadingCep && (
+                                                <Loader2 className="cep-loading-icon" size={18} />
+                                            )}
+                                        </div>
+                                        {cepError && cepError !== 'valido' && <span className="error-msg">{cepError}</span>}
+                                        {cepError === 'valido' && <span className="success-msg">CEP encontrado!</span>}
                                     </div>
                                     <div className="form-group half-width">
+                                        <label>Endereço</label>
+                                        <input
+                                            type="text"
+                                            name="rua"
+                                            className="form-input"
+                                            placeholder="Rua, Avenida, etc."
+                                            value={formData.rua}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="form-group sixth-width">
+                                        <label>Número</label>
+                                        <input
+                                            type="text"
+                                            name="numero"
+                                            className="form-input"
+                                            placeholder="Nº"
+                                            value={formData.numero}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Linha 2: Complemento | Ponto de Referência */}
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label>Complemento</label>
+                                        <input
+                                            type="text"
+                                            name="complemento"
+                                            className="form-input"
+                                            placeholder="Apartamento, Bloco, etc."
+                                            value={formData.complemento}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="form-group half-width">
+                                        <label>Ponto de Referência</label>
+                                        <input
+                                            type="text"
+                                            name="pontoReferencia"
+                                            className="form-input"
+                                            placeholder="Próximo a..."
+                                            value={formData.pontoReferencia}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Linha 3: Bairro | Cidade | Estado */}
+                                <div className="form-row">
+                                    <div className="form-group third-width">
+                                        <label>Bairro</label>
+                                        <input
+                                            type="text"
+                                            name="bairro"
+                                            className="form-input"
+                                            value={formData.bairro}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="form-group third-width">
                                         <label>Cidade</label>
-                                        <input type="text" name="cidade" className="form-input" onChange={handleChange} />
+                                        <input
+                                            type="text"
+                                            name="cidade"
+                                            className="form-input"
+                                            value={formData.cidade}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="form-group third-width">
+                                        <label>Estado</label>
+                                        <select
+                                            name="estado"
+                                            className="form-input form-select"
+                                            value={formData.estado}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="">Selecione...</option>
+                                            {estadosBrasileiros.map((est) => (
+                                                <option key={est.sigla} value={est.sigla}>
+                                                    {est.sigla} - {est.nome}
+                                                </option>
+                                            ))}
+                                        </select>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="form-footer">
-                                <button type="button" className="btn-outline-gray">Limpar</button>
+                                <button type="button" className="btn-outline-gray" onClick={limparFormulario}>Limpar</button>
                                 <button type="button" className="btn-solid-green">Salvar Cadastro</button>
                             </div>
                         </form>

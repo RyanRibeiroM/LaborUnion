@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, UserPlus } from 'lucide-react';
 import '../assets/css/Dashboard.css';
 
 const Dashboard = () => {
+    const navigate = useNavigate();
 
     const [periodoAtendimento, setPeriodoAtendimento] = useState('30dias');
     const [periodoServicos, setPeriodoServicos] = useState('30dias');
@@ -108,7 +110,7 @@ const Dashboard = () => {
                 <button
                     className="btn-white"
                     aria-label="Cadastrar novo agricultor no sistema"
-                    onClick={() => console.log('Cadastrar agricultor')}
+                    onClick={() => navigate('/agricultores', { state: { openCadastro: true } })}
                 >
                     <UserPlus size={20} aria-hidden="true" />
                     Cadastrar novo agricultor

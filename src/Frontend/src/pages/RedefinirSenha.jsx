@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate } from 'react-router-dom'
 import { Lock } from 'lucide-react';
 import '../assets/css/Login.css';
-import '../assets/css/RecuperarSenha.css';
 
 function RedefinirSenha() {
     const navigate = useNavigate();
@@ -36,7 +35,7 @@ function RedefinirSenha() {
                             <Lock className="input-icon" size={20} />
                             <input 
                                 type="password" 
-                                placeholder="Senha" 
+                                placeholder="Nova Senha" 
                                 required 
                             />
                         </div>

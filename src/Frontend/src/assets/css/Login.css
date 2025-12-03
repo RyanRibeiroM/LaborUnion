@@ -45,6 +45,7 @@ body {
 .login-left h2 {
     font-size: 2rem;
     margin-bottom: 0;
+    margin-top: 0;
     font-weight: 700;
 }
 
@@ -55,15 +56,11 @@ body {
     opacity: 0.9;
 }
 
-.logo-placeholder {
-    margin-bottom: 20px;
-    /* Aqui você ajusta o tamanho da sua logo real */
-}
-
 .logo-img {
     mix-blend-mode: multiply;
-    opacity: 0.8;
-    width: 100%;
+    /* opacity: 0.8; */
+    width: 95%;
+
 }
 
 /* Lado Direito (Branco) */
@@ -84,7 +81,7 @@ body {
     color: #2E7D32;
     /* Verde escuro do título "Acesse sua conta" */
     font-size: 1.8rem;
-    margin-bottom: 5px;
+    margin-bottom: 0;
 }
 
 .subtitle {
@@ -131,12 +128,12 @@ body {
 
 .forgot-password {
     text-align: right;
-    font-size: 0.85rem;
+    font-size: 1rem;
 }
 
 .forgot-password a {
-    text-decoration: none;
-    color: #888;
+    /* text-decoration: none; */
+    color: #408951;
 }
 
 /* Botão Entrar */
@@ -161,4 +158,16 @@ body {
 
 .btn-login:hover {
     background-color: #357a44;
+}
+
+.btn-recovery {
+    margin-top: 60px;
+}
+
+.form-ajust {
+    margin-top: 30px;
+}
+
+.recovery-side-text h2{
+    font-size: 1.9rem;
 }

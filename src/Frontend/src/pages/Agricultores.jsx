@@ -56,7 +56,7 @@ const Agricultores = () => {
         { sigla: 'MS', nome: 'Mato Grosso do Sul' },
         { sigla: 'MG', nome: 'Minas Gerais' },
         { sigla: 'PA', nome: 'Pará' },
-        { sigla: 'PB', nome: 'Para íba' },
+        { sigla: 'PB', nome: 'Paraíba' },
         { sigla: 'PR', nome: 'Paraná' },
         { sigla: 'PE', nome: 'Pernambuco' },
         { sigla: 'PI', nome: 'Piauí' },
@@ -76,12 +76,117 @@ const Agricultores = () => {
     const [cepError, setCepError] = useState(null);
     const [loadingCep, setLoadingCep] = useState(false);
 
-    const dadosAgricultores = [
+    // Paginação
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
+
+    const [dadosAgricultores, setDadosAgricultores] = useState([
         { id: 1, nome: 'Francisco Antônio da Silva', cpf: '123.456.789-00', cidade: 'Crateús', status: 'Regular' },
         { id: 2, nome: 'Maria Fernanda', cpf: '987.654.321-11', cidade: 'Novo Oriente', status: 'Pendente' },
         { id: 3, nome: 'Caio Tiberius Mourão', cpf: '456.123.789-22', cidade: 'Crateús', status: 'Regular' },
         { id: 4, nome: 'Vicente Neto', cpf: '456.123.789-22', cidade: 'Crateús', status: 'Regular' },
-    ];
+        { id: 5, nome: 'Ana Paula Souza', cpf: '111.222.333-44', cidade: 'Independência', status: 'Regular' },
+        { id: 6, nome: 'João Pedro Alves', cpf: '555.666.777-88', cidade: 'Crateús', status: 'Bloqueado' },
+        { id: 7, nome: 'Mariana Costa', cpf: '999.888.777-66', cidade: 'Novo Oriente', status: 'Regular' },
+    ]);
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [itemToDelete, setItemToDelete] = useState(null);
+    const [editingId, setEditingId] = useState(null);
+
+    const handleDelete = (id) => {
+        setItemToDelete(id);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = () => {
+        if (itemToDelete) {
+            setDadosAgricultores(dadosAgricultores.filter(agricultor => agricultor.id !== itemToDelete));
+            setShowDeleteModal(false);
+            setItemToDelete(null);
+
+            // Ajustar página se o último item da página for deletado
+            if (currentItems.length === 1 && currentPage > 1) {
+                setCurrentPage(currentPage - 1);
+            }
+        }
+    };
+
+    const cancelDelete = () => {
+        setShowDeleteModal(false);
+        setItemToDelete(null);
+    };
+
+    const handleEdit = (agricultor) => {
+        setFormData({
+            nome: agricultor.nome,
+            cpf: agricultor.cpf,
+            rg: agricultor.rg || '',
+            dataNascimento: agricultor.dataNascimento || '',
+            cidadeNascimento: agricultor.cidadeNascimento || '',
+            ufNascimento: agricultor.ufNascimento || '',
+            estadoCivil: agricultor.estadoCivil || '',
+            profissao: agricultor.profissao || '',
+            matricula: agricultor.matricula || '',
+            telefone: agricultor.telefone || '',
+            email: agricultor.email || '',
+            dataCadastro: agricultor.dataCadastro || new Date().toISOString().split('T')[0],
+            cep: agricultor.cep || '',
+            rua: agricultor.rua || '',
+            numero: agricultor.numero || '',
+            complemento: agricultor.complemento || '',
+            pontoReferencia: agricultor.pontoReferencia || '',
+            bairro: agricultor.bairro || '',
+            cidade: agricultor.cidade || '',
+            estado: agricultor.estado || ''
+        });
+
+        if (agricultor.conjuge) {
+            setConjuge(agricultor.conjuge);
+        } else {
+            setConjuge({
+                nome: '',
+                cpf: '',
+                rg: '',
+                cidadeNascimento: '',
+                ufNascimento: '',
+                profissao: ''
+            });
+        }
+
+        setEditingId(agricultor.id);
+        setActiveTab('cadastro');
+    };
+
+    const handleSave = () => {
+        if (!formData.nome || !formData.cpf) {
+            alert('Por favor, preencha pelo menos Nome e CPF.');
+            return;
+        }
+
+        const dadosCompletos = {
+            ...formData,
+            conjuge: formData.estadoCivil === 'Casado(a)' ? conjuge : null
+        };
+
+        if (editingId) {
+            setDadosAgricultores(dadosAgricultores.map(item =>
+                item.id === editingId ? { ...item, ...dadosCompletos, id: editingId, status: item.status } : item
+            ));
+            alert('Agricultor atualizado com sucesso!');
+        } else {
+            const novoId = Math.max(...dadosAgricultores.map(a => a.id), 0) + 1;
+            setDadosAgricultores([...dadosAgricultores, {
+                id: novoId,
+                ...dadosCompletos,
+                status: 'Regular'
+            }]);
+            alert('Agricultor cadastrado com sucesso!');
+        }
+
+        limparFormulario();
+        setActiveTab('lista');
+    };
 
     const mascaraCPF = (value) => {
         return value
@@ -246,12 +351,26 @@ const Agricultores = () => {
         setCpfError(null);
         setCpfConjugeError(null);
         setCepError(null);
+        setEditingId(null);
     };
 
     const agricultoresFiltrados = dadosAgricultores.filter((agricultor) =>
         agricultor.nome.toLowerCase().includes(busca.toLowerCase()) ||
         agricultor.cpf.includes(busca)
     );
+
+    // Lógica de Paginação
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = agricultoresFiltrados.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(agricultoresFiltrados.length / itemsPerPage);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+    useEffect(() => {
+        // Resetar para página 1 quando a busca mudar
+        setCurrentPage(1);
+    }, [busca]);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -314,6 +433,7 @@ const Agricultores = () => {
                             <table className="farmers-table">
                                 <thead>
                                     <tr>
+                                        <th>id</th>
                                         <th>Nome Completo</th>
                                         <th>CPF</th>
                                         <th>Cidade</th>
@@ -322,8 +442,9 @@ const Agricultores = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {agricultoresFiltrados.map((item) => (
+                                    {currentItems.map((item) => (
                                         <tr key={item.id}>
+                                            <td><strong>{item.id}</strong></td>
                                             <td><strong>{item.nome}</strong></td>
                                             <td>{item.cpf}</td>
                                             <td>{item.cidade}</td>
@@ -331,8 +452,20 @@ const Agricultores = () => {
                                             <td>
                                                 <div className="action-buttons-row">
                                                     <button className="icon-btn view"><Eye size={18} /></button>
-                                                    <button className="icon-btn edit"><Edit size={18} /></button>
-                                                    <button className="icon-btn delete"><Trash2 size={18} /></button>
+                                                    <button
+                                                        className="icon-btn edit"
+                                                        onClick={() => handleEdit(item)}
+                                                        title="Editar"
+                                                    >
+                                                        <Edit size={18} />
+                                                    </button>
+                                                    <button
+                                                        className="icon-btn delete"
+                                                        onClick={() => handleDelete(item.id)}
+                                                        title="Excluir"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -340,12 +473,45 @@ const Agricultores = () => {
                                 </tbody>
                             </table>
                         </div>
+
+                        {/* Controles de Paginação */}
+                        {totalPages > 1 && (
+                            <div className="pagination-container">
+                                <button
+                                    className="pagination-btn"
+                                    onClick={() => paginate(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                >
+                                    Anterior
+                                </button>
+
+                                <div className="pagination-numbers">
+                                    {Array.from({ length: totalPages }, (_, i) => (
+                                        <button
+                                            key={i + 1}
+                                            onClick={() => paginate(i + 1)}
+                                            className={`pagination-number ${currentPage === i + 1 ? 'active' : ''}`}
+                                        >
+                                            {i + 1}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                <button
+                                    className="pagination-btn"
+                                    onClick={() => paginate(currentPage + 1)}
+                                    disabled={currentPage === totalPages}
+                                >
+                                    Próximo
+                                </button>
+                            </div>
+                        )}
                     </>
                 )}
 
                 {activeTab === 'cadastro' && (
                     <div className="form-container fade-in">
-                        <h2 className="form-title">Cadastrar Novo Agricultor</h2>
+                        <h2 className="form-title">{editingId ? 'Editar Agricultor' : 'Cadastrar Novo Agricultor'}</h2>
 
                         <form className="custom-form">
                             {/* Dados Pessoais */}
@@ -471,20 +637,6 @@ const Agricultores = () => {
                                             onChange={handleChange}
                                         />
                                     </div>
-                                    <div className="form-row">
-                                        <div className="form-group full-width">
-                                            <label>Data de Cadastro</label>
-                                            <input
-                                                type="date"
-                                                name="dataCadastro"
-                                                className="form-input"
-                                                value={formData.dataCadastro}
-                                                readOnly
-                                                disabled
-                                                style={{ backgroundColor: '#f5f5f5' }}
-                                            />
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
 
@@ -603,6 +755,22 @@ const Agricultores = () => {
                                         />
                                     </div>
                                 </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label>Data de Cadastro</label>
+                                        <input
+                                            type="date"
+                                            name="dataCadastro"
+                                            className="form-input"
+                                            value={formData.dataCadastro}
+                                            readOnly
+                                            disabled
+                                            style={{ backgroundColor: '#f5f5f5' }}
+                                        />
+                                        <small style={{ color: '#666', fontSize: '0.85rem' }}>Preenchido automaticamente</small>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="form-section no-border">
@@ -715,7 +883,7 @@ const Agricultores = () => {
                                             <option value="">Selecione...</option>
                                             {estadosBrasileiros.map((est) => (
                                                 <option key={est.sigla} value={est.sigla}>
-                                                    {est.sigla} - {est.nome}
+                                                    {est.nome}
                                                 </option>
                                             ))}
                                         </select>
@@ -724,14 +892,38 @@ const Agricultores = () => {
                             </div>
 
                             <div className="form-footer">
-                                <button type="button" className="btn-outline-gray" onClick={limparFormulario}>Limpar</button>
-                                <button type="button" className="btn-solid-green">Salvar Cadastro</button>
+                                <button type="button" className="btn-outline-gray" onClick={limparFormulario}>
+                                    {editingId ? 'Cancelar' : 'Limpar'}
+                                </button>
+                                <button type="button" className="btn-solid-green" onClick={handleSave}>
+                                    {editingId ? 'Atualizar Cadastro' : 'Salvar Cadastro'}
+                                </button>
                             </div>
                         </form>
                     </div>
                 )}
 
             </div>
+
+            {/* Modal de Exclusão */}
+            {showDeleteModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <h3 className="modal-title">Confirmar Exclusão</h3>
+                        </div>
+                        <div className="modal-body">
+                            <p>Tem certeza que deseja excluir este agricultor? Esta ação não pode ser desfeita.</p>
+                        </div>
+                        <div className="modal-footer">
+                            <button className="btn-modal-cancel" onClick={cancelDelete}>Cancelar</button>
+                            <button className="btn-modal-delete" onClick={confirmDelete}>
+                                <Trash2 size={18} /> Excluir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

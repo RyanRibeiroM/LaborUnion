@@ -335,7 +335,7 @@ const Atendimentos = () => {
                             margin-bottom: 12px;
                         }
                         .field {
-                            flex: 1;
+                            flex: 3;
                         }
                         .field label {
                             font-size: 11px;
@@ -363,7 +363,7 @@ const Atendimentos = () => {
                             background: #f9f9f9;
                             padding: 15px;
                             border-radius: 8px;
-                            border-left: 3px solid #4a8b58;
+                            border: 1px solid #4a8b58;
                             font-size: 14px;
                             line-height: 1.6;
                         }
@@ -376,12 +376,15 @@ const Atendimentos = () => {
                             padding-top: 20px;
                         }
                         .signature {
-                            margin-top: 60px;
+                            margin-top: 120px;
+                            margin-left: 40px;
+                            margin-right: 40px;
                             display: flex;
                             justify-content: space-between;
+                            align-items: center;
                         }
                         .signature-line {
-                            width: 200px;
+                            width: 300px;
                             text-align: center;
                         }
                         .signature-line div {

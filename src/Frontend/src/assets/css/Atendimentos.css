@@ -74,6 +74,7 @@
 
 .form-row {
     width: 100%;
+    margin-bottom: 0;
 }
 
 .form-group {
@@ -143,7 +144,7 @@
     display: flex;
     justify-content: flex-end;
     gap: 15px;
-    margin-top: 20px;
+    margin-top: 0;
 }
 
 .btn-outline-gray {

@@ -8,6 +8,7 @@ import Agricultores from './pages/Agricultores'
 import Atendimentos from './pages/Atendimentos'
 import Relatorio from './pages/Relatorio'
 import Configuracao from './pages/Configuracao'
+import Profile from './pages/Profile'
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/atendimentos" element={<Atendimentos />} />
           <Route path="/relatorio" element={<Relatorio />} />
           <Route path="/configuracao" element={<Configuracao />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Routes>
     </Router>

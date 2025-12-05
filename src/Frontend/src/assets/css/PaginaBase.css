@@ -1,4 +1,3 @@
-/* Layout Principal que segura o Menu e o Conteúdo */
 body {
     margin: 0;
 }
@@ -8,14 +7,11 @@ body {
     height: 100vh;
     width: 100vw;
     background-color: #f5f5f5;
-    /* Cor de fundo suave para o resto da página */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* --- SIDEBAR --- */
 .sidebar {
     background-color: #4089511A;
-    /* Sua cor especificada */
     display: flex;
     flex-direction: column;
     transition: width 0.3s ease;
@@ -31,7 +27,6 @@ body {
     width: 80px;
 }
 
-/* Cabeçalho do Sidebar */
 .sidebar-header {
     display: flex;
     align-items: center;
@@ -39,12 +34,10 @@ body {
     margin-bottom: 40px;
     padding: 0 10px;
     height: 50px;
-    /* Altura fixa para alinhar */
 }
 
 .logo-text {
     color: #2E7D32;
-    /* Um verde mais forte para o texto do logo */
     margin: 0;
     font-weight: bold;
     white-space: nowrap;
@@ -59,7 +52,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Se estiver colapsado, centraliza o botão na barra */
     margin-left: auto;
 }
 
@@ -67,7 +59,6 @@ body {
     margin: 0 auto;
 }
 
-/* Navegação */
 .sidebar-nav ul {
     list-style: none;
     padding: 0;
@@ -84,7 +75,6 @@ body {
     padding: 12px 15px;
     text-decoration: none;
     color: #666;
-    /* Cinza escuro para itens inativos */
     border-radius: 8px;
     transition: all 0.2s ease;
     white-space: nowrap;
@@ -93,20 +83,17 @@ body {
 
 .nav-item:hover {
     background-color: rgba(64, 137, 81, 0.1);
-    /* Um hover suave baseado na sua cor */
     color: #2E7D32;
 }
 
 .nav-item.active {
     background-color: rgba(64, 137, 81, 0.2);
-    /* Um pouco mais forte para o ativo */
     color: #1b5e20;
     font-weight: 600;
 }
 
 .nav-icon {
     min-width: 24px;
-    /* Garante que o ícone não encolha */
 }
 
 .nav-label {
@@ -115,7 +102,6 @@ body {
     transition: opacity 0.2s;
 }
 
-/* Esconde o texto quando colapsado */
 .sidebar.collapsed .nav-label,
 .sidebar.collapsed .logo-text {
     opacity: 0;
@@ -132,11 +118,120 @@ body {
     margin: 0;
 }
 
-/* --- ÁREA DE CONTEÚDO --- */
 .content-area {
     flex: 1;
-    /* Ocupa todo o espaço restante */
     padding: 30px;
     overflow-y: auto;
-    /* Permite scroll se o conteúdo for grande */
+}
+
+footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 20px;
+    padding-left: 3px;
+    padding-right: 3px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    color: #666;
+    overflow: hidden;
+}
+
+.footer-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: color 0.2s;
+    white-space: nowrap;
+    text-decoration: none;
+    color: inherit;
+}
+
+.footer-item:hover {
+    color: #2E7D32;
+}
+
+.footer-text {
+    font-size: 0.9rem;
+    opacity: 1;
+    transition: opacity 0.2s, width 0.2s;
+    font-size: 16px;
+}
+
+.profile-link .footer-text {
+    margin-left: 5px;
+}
+
+.logout-btn .footer-text {
+    margin-right: 5px;
+}
+
+.sidebar.collapsed .footer-text {
+    opacity: 0;
+    width: 0;
+    display: none;
+}
+
+.sidebar.collapsed footer {
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+    padding-bottom: 10px;
+}
+
+.sidebar.collapsed .footer-item {
+    justify-content: center;
+    width: 100%;
+}
+
+.sidebar.collapsed .logout-btn .footer-text {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar.expanded {
+        width: 65%;
+        max-width: 300px;
+        background-color: #ebf3ed;
+        box-shadow: 4px 0 50px rgba(0, 0, 0, 0.3);
+        border-right: 1px solid #ddd;
+    }
+
+    .content-area {
+        width: 100%;
+        margin-left: 20px;
+        margin-right: 10px;
+        padding-right: 0;
+    }
+    .sidebar.collapsed {
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+        width: auto;
+        height: auto;
+    }
+    .sidebar.collapsed .sidebar-header {
+        padding: 0;
+    }
+
+    .sidebar.collapsed .toggle-btn {
+        margin: 0;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 8px;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar.collapsed footer {
+        margin-top: 300px;
+    }
 }

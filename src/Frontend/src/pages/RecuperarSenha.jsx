@@ -13,11 +13,9 @@ function RecuperarSenha() {
     };
 
     return (
-        <div className="login-container"> {/* Usando container do login */}
-            <div className="login-card">      {/* Usando card do login */}
+        <div className="login-container"> 
+            <div className="login-card">
                 
-                {/* Lado Esquerdo */}
-                {/* Adicionei a classe 'recovery-side-text' para ajustar o tamanho da fonte */}
                 <div className="login-right recovery-side-text"> 
                     <div className="login-header">
                         <h2>Esqueceu a senha?</h2>
@@ -43,7 +41,6 @@ function RecuperarSenha() {
                     </form>
                 </div>
 
-                {/* Lado Direito */}
                 <div className="login-left">
                     <h2>Não se preocupe!</h2>
                     <p>Vamos recuperá-la.</p>

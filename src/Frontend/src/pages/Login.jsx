@@ -9,8 +9,7 @@ function Login() {
 
     const handleLogin = (e) => {
         e.preventDefault();
-        // Aqui entraria a lógica de autenticação (API)
-        // Por enquanto, apenas redireciona para o dashboard
+        // API
         navigate('/dashboard');
     };
 
@@ -18,10 +17,8 @@ function Login() {
         <div className="login-container">
             <div className="login-card">
 
-                {/* Lado Esquerdo - Decorativo */}
                 <div className="login-left">
                     <div className="login-logo-area">
-                        {/* Placeholder para a Logo do Sindicato */}
                         <div>
                             <img
                                 src={logo}
@@ -34,7 +31,6 @@ function Login() {
                     <p>Bom ter você como colaborador.</p>
                 </div>
 
-                {/* Lado Direito - Formulário */}
                 <div className="login-right">
                     <div className="login-header">
                         <h2>Acesse sua conta</h2>
@@ -62,7 +58,6 @@ function Login() {
                         </div>
 
                         <div className="forgot-password">
-                            {/* <a href="#">Esqueceu a senha?</a> */}
                             <Link to="/recuperar-senha">Esqueceu a senha?</Link>
                         </div>
 

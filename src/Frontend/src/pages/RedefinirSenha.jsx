@@ -8,8 +8,7 @@ function RedefinirSenha() {
 
     const handleLogin = (e) => {
         e.preventDefault();
-        // Aqui entraria a lógica de autenticação (API)
-        // Por enquanto, apenas redireciona para o dashboard
+        // API
         navigate('/');
     };
 
@@ -17,13 +16,11 @@ function RedefinirSenha() {
         <div className="login-container">
             <div className="login-card">
                 
-                {/* Lado Esquerdo - Decorativo */}
                 <div className="login-left">
                     <h2>Tudo ok!</h2>
                     <p>Você já pode definir sua nova senha.</p>
                 </div>
 
-                {/* Lado Direito - Formulário */}
                 <div className="login-right">
                     <div className="login-header">
                         <h2>Redefinir Senha</h2>

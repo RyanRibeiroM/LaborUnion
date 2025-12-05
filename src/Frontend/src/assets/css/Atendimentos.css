@@ -433,7 +433,7 @@
     padding: 15px 20px;
     background-color: #fafafa;
     border-radius: 8px;
-    border-left: 3px solid var(--color-primary);
+    border: 1px solid var(--color-primary);
 }
 
 /* Loading Styles */
@@ -715,25 +715,26 @@
         grid-template-columns: 1fr;
     }
 }
-    .pagination-container {
-        flex-wrap: wrap;
-        gap: 10px;
-        padding-top: 15px;
-    }
 
-    .pagination-btn {
-        padding: 10px 15px;
-        font-size: 0.85rem;
-    }
+.pagination-container {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 15px;
+}
 
-    .pagination-numbers {
-        order: 3;
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
+.pagination-btn {
+    padding: 10px 15px;
+    font-size: 0.85rem;
+}
 
-    .pagination-number {
-        width: 36px;
-        height: 36px;
-    }
+.pagination-numbers {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.pagination-number {
+    width: 36px;
+    height: 36px;
+}

@@ -217,7 +217,7 @@ footer {
         border: none;
         box-shadow: none;
         width: auto;
-        height: auto;
+        height: 100%;
     }
     .sidebar.collapsed .sidebar-header {
         padding: 0;
@@ -227,11 +227,7 @@ footer {
         margin: 0;
         background-color: rgba(255, 255, 255, 0.8);
         padding: 8px;
-        border-radius: 50%;
+        border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .sidebar.collapsed footer {
-        margin-top: 300px;
     }
 }

@@ -6,6 +6,7 @@ using LaborUnion.Infrastructe.Migrations;
 using LaborUnion.Infrastructure.Extensions;
 using Microsoft.OpenApi.Models;
 
+const string CORSSpecifcOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSwaggerGen(option =>
@@ -35,6 +36,17 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: CORSSpecifcOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins()
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -46,10 +58,18 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHealthChecks();
+
 builder.Services.AddJwtAuthentication(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
+
+app.MapHealthChecks("/health");
+app.UseCors(CORSSpecifcOrigins);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

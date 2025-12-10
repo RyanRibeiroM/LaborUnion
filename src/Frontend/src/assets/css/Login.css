@@ -1,0 +1,156 @@
+body {
+    margin: 0;
+}
+
+.login-container {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fdfdfd;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-card {
+    display: flex;
+    width: 900px;
+    height: 500px;
+    background-color: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.login-left {
+    flex: 0.45;
+    background-color: #98bf9b;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    text-align: center;
+    padding: 20px;
+}
+
+.login-left h2 {
+    font-size: 2rem;
+    margin-bottom: 0;
+    margin-top: 0;
+    font-weight: 700;
+}
+
+.login-left p {
+    font-size: 1rem;
+    margin-top: 0;
+    font-weight: 300;
+    opacity: 0.9;
+}
+
+.logo-img {
+    mix-blend-mode: multiply;
+    width: 95%;
+
+}
+
+.login-right {
+    flex: 0.55;
+    padding: 40px 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.login-header h2 {
+    color: #2E7D32;
+    font-size: 1.8rem;
+    margin-bottom: 0;
+}
+
+.subtitle {
+    color: #999;
+    font-size: 1.1rem;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 15px;
+    color: #888;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    border: none;
+    background-color: #e6e6e6;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    color: #555;
+    transition: background-color 0.2s;
+}
+
+.input-group input:focus {
+    background-color: #dcdcdc;
+}
+
+.forgot-password {
+    text-align: right;
+    font-size: 1rem;
+}
+
+.forgot-password a {
+    color: #408951;
+}
+
+/* Botão Entrar */
+.btn-login {
+    width: 200px;
+    align-self: center;
+    margin-top: 10px;
+    padding: 15px;
+    border: none;
+    background-color: #408951;
+    color: white;
+    font-weight: bold;
+    font-size: 1rem;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    box-shadow: 0 4px 6px rgba(64, 137, 81, 0.2);
+    letter-spacing: 1px;
+}
+
+.btn-login:hover {
+    background-color: #357a44;
+}
+
+.btn-recovery {
+    margin-top: 60px;
+}
+
+.form-ajust {
+    margin-top: 30px;
+}
+
+.recovery-side-text h2{
+    font-size: 1.9rem;
+}

@@ -1,0 +1,233 @@
+body {
+    margin: 0;
+}
+
+.main-layout {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    background-color: #f5f5f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sidebar {
+    background-color: #4089511A;
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s ease;
+    border-right: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 20px 10px;
+}
+
+.sidebar.expanded {
+    width: 250px;
+}
+
+.sidebar.collapsed {
+    width: 80px;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    padding: 0 10px;
+    height: 50px;
+}
+
+.logo-text {
+    color: #2E7D32;
+    margin: 0;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+
+.sidebar.collapsed .toggle-btn {
+    margin: 0 auto;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-nav li {
+    margin-bottom: 15px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: #666;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.nav-item:hover {
+    background-color: rgba(64, 137, 81, 0.1);
+    color: #2E7D32;
+}
+
+.nav-item.active {
+    background-color: rgba(64, 137, 81, 0.2);
+    color: #1b5e20;
+    font-weight: 600;
+}
+
+.nav-icon {
+    min-width: 24px;
+}
+
+.nav-label {
+    margin-left: 15px;
+    opacity: 1;
+    transition: opacity 0.2s;
+}
+
+.sidebar.collapsed .nav-label,
+.sidebar.collapsed .logo-text {
+    opacity: 0;
+    width: 0;
+    display: none;
+}
+
+.sidebar.collapsed .nav-item {
+    justify-content: center;
+    padding: 12px 0;
+}
+
+.sidebar.collapsed .nav-icon {
+    margin: 0;
+}
+
+.content-area {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}
+
+footer {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 20px;
+    padding-left: 3px;
+    padding-right: 3px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    color: #666;
+    overflow: hidden;
+}
+
+.footer-item {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: color 0.2s;
+    white-space: nowrap;
+    text-decoration: none;
+    color: inherit;
+}
+
+.footer-item:hover {
+    color: #2E7D32;
+}
+
+.footer-text {
+    font-size: 0.9rem;
+    opacity: 1;
+    transition: opacity 0.2s, width 0.2s;
+    font-size: 16px;
+}
+
+.profile-link .footer-text {
+    margin-left: 5px;
+}
+
+.logout-btn .footer-text {
+    margin-right: 5px;
+}
+
+.sidebar.collapsed .footer-text {
+    opacity: 0;
+    width: 0;
+    display: none;
+}
+
+.sidebar.collapsed footer {
+    flex-direction: column;
+    gap: 20px;
+    justify-content: center;
+    padding-bottom: 10px;
+}
+
+.sidebar.collapsed .footer-item {
+    justify-content: center;
+    width: 100%;
+}
+
+.sidebar.collapsed .logout-btn .footer-text {
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+
+    .sidebar.expanded {
+        width: 65%;
+        max-width: 300px;
+        background-color: #ebf3ed;
+        box-shadow: 4px 0 50px rgba(0, 0, 0, 0.3);
+        border-right: 1px solid #ddd;
+    }
+
+    .content-area {
+        width: 100%;
+        margin-left: 20px;
+        margin-right: 10px;
+        padding-right: 0;
+    }
+    .sidebar.collapsed {
+        background-color: transparent;
+        border: none;
+        box-shadow: none;
+        width: auto;
+        height: 100%;
+    }
+    .sidebar.collapsed .sidebar-header {
+        padding: 0;
+    }
+
+    .sidebar.collapsed .toggle-btn {
+        margin: 0;
+        background-color: rgba(255, 255, 255, 0.8);
+        padding: 8px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+}

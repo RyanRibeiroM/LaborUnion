@@ -28,6 +28,35 @@ namespace LaborUnion.Application.UseCases.Farmer
                 .NotEmpty()
                     .WithMessage(ResourceMessagesException.REGISTRATION_EMPTY);
 
+            When(farmer => !string.IsNullOrWhiteSpace(farmer.SpouseCpf), () =>
+            {
+                RuleFor(farmer => farmer.SpouseCpf)
+                .Must(CpfUtils.ValidCPF)
+                    .WithMessage(ResourceMessagesException.INVALID_SPOUSE_CPF)
+                .Must((request, spouseCpf) =>
+                {
+                    string farmerCpfClean = CpfUtils.Format(request.Cpf);
+                    string spouseCpfClean = CpfUtils.Format(request.SpouseCpf);
+
+                    return farmerCpfClean != spouseCpfClean;
+                })
+                .WithMessage(ResourceMessagesException.SPOUSE_CPF_EQUAL_TO_FARMER_CPF);
+            });
+
+            When(farmer => !string.IsNullOrWhiteSpace(farmer.SpouseName), () =>
+            {
+                RuleFor(farmer => farmer.SpouseName)
+                .Must(name => name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length >= 2)
+                    .WithMessage(ResourceMessagesException.INVALID_SPOUSE_NAME)
+                .Matches(TextOnlyRegex)
+                    .WithMessage(ResourceMessagesException.NAME_SPOUSE_WITH_SPECIAL_CHARACTERES)
+                .Must((request, spouseName) =>
+                {
+                    return !spouseName.Trim().Equals(request.Name.Trim(), StringComparison.CurrentCultureIgnoreCase);
+                })
+                    .WithMessage(ResourceMessagesException.SPOUSE_NAME_SAME_AS_FARMER);
+            });
+
             RuleFor(farmer => farmer.AddressNumber)
                 .NotEmpty()
                     .WithMessage(ResourceMessagesException.INVALID_ADDRESS_NUMBER);

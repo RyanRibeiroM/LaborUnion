@@ -19,7 +19,7 @@ namespace LaborUnion.Exceptions {
     // através de uma ferramenta como ResGen ou Visual Studio.
     // Para adicionar ou remover um associado, edite o arquivo .ResX e execute ResGen novamente
     // com a opção /str, ou recrie o projeto do VS.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "18.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class ResourceMessagesException {
@@ -223,11 +223,38 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O CPF do cônjuge está inválido..
+        /// </summary>
+        public static string INVALID_SPOUSE_CPF {
+            get {
+                return ResourceManager.GetString("INVALID_SPOUSE_CPF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O nome do cônjuge está inválido..
+        /// </summary>
+        public static string INVALID_SPOUSE_NAME {
+            get {
+                return ResourceManager.GetString("INVALID_SPOUSE_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a O nome é obrigatório..
         /// </summary>
         public static string NAME_EMPTY {
             get {
                 return ResourceManager.GetString("NAME_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O nome do cônjuge não pode ter caracteres especiais..
+        /// </summary>
+        public static string NAME_SPOUSE_WITH_SPECIAL_CHARACTERES {
+            get {
+                return ResourceManager.GetString("NAME_SPOUSE_WITH_SPECIAL_CHARACTERES", resourceCulture);
             }
         }
         
@@ -309,6 +336,33 @@ namespace LaborUnion.Exceptions {
         public static string REGISTRATION_EMPTY {
             get {
                 return ResourceManager.GetString("REGISTRATION_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O CPF do cônjuge fornecido já está vinculado a outro agricultor..
+        /// </summary>
+        public static string SPOUSE_CPF_ALREADY_LINKED_TO_A_FARMER {
+            get {
+                return ResourceManager.GetString("SPOUSE_CPF_ALREADY_LINKED_TO_A_FARMER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O CPF do cônjuge não pode ser igual ao CPF do agricultor..
+        /// </summary>
+        public static string SPOUSE_CPF_EQUAL_TO_FARMER_CPF {
+            get {
+                return ResourceManager.GetString("SPOUSE_CPF_EQUAL_TO_FARMER_CPF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O nome do cônjuge não pode ser igual ao nome do agricultor..
+        /// </summary>
+        public static string SPOUSE_NAME_SAME_AS_FARMER {
+            get {
+                return ResourceManager.GetString("SPOUSE_NAME_SAME_AS_FARMER", resourceCulture);
             }
         }
         

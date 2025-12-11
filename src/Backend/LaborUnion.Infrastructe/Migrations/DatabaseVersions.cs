@@ -2,6 +2,7 @@
 {
     public abstract class DataBaseVersions
     {
-        public const int TABLE_USER = 1;
+        public const int TABLE_USER_AND_FARMER = 1;
+        public const int SPOUSE_AND_IS_ALIVE_COLUMNS_IN_THE_FARMER_TABLE = 2;
     }
 }

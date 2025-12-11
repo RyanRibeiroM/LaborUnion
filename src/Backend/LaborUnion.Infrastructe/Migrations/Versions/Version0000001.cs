@@ -5,7 +5,7 @@ using LaborUnion.Infrastructure.Migrations.Versions;
 
 namespace GymManager.Infrastructure.Migrations.Versions
 {
-    [Migration(DataBaseVersions.TABLE_USER, "Create Students Table and User Table")]
+    [Migration(DataBaseVersions.TABLE_USER_AND_FARMER, "Create User Table and Farmer Table")]
     public class Version0000001 : VersionBase
     {
         public override void Up()

@@ -33,6 +33,12 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
                 .AsNoTracking()
                 .AnyAsync(f => f.Email.Equals(email) && f.Active);
         }
+        public async Task<bool> ExistActiveFarmerWithSpouseCpf(string spouseCpf)
+        {
+            return await _dbContext.Farmers
+                .AsNoTracking()
+                .AnyAsync(f => f.SpouseCpf != null && f.SpouseCpf.Equals(spouseCpf) && f.Active);   
+        }
 
         public async Task<Farmer?> GetById(int id)
         {

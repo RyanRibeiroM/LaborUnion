@@ -171,8 +171,17 @@
   <data name="INVALID_PHONE_NUMBER" xml:space="preserve">
     <value>O número de telefone é inválido.</value>
   </data>
+  <data name="INVALID_SPOUSE_CPF" xml:space="preserve">
+    <value>O CPF do cônjuge está inválido.</value>
+  </data>
+  <data name="INVALID_SPOUSE_NAME" xml:space="preserve">
+    <value>O nome do cônjuge está inválido.</value>
+  </data>
   <data name="NAME_EMPTY" xml:space="preserve">
     <value>O nome é obrigatório.</value>
+  </data>
+  <data name="NAME_SPOUSE_WITH_SPECIAL_CHARACTERES" xml:space="preserve">
+    <value>O nome do cônjuge não pode ter caracteres especiais.</value>
   </data>
   <data name="NAME_WITH_SPECIAL_CHARACTERS" xml:space="preserve">
     <value>O nome não pode ter caracteres especiais.</value>
@@ -200,6 +209,15 @@
   </data>
   <data name="REGISTRATION_EMPTY" xml:space="preserve">
     <value>A matrícula é obrigatória.</value>
+  </data>
+  <data name="SPOUSE_CPF_ALREADY_LINKED_TO_A_FARMER" xml:space="preserve">
+    <value>O CPF do cônjuge fornecido já está vinculado a outro agricultor.</value>
+  </data>
+  <data name="SPOUSE_CPF_EQUAL_TO_FARMER_CPF" xml:space="preserve">
+    <value>O CPF do cônjuge não pode ser igual ao CPF do agricultor.</value>
+  </data>
+  <data name="SPOUSE_NAME_SAME_AS_FARMER" xml:space="preserve">
+    <value>O nome do cônjuge não pode ser igual ao nome do agricultor.</value>
   </data>
   <data name="UNAUTHORIZED_ACCESS" xml:space="preserve">
     <value>Acesso não autorizado.</value>

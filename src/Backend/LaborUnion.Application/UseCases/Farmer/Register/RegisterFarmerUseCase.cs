@@ -47,6 +47,11 @@ namespace LaborUnion.Application.UseCases.Farmer.Register
             farmer.AddressUf = UfUtils.Format(request.AddressUf);
             farmer.RegisteredBy = adminUser.Id;
 
+            if (!string.IsNullOrWhiteSpace(request.SpouseCpf))
+            {
+                farmer.SpouseCpf = CpfUtils.Format(request.SpouseCpf);
+            }
+
             if (!string.IsNullOrWhiteSpace(request.Phone))
             {
                 farmer.Phone = PhoneUtils.Format(request.Phone);
@@ -87,6 +92,13 @@ namespace LaborUnion.Application.UseCases.Farmer.Register
                 {
                     result.Errors.Add(new FluentValidation.Results.ValidationFailure(nameof(request.Email), ResourceMessagesException.EMAIL_ALREADY_EXISTS));
                 }
+            }
+
+            var cleanSpouseCpf = CpfUtils.Format(request.SpouseCpf);
+            var spouseCpfExists = await _farmerReadOnlyRepository.ExistActiveFarmerWithSpouseCpf(cleanSpouseCpf);
+            if (spouseCpfExists)
+            {
+                result.Errors.Add(new FluentValidation.Results.ValidationFailure(nameof(request.SpouseCpf), ResourceMessagesException.SPOUSE_CPF_ALREADY_LINKED_TO_A_FARMER));
             }
 
             if (!result.IsValid)

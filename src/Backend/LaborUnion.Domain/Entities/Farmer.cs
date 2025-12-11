@@ -7,6 +7,9 @@
         public string Cpf { get; set; } = string.Empty;
         public string Registration { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
+        public string? SpouseName { get; set; }
+        public string? SpouseCpf { get; set; }
+        public bool IsAlive { get; set; } = true;
         public string AddressNumber { get; set; } = string.Empty;
         public string AddressNeighborhood { get; set; } = string.Empty;
         public string AddressCity { get; set; } = string.Empty;

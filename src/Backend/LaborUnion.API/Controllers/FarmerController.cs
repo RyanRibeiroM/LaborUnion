@@ -1,5 +1,6 @@
 ﻿using LaborUnion.Application.UseCases.Farmer.Filter;
 using LaborUnion.Application.UseCases.Farmer.Register;
+using LaborUnion.Application.UseCases.Farmer.Update;
 using LaborUnion.Communication.Requests;
 using LaborUnion.Communication.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -37,6 +38,22 @@ namespace LaborUnion.API.Controllers
             {
                 return Ok(response);
             }
+
+            return NoContent();
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Update(
+            [FromServices] IUpdateFarmerUseCase useCase,
+            [FromRoute] int id,
+            [FromBody] RequestRegisterFarmerJson request
+            )
+        {
+            await useCase.Execute(id, request);
 
             return NoContent();
         }

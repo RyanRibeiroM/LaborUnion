@@ -135,6 +135,9 @@
   <data name="CPF_NOT_EXIST" xml:space="preserve">
     <value>Não foi possível encontrar um usuário com esse CPF.</value>
   </data>
+  <data name="SPOUSE_CPF_REQUIRED" xml:space="preserve">
+    <value>O CPF do cônjuge é obrigatório quando o nome do cônjuge é informado.</value>
+  </data>
   <data name="EMAIL_ALREADY_EXISTS" xml:space="preserve">
     <value>O Email informado já está em uso.</value>
   </data>
@@ -143,6 +146,9 @@
   </data>
   <data name="EMAIL_INVALID" xml:space="preserve">
     <value>O e-mail informado não é válido.</value>
+  </data>
+  <data name="FARMER_NOT_FOUND" xml:space="preserve">
+    <value>Agricultor não encontrado.</value>
   </data>
   <data name="INVALID_ADDRESS_CEP" xml:space="preserve">
     <value>O CEP do endereço é inválido.</value>
@@ -224,5 +230,8 @@
   </data>
   <data name="UNKNOWN_ERROR" xml:space="preserve">
     <value>Erro desconhecido.</value>
+  </data>
+  <data name="SPOUSE_NAME_REQUIRED" xml:space="preserve">
+    <value>O nome do cônjuge é obrigatório quando o CPF do cônjuge é informado.</value>
   </data>
 </root>

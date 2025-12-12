@@ -30,6 +30,10 @@ namespace LaborUnion.Application.UseCases.Farmer
 
             When(farmer => !string.IsNullOrWhiteSpace(farmer.SpouseCpf), () =>
             {
+                RuleFor(farmer => farmer.SpouseName)
+                    .NotEmpty()
+                    .WithMessage(ResourceMessagesException.SPOUSE_NAME_REQUIRED);
+
                 RuleFor(farmer => farmer.SpouseCpf)
                 .Must(CpfUtils.ValidCPF)
                     .WithMessage(ResourceMessagesException.INVALID_SPOUSE_CPF)
@@ -45,6 +49,10 @@ namespace LaborUnion.Application.UseCases.Farmer
 
             When(farmer => !string.IsNullOrWhiteSpace(farmer.SpouseName), () =>
             {
+                RuleFor(farmer => farmer.SpouseCpf)
+                    .NotEmpty()
+                    .WithMessage(ResourceMessagesException.SPOUSE_CPF_REQUIRED);
+
                 RuleFor(farmer => farmer.SpouseName)
                 .Must(name => name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length >= 2)
                     .WithMessage(ResourceMessagesException.INVALID_SPOUSE_NAME)

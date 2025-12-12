@@ -80,6 +80,16 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
                 query = query.Where(f => f.AddressCity.Contains(filters.AddressCity));
             }
 
+            if (!string.IsNullOrEmpty(filters.SpouseName))
+            {
+                query = query.Where(f => f.SpouseName != null && f.SpouseName.Contains(filters.SpouseName));
+            }
+
+            if (filters.IsAlive.HasValue)
+            {
+                query = query.Where(f => f.IsAlive == filters.IsAlive.Value);
+            }
+
             return await query.OrderBy(f => f.Name).ToListAsync();
         }
 

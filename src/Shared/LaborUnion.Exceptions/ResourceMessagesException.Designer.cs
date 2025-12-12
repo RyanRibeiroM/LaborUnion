@@ -142,6 +142,15 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Agricultor não encontrado..
+        /// </summary>
+        public static string FARMER_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("FARMER_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a O CEP do endereço é inválido..
         /// </summary>
         public static string INVALID_ADDRESS_CEP {
@@ -354,6 +363,24 @@ namespace LaborUnion.Exceptions {
         public static string SPOUSE_CPF_EQUAL_TO_FARMER_CPF {
             get {
                 return ResourceManager.GetString("SPOUSE_CPF_EQUAL_TO_FARMER_CPF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O CPF do cônjuge é obrigatório quando o nome do cônjuge é informado..
+        /// </summary>
+        public static string SPOUSE_CPF_REQUIRED {
+            get {
+                return ResourceManager.GetString("SPOUSE_CPF_REQUIRED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O nome do cônjuge é obrigatório quando o CPF do cônjuge é informado..
+        /// </summary>
+        public static string SPOUSE_NAME_REQUIRED {
+            get {
+                return ResourceManager.GetString("SPOUSE_NAME_REQUIRED", resourceCulture);
             }
         }
         

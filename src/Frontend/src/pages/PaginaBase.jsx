@@ -10,9 +10,12 @@ import {
     LogOut, CircleUser
 } from 'lucide-react';
 import '../assets/css/PaginaBase.css';
+import ModalConfirmacao from '../components/ModalConfirmacao';
 
 function PaginaBase() {
     const [isExpanded, setIsExpanded] = useState(true);
+
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const navigate = useNavigate();
 
@@ -20,12 +23,13 @@ function PaginaBase() {
         setIsExpanded(!isExpanded);
     };
 
-    const handleLogout = () => {
-        const confirmacao = window.confirm("Deseja realmente sair e desconectar sua conta?");
-        
-        if (confirmacao) {
-            navigate('/');
-        }
+    const handleLogoutClick = () => {
+        setShowLogoutModal(true);
+    };
+
+    const confirmLogout = () => {
+        setShowLogoutModal(false);
+        navigate('/');
     };
 
     const menuItems = [
@@ -72,7 +76,7 @@ function PaginaBase() {
                         <span className="footer-text">Perfil</span>
                     </Link>
 
-                    <div onClick={handleLogout} className="footer-item logout-btn">
+                    <div onClick={handleLogoutClick} className="footer-item logout-btn">
                         <span className="footer-text">Sair</span>
                         <LogOut size={24} />
                     </div>
@@ -82,6 +86,16 @@ function PaginaBase() {
             <main className="content-area">
                 <Outlet />
             </main>
+
+            <ModalConfirmacao 
+                isOpen={showLogoutModal}
+                onCancel={() => setShowLogoutModal(false)}
+                onConfirm={confirmLogout}
+                title="Desconectar Conta"
+                message="Deseja realmente sair e desconectar sua conta do sistema?"
+                confirmText="Sair"
+                tipo="logout"
+            />
         </div>
     );
 }

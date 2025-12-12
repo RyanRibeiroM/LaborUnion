@@ -2,6 +2,7 @@
 import { useLocation } from 'react-router-dom';
 import { Edit, Trash2, Eye, Save, Eraser, Loader2, X, ArrowLeft, CheckCircle, AlertCircle, AlertTriangle } from 'lucide-react';
 import '../assets/css/Agricultores.css';
+import ModalConfirmacao from '../components/ModalConfirmacao';
 
 const Agricultores = () => {
     const location = useLocation();
@@ -1256,24 +1257,15 @@ const Agricultores = () => {
                 </div>
 
                 {/* Modal de Exclusão */}
-                {showDeleteModal && (
-                    <div className="modal-overlay">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h3 className="modal-title">Confirmar Exclusão</h3>
-                            </div>
-                            <div className="modal-body">
-                                <p>Tem certeza que deseja excluir este agricultor? Esta ação não pode ser desfeita.</p>
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn-modal-cancel" onClick={cancelDelete}>Cancelar</button>
-                                <button className="btn-modal-delete" onClick={confirmDelete}>
-                                    <Trash2 size={18} /> Excluir
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                <ModalConfirmacao 
+                isOpen={showDeleteModal}
+                onCancel={cancelDelete}
+                onConfirm={confirmDelete}
+                title="Confirmar Exclusão"
+                message="Tem certeza que deseja excluir este agricultor? Esta ação não pode ser desfeita."
+                confirmText="Excluir"
+                tipo="delete"
+                />
             </div>
         </>
     );

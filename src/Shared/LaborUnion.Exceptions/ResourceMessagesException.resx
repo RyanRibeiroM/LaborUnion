@@ -234,4 +234,13 @@
   <data name="SPOUSE_NAME_REQUIRED" xml:space="preserve">
     <value>O nome do cônjuge é obrigatório quando o CPF do cônjuge é informado.</value>
   </data>
+  <data name="BIRTH_DATE_EMPTY" xml:space="preserve">
+    <value>A data de nascimento é obrigatória.</value>
+  </data>
+  <data name="INVALID_BIRTH_DATE" xml:space="preserve">
+    <value>A data de nascimento não pode estar no futuro.</value>
+  </data>
+  <data name="UNDERAGE_FARMER" xml:space="preserve">
+    <value>O agricultor deve ser maior de idade (18 anos).</value>
+  </data>
 </root>

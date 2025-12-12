@@ -70,6 +70,15 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a A data de nascimento é obrigatória..
+        /// </summary>
+        public static string BIRTH_DATE_EMPTY {
+            get {
+                return ResourceManager.GetString("BIRTH_DATE_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a O CPF informado já está em uso..
         /// </summary>
         public static string CPF_ALREADY_EXISTS {
@@ -192,6 +201,15 @@ namespace LaborUnion.Exceptions {
         public static string INVALID_ADDRESS_UF {
             get {
                 return ResourceManager.GetString("INVALID_ADDRESS_UF", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a A data de nascimento não pode estar no futuro..
+        /// </summary>
+        public static string INVALID_BIRTH_DATE {
+            get {
+                return ResourceManager.GetString("INVALID_BIRTH_DATE", resourceCulture);
             }
         }
         
@@ -399,6 +417,15 @@ namespace LaborUnion.Exceptions {
         public static string UNAUTHORIZED_ACCESS {
             get {
                 return ResourceManager.GetString("UNAUTHORIZED_ACCESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O agricultor deve ser maior de idade (18 anos)..
+        /// </summary>
+        public static string UNDERAGE_FARMER {
+            get {
+                return ResourceManager.GetString("UNDERAGE_FARMER", resourceCulture);
             }
         }
         

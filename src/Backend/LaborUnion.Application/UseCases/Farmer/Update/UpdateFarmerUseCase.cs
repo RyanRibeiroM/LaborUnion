@@ -47,6 +47,7 @@ namespace LaborUnion.Application.UseCases.Farmer.Update
             farmer.Cpf = CpfUtils.Format(request.Cpf);
             farmer.Registration = request.Registration;
             farmer.SpouseName = request.SpouseName;
+            farmer.BirthDate = request.BirthDate;
             farmer.IsAlive = request.IsAlive;
             farmer.AddressNumber = request.AddressNumber;
             farmer.AddressNeighborhood = request.AddressNeighborhood;

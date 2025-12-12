@@ -9,6 +9,7 @@
         public string Phone { get; set; } = string.Empty;
         public string SpouseName { get; set; } = string.Empty;
         public string SpouseCpf { get; set; } = string.Empty;
+        public DateOnly BirthDate { get; set; }
         public bool IsAlive { get; set; } = true;
         public string AddressNumber { get; set; } = string.Empty;
         public string AddressNeighborhood { get; set; } = string.Empty;

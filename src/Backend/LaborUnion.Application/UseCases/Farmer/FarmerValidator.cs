@@ -65,6 +65,14 @@ namespace LaborUnion.Application.UseCases.Farmer
                     .WithMessage(ResourceMessagesException.SPOUSE_NAME_SAME_AS_FARMER);
             });
 
+            RuleFor(farmer => farmer.BirthDate)
+                .NotEmpty()
+                    .WithMessage(ResourceMessagesException.BIRTH_DATE_EMPTY)
+                .LessThanOrEqualTo(DateOnly.FromDateTime(DateTime.Today))
+                    .WithMessage(ResourceMessagesException.INVALID_BIRTH_DATE)
+                .Must(date => date <= DateOnly.FromDateTime(DateTime.Today).AddYears(-18))
+                    .WithMessage(ResourceMessagesException.UNDERAGE_FARMER);
+
             RuleFor(farmer => farmer.AddressNumber)
                 .NotEmpty()
                     .WithMessage(ResourceMessagesException.INVALID_ADDRESS_NUMBER);

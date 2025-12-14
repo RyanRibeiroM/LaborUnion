@@ -8,6 +8,7 @@ namespace LaborUnion.Infrastructe.DataAccess
         public LaborUnionDbContext(DbContextOptions<LaborUnionDbContext> options) : base(options) { }
         public DbSet<User> Users { get; set; }
         public DbSet<Farmer> Farmers { get; set; }
+        public DbSet<ServiceType> ServicesTypes { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

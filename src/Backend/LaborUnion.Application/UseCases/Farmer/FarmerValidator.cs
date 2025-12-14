@@ -35,12 +35,12 @@ namespace LaborUnion.Application.UseCases.Farmer
                     .WithMessage(ResourceMessagesException.SPOUSE_NAME_REQUIRED);
 
                 RuleFor(farmer => farmer.SpouseCpf)
-                .Must(CpfUtils.ValidCPF)
+                .Must(CpfUtils.ValidCPF!)
                     .WithMessage(ResourceMessagesException.INVALID_SPOUSE_CPF)
                 .Must((request, spouseCpf) =>
                 {
                     string farmerCpfClean = CpfUtils.Format(request.Cpf);
-                    string spouseCpfClean = CpfUtils.Format(request.SpouseCpf);
+                    string spouseCpfClean = CpfUtils.Format(request.SpouseCpf!);
 
                     return farmerCpfClean != spouseCpfClean;
                 })
@@ -54,7 +54,7 @@ namespace LaborUnion.Application.UseCases.Farmer
                     .WithMessage(ResourceMessagesException.SPOUSE_CPF_REQUIRED);
 
                 RuleFor(farmer => farmer.SpouseName)
-                .Must(name => name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length >= 2)
+                .Must(name => name!.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length >= 2)
                     .WithMessage(ResourceMessagesException.INVALID_SPOUSE_NAME)
                 .Matches(TextOnlyRegex)
                     .WithMessage(ResourceMessagesException.NAME_SPOUSE_WITH_SPECIAL_CHARACTERES)

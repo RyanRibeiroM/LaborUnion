@@ -12,12 +12,9 @@ namespace LaborUnion.Application.UseCases.Farmer.Update
     public class UpdateFarmerUseCase : IUpdateFarmerUseCase
     {
         private readonly IFarmerReadOnlyRepository _farmerReadOnlyRepository;
-        private readonly IFarmerWriteOnlyRepository _farmerWriteOnlyRepository;
         private readonly IFarmerUpdateOnlyRepository _farmerUpdateOnlyRepository;
         private readonly IUserReadOnlyRepository _userReadOnlyRepository;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IMapper _mapper;
-        private readonly ILoggedUser _loggedUser;
         public UpdateFarmerUseCase(
             IFarmerReadOnlyRepository farmerReadOnlyRepository,
             IFarmerWriteOnlyRepository farmerWriteOnlyRepository,
@@ -28,12 +25,9 @@ namespace LaborUnion.Application.UseCases.Farmer.Update
             ILoggedUser loggedUser)
         {
             _farmerReadOnlyRepository = farmerReadOnlyRepository;
-            _farmerWriteOnlyRepository = farmerWriteOnlyRepository;
             _farmerUpdateOnlyRepository = farmerUpdateOnlyRepository;
             _userReadOnlyRepository = userReadOnlyRepository;
             _unitOfWork = unitOfWork;
-            _mapper = mapper;
-            _loggedUser = loggedUser;
         }
 
         public async Task Execute(int id, RequestRegisterFarmerJson request)

@@ -2,6 +2,6 @@
 {
     public class ResponseFarmersJson
     {
-        public IList<ResponseRegisteredFarmerJson> Farmers { get; set; } = [];
+        public IList<ResponseFarmerShortJson> Farmers { get; set; } = [];
     }
 }

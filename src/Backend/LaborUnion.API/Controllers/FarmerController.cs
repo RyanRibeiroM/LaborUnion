@@ -1,4 +1,6 @@
-﻿using LaborUnion.Application.UseCases.Farmer.Filter;
+﻿using LaborUnion.Application.UseCases.Farmer.Delete;
+using LaborUnion.Application.UseCases.Farmer.Filter;
+using LaborUnion.Application.UseCases.Farmer.GetById;
 using LaborUnion.Application.UseCases.Farmer.Register;
 using LaborUnion.Application.UseCases.Farmer.Update;
 using LaborUnion.Communication.Requests;
@@ -22,6 +24,20 @@ namespace LaborUnion.API.Controllers
             var response = await useCase.Execute(request);
 
             return Created(string.Empty, response);
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        [ProducesResponseType(typeof(ResponseFarmerJson), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> GetById(
+            [FromServices] IGetFarmerByIdUseCase useCase,
+            [FromRoute] int id)
+        {
+            var response = await useCase.Execute(id);
+
+            return Ok(response);
         }
 
         [HttpPost("filter")]
@@ -54,6 +70,20 @@ namespace LaborUnion.API.Controllers
             )
         {
             await useCase.Execute(id, request);
+
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Delete(
+            [FromServices] IDeleteFarmerUseCase useCase,
+            [FromRoute] int id)
+        {
+            await useCase.Execute(id);
 
             return NoContent();
         }

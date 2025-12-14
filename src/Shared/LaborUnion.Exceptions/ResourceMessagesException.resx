@@ -243,4 +243,10 @@
   <data name="UNDERAGE_FARMER" xml:space="preserve">
     <value>O agricultor deve ser maior de idade (18 anos).</value>
   </data>
+  <data name="NAME_TYPE_SERVICE_ALREADY_REGISTERED" xml:space="preserve">
+    <value>O nome do tipo de serviço já existe.</value>
+  </data>
+  <data name="SERVICE_TYPE_NOT_FOUND" xml:space="preserve">
+    <value>Tipo de serviço não encontrado.</value>
+  </data>
 </root>

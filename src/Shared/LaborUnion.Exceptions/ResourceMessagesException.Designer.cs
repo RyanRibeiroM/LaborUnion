@@ -286,6 +286,15 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O nome do tipo de serviço já existe..
+        /// </summary>
+        public static string NAME_TYPE_SERVICE_ALREADY_REGISTERED {
+            get {
+                return ResourceManager.GetString("NAME_TYPE_SERVICE_ALREADY_REGISTERED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a O nome não pode ter caracteres especiais..
         /// </summary>
         public static string NAME_WITH_SPECIAL_CHARACTERS {
@@ -363,6 +372,15 @@ namespace LaborUnion.Exceptions {
         public static string REGISTRATION_EMPTY {
             get {
                 return ResourceManager.GetString("REGISTRATION_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Tipo de serviço não encontrado..
+        /// </summary>
+        public static string SERVICE_TYPE_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("SERVICE_TYPE_NOT_FOUND", resourceCulture);
             }
         }
         

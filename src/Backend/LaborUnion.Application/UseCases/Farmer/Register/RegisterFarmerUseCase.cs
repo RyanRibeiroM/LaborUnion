@@ -94,11 +94,13 @@ namespace LaborUnion.Application.UseCases.Farmer.Register
                 }
             }
 
-            var cleanSpouseCpf = CpfUtils.Format(request.SpouseCpf);
-            var spouseCpfExists = await _farmerReadOnlyRepository.ExistActiveFarmerWithSpouseCpf(cleanSpouseCpf);
-            if (spouseCpfExists)
-            {
-                result.Errors.Add(new FluentValidation.Results.ValidationFailure(nameof(request.SpouseCpf), ResourceMessagesException.SPOUSE_CPF_ALREADY_LINKED_TO_A_FARMER));
+            if (!string.IsNullOrWhiteSpace(request.SpouseCpf)) { 
+                var cleanSpouseCpf = CpfUtils.Format(request.SpouseCpf);
+                var spouseCpfExists = await _farmerReadOnlyRepository.ExistActiveFarmerWithSpouseCpf(cleanSpouseCpf);
+                if (spouseCpfExists)
+                {
+                    result.Errors.Add(new FluentValidation.Results.ValidationFailure(nameof(request.SpouseCpf), ResourceMessagesException.SPOUSE_CPF_ALREADY_LINKED_TO_A_FARMER));
+                } 
             }
 
             if (!result.IsValid)

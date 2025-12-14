@@ -31,7 +31,7 @@ namespace LaborUnion.Application.UseCases.Farmer.Filter
 
             return new ResponseFarmersJson
             {
-                Farmers = _mapper.Map<IList<ResponseRegisteredFarmerJson>>(farmers)
+                Farmers = _mapper.Map<IList<ResponseFarmerShortJson>>(farmers)
             };
         }
     }

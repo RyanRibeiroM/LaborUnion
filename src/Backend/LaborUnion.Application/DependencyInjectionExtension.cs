@@ -1,8 +1,12 @@
 ﻿using LaborUnion.Application.Services.Mapper;
+using LaborUnion.Application.UseCases.Farmer.Delete;
 using LaborUnion.Application.UseCases.Farmer.Filter;
+using LaborUnion.Application.UseCases.Farmer.GetById;
 using LaborUnion.Application.UseCases.Farmer.Register;
 using LaborUnion.Application.UseCases.Farmer.Update;
 using LaborUnion.Application.UseCases.Login.DoLogin;
+using LaborUnion.Application.UseCases.ServiceType.Register;
+using LaborUnion.Application.UseCases.ServiceType.Resgister;
 using LaborUnion.Application.UseCases.User.Register;
 using Microsoft.Extensions.DependencyInjection;
 namespace LaborUnion.Application
@@ -22,10 +26,17 @@ namespace LaborUnion.Application
         private static void AddUseCases(IServiceCollection services)
         {
             services.AddScoped<IDoLoginUseCase, DoLoginUseCase>();
+
             services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
+
             services.AddScoped<IRegisterFarmerUseCase, RegisterFarmerUseCase>();
             services.AddScoped<IUpdateFarmerUseCase, UpdateFarmerUseCase>();
             services.AddScoped<IFilterFarmerUseCase, FilterFarmerUseCase>();
+            services.AddScoped<IDeleteFarmerUseCase, DeleteFarmerUseCase>();
+            services.AddScoped<IGetFarmerByIdUseCase, GetFarmerByIdUseCase>();
+
+            services.AddScoped<IRegisterServiceTypeUseCase, RegisterServiceTypeUseCase>();
+            
         }
     }
 }

@@ -2,17 +2,19 @@
 using LaborUnion.Domain.Repositories;
 using LaborUnion.Domain.Repositories.Farmer;
 using LaborUnion.Domain.Repositories.ServiceType;
+using LaborUnion.Domain.Repositories.Token;
 using LaborUnion.Domain.Repositories.User;
 using LaborUnion.Domain.Security.Criptography;
 using LaborUnion.Domain.Security.Tokens;
 using LaborUnion.Domain.Services.LoggedUser;
 using LaborUnion.Infrastructe.DataAccess;
 using LaborUnion.Infrastructe.DataAccess.Repositories;
+using LaborUnion.Infrastructe.Security.Tokens.Access.Generator;
+using LaborUnion.Infrastructe.Security.Tokens.Refresh;
 using LaborUnion.Infrastructure.DataAccess;
 using LaborUnion.Infrastructure.DataAccess.Repositories;
 using LaborUnion.Infrastructure.Extensions;
 using LaborUnion.Infrastructure.Security.Criptography;
-using LaborUnion.Infrastructure.Security.Tokens;
 using LaborUnion.Infrastructure.Services.LoggedUser;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -54,14 +56,20 @@ namespace LaborUnion.Infrastructe
         public static void AddRepositories(IServiceCollection services)
         {
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             services.AddScoped<IUserReadOnlyRepository, UserRepository>();
+
             services.AddScoped<IUserWriteOnlyRepository, UserRepository>();
             services.AddScoped<IFarmerReadOnlyRepository, FarmerRepository>();
             services.AddScoped<IFarmerWriteOnlyRepository, FarmerRepository>();
             services.AddScoped<IFarmerUpdateOnlyRepository, FarmerRepository>();
+
             services.AddScoped<IServiceTypeReadOnlyRepository, ServiceTypeRepository>();
             services.AddScoped<IServiceTypeWriteOnlyRepository, ServiceTypeRepository>();
             services.AddScoped<IServiceTypeUpdateOnlyRepository, ServiceTypeRepository>();
+
+            services.AddScoped<ITokenRepository, TokenRepository>();
+            services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
         }
 
         private static void AddPasswordEncript(IServiceCollection services)

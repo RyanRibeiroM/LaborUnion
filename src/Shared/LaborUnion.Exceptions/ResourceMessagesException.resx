@@ -249,4 +249,7 @@
   <data name="SERVICE_TYPE_NOT_FOUND" xml:space="preserve">
     <value>Tipo de serviço não encontrado.</value>
   </data>
+  <data name="USER_NOT_FOUND" xml:space="preserve">
+    <value>O usuário não foi encontrado.</value>
+  </data>
 </root>

@@ -1,7 +1,7 @@
 ﻿using LaborUnion.Domain.Security.Tokens;
 using System.Security.Cryptography;
 
-namespace LaborUnion.Infrastructure.Security.Tokens
+namespace LaborUnion.Infrastructe.Security.Tokens.Access.Generator
 {
     public class ActivationTokenGenerator : IActivationTokenGenerator
     {

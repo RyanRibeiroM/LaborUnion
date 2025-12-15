@@ -5,7 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace LaborUnion.Infrastructure.Security.Tokens
+namespace LaborUnion.Infrastructe.Security.Tokens.Access.Generator
 {
     public class JwtTokenGenerator : IAccessTokenGenerate
     {

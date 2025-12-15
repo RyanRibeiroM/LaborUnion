@@ -9,6 +9,7 @@ namespace LaborUnion.Infrastructe.DataAccess
         public DbSet<User> Users { get; set; }
         public DbSet<Farmer> Farmers { get; set; }
         public DbSet<ServiceType> ServicesTypes { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

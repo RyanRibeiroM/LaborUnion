@@ -5,6 +5,8 @@ using LaborUnion.Application.UseCases.Farmer.GetById;
 using LaborUnion.Application.UseCases.Farmer.Register;
 using LaborUnion.Application.UseCases.Farmer.Update;
 using LaborUnion.Application.UseCases.Login.DoLogin;
+using LaborUnion.Application.UseCases.ServiceType.Delete;
+using LaborUnion.Application.UseCases.ServiceType.Filter;
 using LaborUnion.Application.UseCases.ServiceType.GetById;
 using LaborUnion.Application.UseCases.ServiceType.Register;
 using LaborUnion.Application.UseCases.ServiceType.Resgister;
@@ -38,6 +40,8 @@ namespace LaborUnion.Application
 
             services.AddScoped<IRegisterServiceTypeUseCase, RegisterServiceTypeUseCase>();
             services.AddScoped<IGetServiceTypeByIdUseCase, GetServiceTypeByIdUseCase>();
+            services.AddScoped<IFilterServiceTypeUseCase, FilterServiceTypeUseCase>();
+            services.AddScoped<IDeleteServiceTypeUseCase, DeleteServiceTypeUseCase>();
             
         }
     }

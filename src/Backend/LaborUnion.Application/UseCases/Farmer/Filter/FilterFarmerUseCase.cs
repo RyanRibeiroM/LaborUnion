@@ -24,7 +24,8 @@ namespace LaborUnion.Application.UseCases.Farmer.Filter
                 Name = request.Name,
                 Cpf = request.Cpf,
                 Registration = request.Registration,
-                AddressCity = request.AddressCity
+                AddressCity = request.AddressCity,
+                IsAlive = request.IsAlive
             };
 
             var farmers = await _repository.Filter(filters);

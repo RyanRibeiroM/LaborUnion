@@ -1,4 +1,5 @@
 ﻿using LaborUnion.Application.UseCases.ServiceType.Delete;
+using LaborUnion.Application.UseCases.ServiceType.Filter;
 using LaborUnion.Application.UseCases.ServiceType.GetById;
 using LaborUnion.Application.UseCases.ServiceType.Resgister;
 using LaborUnion.Communication.Requests;
@@ -48,6 +49,24 @@ namespace LaborUnion.API.Controllers
             [FromRoute] int id)
         {
             await useCase.Execute(id);
+
+            return NoContent();
+        }
+
+        [HttpPost("filter")]
+        [ProducesResponseType(typeof(ResponseServicesTypesJson), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Filter(
+            [FromServices] IFilterServiceTypeUseCase useCase,
+            [FromBody] RequestFilterServiceTypeJson request)
+        {
+            var response = await useCase.Execute(request);
+
+            if (response.ServicesTypes.Any())
+            {
+                return Ok(response);
+            }
 
             return NoContent();
         }

@@ -98,7 +98,6 @@ namespace LaborUnion.Application.UseCases.Farmer
                 .NotEmpty()
                     .WithMessage(ResourceMessagesException.INVALID_ADDRESS_CEP);
 
-
             When(farmer => !string.IsNullOrWhiteSpace(farmer.Email), () =>
             {
                 RuleFor(farmer => farmer.Email)

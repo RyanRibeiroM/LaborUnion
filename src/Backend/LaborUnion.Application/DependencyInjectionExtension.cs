@@ -5,6 +5,7 @@ using LaborUnion.Application.UseCases.Farmer.GetById;
 using LaborUnion.Application.UseCases.Farmer.Register;
 using LaborUnion.Application.UseCases.Farmer.Update;
 using LaborUnion.Application.UseCases.Login.DoLogin;
+using LaborUnion.Application.UseCases.ServiceType.GetById;
 using LaborUnion.Application.UseCases.ServiceType.Register;
 using LaborUnion.Application.UseCases.ServiceType.Resgister;
 using LaborUnion.Application.UseCases.User.Register;
@@ -36,6 +37,7 @@ namespace LaborUnion.Application
             services.AddScoped<IGetFarmerByIdUseCase, GetFarmerByIdUseCase>();
 
             services.AddScoped<IRegisterServiceTypeUseCase, RegisterServiceTypeUseCase>();
+            services.AddScoped<IGetServiceTypeByIdUseCase, GetServiceTypeByIdUseCase>();
             
         }
     }

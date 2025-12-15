@@ -1,5 +1,5 @@
-﻿using LaborUnion.Application.UseCases.Farmer.Delete;
-using LaborUnion.Application.UseCases.ServiceType.Delete;
+﻿using LaborUnion.Application.UseCases.ServiceType.Delete;
+using LaborUnion.Application.UseCases.ServiceType.GetById;
 using LaborUnion.Application.UseCases.ServiceType.Resgister;
 using LaborUnion.Communication.Requests;
 using LaborUnion.Communication.Responses;
@@ -22,6 +22,20 @@ namespace LaborUnion.API.Controllers
             var response = await useCase.Execute(request);
 
             return Created(string.Empty, response);
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        [ProducesResponseType(typeof(ResponseServiceTypeJson), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> GetById(
+            [FromServices] IGetServiceTypeByIdUseCase useCase,
+            [FromRoute] int id)
+        {
+            var response = await useCase.Execute(id);
+
+            return Ok(response);
         }
 
         [HttpDelete]

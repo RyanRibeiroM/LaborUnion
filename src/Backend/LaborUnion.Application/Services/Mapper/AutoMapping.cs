@@ -33,6 +33,7 @@ namespace LaborUnion.Application.Services.Mapper
             CreateMap<Farmer, ResponseFarmerShortJson>();
 
             CreateMap<ServiceType, ResponseRegisteredServiceTypeJson>();
+            CreateMap<ServiceType, ResponseServiceTypeJson>();
         }
     }
 }

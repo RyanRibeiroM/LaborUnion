@@ -11,6 +11,7 @@ using LaborUnion.Application.UseCases.ServiceType.GetById;
 using LaborUnion.Application.UseCases.ServiceType.Register;
 using LaborUnion.Application.UseCases.ServiceType.Resgister;
 using LaborUnion.Application.UseCases.Token.RefreshToken;
+using LaborUnion.Application.UseCases.User.Profile;
 using LaborUnion.Application.UseCases.User.Register;
 using Microsoft.Extensions.DependencyInjection;
 namespace LaborUnion.Application
@@ -32,6 +33,7 @@ namespace LaborUnion.Application
             services.AddScoped<IDoLoginUseCase, DoLoginUseCase>();
 
             services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
+            services.AddScoped<IGetUserProfileUseCase, GetUserProfileUseCase>();
 
             services.AddScoped<IRegisterFarmerUseCase, RegisterFarmerUseCase>();
             services.AddScoped<IUpdateFarmerUseCase, UpdateFarmerUseCase>();

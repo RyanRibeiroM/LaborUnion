@@ -1,5 +1,6 @@
 ﻿using LaborUnion.Communication.Responses;
 using LaborUnion.Exceptions;
+using LaborUnion.Exceptions.ExceptionsBase;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 

@@ -2,6 +2,7 @@
 using LaborUnion.Communication.Responses;
 using LaborUnion.Domain.Repositories.ServiceType;
 using LaborUnion.Exceptions;
+using LaborUnion.Exceptions.ExceptionsBase;
 
 namespace LaborUnion.Application.UseCases.ServiceType.GetById
 {

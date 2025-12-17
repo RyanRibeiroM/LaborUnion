@@ -4,7 +4,7 @@ using LaborUnion.Domain.Repositories;
 using LaborUnion.Domain.Repositories.Token;
 using LaborUnion.Domain.Security.Tokens;
 using LaborUnion.Domain.ValueObjects;
-using LaborUnion.Exceptions;
+using LaborUnion.Exceptions.ExceptionsBase;
 
 namespace LaborUnion.Application.UseCases.Token.RefreshToken
 {

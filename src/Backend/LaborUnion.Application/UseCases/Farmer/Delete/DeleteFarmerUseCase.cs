@@ -2,6 +2,7 @@
 using LaborUnion.Domain.Repositories;
 using LaborUnion.Domain.Repositories.Farmer;
 using LaborUnion.Exceptions;
+using LaborUnion.Exceptions.ExceptionsBase;
 
 namespace LaborUnion.Application.UseCases.Farmer.Delete
 {

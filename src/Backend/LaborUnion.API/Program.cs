@@ -78,6 +78,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<LaborUnion.API.Middlewares.UnauthorizedHandlerMiddleware>();
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

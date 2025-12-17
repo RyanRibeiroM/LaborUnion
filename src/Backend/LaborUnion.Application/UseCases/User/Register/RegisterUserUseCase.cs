@@ -7,6 +7,7 @@ using LaborUnion.Domain.Repositories.User;
 using LaborUnion.Domain.Security.Criptography;
 using LaborUnion.Domain.Security.Tokens;
 using LaborUnion.Exceptions;
+using LaborUnion.Exceptions.ExceptionsBase;
 
 namespace LaborUnion.Application.UseCases.User.Register
 {

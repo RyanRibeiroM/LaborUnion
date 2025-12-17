@@ -2,6 +2,8 @@
 using LaborUnion.Communication.Responses;
 using LaborUnion.Communication.Requests;
 using Microsoft.AspNetCore.Mvc;
+using LaborUnion.Application.UseCases.User.Profile;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LaborUnion.API.Controllers
 {
@@ -20,18 +22,18 @@ namespace LaborUnion.API.Controllers
             return Created(string.Empty, response);
         }
 
-        //[HttpGet("Profile")]
-        //[ProducesResponseType(typeof(ResponseUserProfileJson), StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[Authorize]
-        //public async Task<IActionResult> GetProfile(
-        //    [FromServices] IGetUserProfileUseCase useCase
-        //    )
-        //{
-        //    var response = await useCase.Execute();
-        //    return Ok(response);
+        [HttpGet("Profile")]
+        [ProducesResponseType(typeof(ResponseUserProfileJson), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [Authorize]
+        public async Task<IActionResult> GetProfile(
+            [FromServices] IGetUserProfileUseCase useCase
+            )
+        {
+            var response = await useCase.Execute();
+            return Ok(response);
 
-        //}
+        }
 
         //[HttpPost("Filter")]
         //[ProducesResponseType(typeof(ResponseUserListJson), StatusCodes.Status200OK)]

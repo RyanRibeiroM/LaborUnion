@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace LaborUnion.Exceptions
+namespace LaborUnion.Exceptions.ExceptionsBase
 {
     public class InvalidLoginException : LaborUnionException
     {

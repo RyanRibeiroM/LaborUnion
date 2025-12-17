@@ -6,6 +6,7 @@ using LaborUnion.Domain.Repositories.Farmer;
 using LaborUnion.Domain.Repositories.User;
 using LaborUnion.Domain.Services.LoggedUser;
 using LaborUnion.Exceptions;
+using LaborUnion.Exceptions.ExceptionsBase;
 
 namespace LaborUnion.Application.UseCases.Farmer.Update
 {
@@ -96,11 +97,14 @@ namespace LaborUnion.Application.UseCases.Farmer.Update
                 }
             }
 
-            var cleanSpouseCpf = CpfUtils.Format(request.SpouseCpf);
-            var spouseCpfExists = farmer.SpouseCpf != cleanSpouseCpf && await _farmerReadOnlyRepository.ExistActiveFarmerWithSpouseCpf(cleanSpouseCpf);
-            if (spouseCpfExists)
+            if (!string.IsNullOrWhiteSpace(request.SpouseCpf))
             {
-                result.Errors.Add(new FluentValidation.Results.ValidationFailure(nameof(request.SpouseCpf), ResourceMessagesException.SPOUSE_CPF_ALREADY_LINKED_TO_A_FARMER));
+                var cleanSpouseCpf = CpfUtils.Format(request.SpouseCpf);
+                var spouseCpfExists = farmer.SpouseCpf != cleanSpouseCpf && await _farmerReadOnlyRepository.ExistActiveFarmerWithSpouseCpf(cleanSpouseCpf);
+                if (spouseCpfExists)
+                {
+                    result.Errors.Add(new FluentValidation.Results.ValidationFailure(nameof(request.SpouseCpf), ResourceMessagesException.SPOUSE_CPF_ALREADY_LINKED_TO_A_FARMER));
+                }
             }
 
             if (!result.IsValid)

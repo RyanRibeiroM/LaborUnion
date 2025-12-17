@@ -4,8 +4,8 @@ using LaborUnion.Communication.Requests;
 using LaborUnion.Communication.Responses;
 using LaborUnion.Domain.Repositories;
 using LaborUnion.Domain.Repositories.ServiceType;
-using LaborUnion.Domain.Services.LoggedUser;
 using LaborUnion.Exceptions;
+using LaborUnion.Exceptions.ExceptionsBase;
 
 namespace LaborUnion.Application.UseCases.ServiceType.Register
 {

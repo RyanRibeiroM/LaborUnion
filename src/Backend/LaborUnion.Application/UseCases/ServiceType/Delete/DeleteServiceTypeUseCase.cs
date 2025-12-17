@@ -3,6 +3,7 @@ using LaborUnion.Domain.Repositories;
 using LaborUnion.Domain.Repositories.Farmer;
 using LaborUnion.Domain.Repositories.ServiceType;
 using LaborUnion.Exceptions;
+using LaborUnion.Exceptions.ExceptionsBase;
 
 namespace LaborUnion.Application.UseCases.ServiceType.Delete
 {

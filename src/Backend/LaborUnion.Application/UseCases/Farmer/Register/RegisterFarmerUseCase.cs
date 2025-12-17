@@ -7,6 +7,7 @@ using LaborUnion.Domain.Repositories.Farmer;
 using LaborUnion.Domain.Repositories.User;
 using LaborUnion.Domain.Services.LoggedUser;
 using LaborUnion.Exceptions;
+using LaborUnion.Exceptions.ExceptionsBase;
 
 namespace LaborUnion.Application.UseCases.Farmer.Register
 {

@@ -5,6 +5,14 @@ using LaborUnion.Application.UseCases.Farmer.GetById;
 using LaborUnion.Application.UseCases.Farmer.Register;
 using LaborUnion.Application.UseCases.Farmer.Update;
 using LaborUnion.Application.UseCases.Login.DoLogin;
+using LaborUnion.Application.UseCases.Sector.AddUser;
+using LaborUnion.Application.UseCases.Sector.Delete;
+using LaborUnion.Application.UseCases.Sector.Filter;
+using LaborUnion.Application.UseCases.Sector.GetById;
+using LaborUnion.Application.UseCases.Sector.Register;
+using LaborUnion.Application.UseCases.Sector.RemovePermission;
+using LaborUnion.Application.UseCases.Sector.Update;
+using LaborUnion.Application.UseCases.Service.Register;
 using LaborUnion.Application.UseCases.ServiceType.Delete;
 using LaborUnion.Application.UseCases.ServiceType.Filter;
 using LaborUnion.Application.UseCases.ServiceType.GetById;
@@ -46,7 +54,17 @@ namespace LaborUnion.Application
             services.AddScoped<IFilterServiceTypeUseCase, FilterServiceTypeUseCase>();
             services.AddScoped<IDeleteServiceTypeUseCase, DeleteServiceTypeUseCase>();
 
+            services.AddScoped<IRegisterSectorUseCase, RegisterSectorUseCase>();
+            services.AddScoped<IGetSectorByIdUseCase, GetSectorByIdUseCase>();
+            services.AddScoped<IDeleteSectorUseCase, DeleteSectorUseCase>();
+            services.AddScoped<IUpdateSectorUseCase, UpdateSectorUseCase>();
+            services.AddScoped<IRegisterUserToSectorUseCase, RegisterUserToSectorUseCase>();
+            services.AddScoped<IFilterSectorUseCase, FilterSectorUseCase>();
+            services.AddScoped<IRemovePermissionUserToSectorUseCase, RemovePermissionUserToSectorUseCase>();
+
             services.AddScoped<IUserRefreshTokenUseCase, UserRefreshTokenUseCase>();
+
+            services.AddScoped<IRegisterServiceUseCase, RegisterServiceUseCase>();
 
         }
     }

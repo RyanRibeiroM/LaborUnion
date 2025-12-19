@@ -124,7 +124,7 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
-        ///   Consulta uma cadeia de caracteres localizada semelhante a O Email informado já está em uso..
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O e-mail informado já está em uso..
         /// </summary>
         public static string EMAIL_ALREADY_EXISTS {
             get {
@@ -133,7 +133,7 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
-        ///   Consulta uma cadeia de caracteres localizada semelhante a O e-mail do aluno é obrigatório..
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O e-mail do usuário é obrigatório..
         /// </summary>
         public static string EMAIL_EMPTY {
             get {
@@ -147,6 +147,15 @@ namespace LaborUnion.Exceptions {
         public static string EMAIL_INVALID {
             get {
                 return ResourceManager.GetString("EMAIL_INVALID", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Ação inválida, existe atendimentos nesse setor..
+        /// </summary>
+        public static string EXISTING_SERVICES_IN_THE_SECTOR {
+            get {
+                return ResourceManager.GetString("EXISTING_SERVICES_IN_THE_SECTOR", resourceCulture);
             }
         }
         
@@ -223,6 +232,15 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a A descrição está inválida..
+        /// </summary>
+        public static string INVALID_DESCRIPTION {
+            get {
+                return ResourceManager.GetString("INVALID_DESCRIPTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a Login inválido. Verifique suas credenciais..
         /// </summary>
         public static string INVALID_LOGIN {
@@ -268,11 +286,38 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Estado civil incompatível com as informações do cônjuge..
+        /// </summary>
+        public static string MARITAL_STATUS_NOT_COMPATIBLE_WITH_SPOUSE_INFO {
+            get {
+                return ResourceManager.GetString("MARITAL_STATUS_NOT_COMPATIBLE_WITH_SPOUSE_INFO", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O estado civil fornecido não é suportado..
+        /// </summary>
+        public static string MARITAL_STATUS_NOT_SUPPORTED {
+            get {
+                return ResourceManager.GetString("MARITAL_STATUS_NOT_SUPPORTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a O nome é obrigatório..
         /// </summary>
         public static string NAME_EMPTY {
             get {
                 return ResourceManager.GetString("NAME_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O nome do setor já existe..
+        /// </summary>
+        public static string NAME_SECTOR_ALREADY_REGISTERED {
+            get {
+                return ResourceManager.GetString("NAME_SECTOR_ALREADY_REGISTERED", resourceCulture);
             }
         }
         
@@ -300,6 +345,15 @@ namespace LaborUnion.Exceptions {
         public static string NAME_WITH_SPECIAL_CHARACTERS {
             get {
                 return ResourceManager.GetString("NAME_WITH_SPECIAL_CHARACTERS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Nenhuma permissão foi encontrada para esse usuário..
+        /// </summary>
+        public static string NO_PERMISSION_FOUND_FOR_USER {
+            get {
+                return ResourceManager.GetString("NO_PERMISSION_FOUND_FOR_USER", resourceCulture);
             }
         }
         
@@ -358,6 +412,15 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a A profissão não pode ser vazia..
+        /// </summary>
+        public static string PROFESSION_EMPTY {
+            get {
+                return ResourceManager.GetString("PROFESSION_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a Matrícula já registrada..
         /// </summary>
         public static string REGISTRATION_ALREADY_EXISTS {
@@ -372,6 +435,24 @@ namespace LaborUnion.Exceptions {
         public static string REGISTRATION_EMPTY {
             get {
                 return ResourceManager.GetString("REGISTRATION_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Setor não encontrado..
+        /// </summary>
+        public static string SECTOR_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("SECTOR_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O valor do status do serviço não é suportado..
+        /// </summary>
+        public static string SERVICE_STATUS_NOT_SUPPORTED {
+            get {
+                return ResourceManager.GetString("SERVICE_STATUS_NOT_SUPPORTED", resourceCulture);
             }
         }
         
@@ -453,6 +534,15 @@ namespace LaborUnion.Exceptions {
         public static string UNKNOWN_ERROR {
             get {
                 return ResourceManager.GetString("UNKNOWN_ERROR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O usuário já tem permissão no setor..
+        /// </summary>
+        public static string USER_ALREADY_HAS_PERMISSION_IN_SECTOR {
+            get {
+                return ResourceManager.GetString("USER_ALREADY_HAS_PERMISSION_IN_SECTOR", resourceCulture);
             }
         }
         

@@ -65,6 +65,7 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
                 query = query.Where(f => f.Name.Contains(filters.Name));
             }
 
+
             if (!string.IsNullOrWhiteSpace(filters.Cpf))
             {
                 query = query.Where(f => f.Cpf.Equals(filters.Cpf));
@@ -78,6 +79,16 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
             if (!string.IsNullOrWhiteSpace(filters.AddressCity))
             {
                 query = query.Where(f => f.AddressCity.Contains(filters.AddressCity));
+            }
+
+            if (!string.IsNullOrEmpty(filters.Profission))
+            {
+                query = query.Where(f => f.Profession.Contains(filters.Profission));
+            }
+
+            if (filters.MaritalStatus.HasValue)
+            {
+                query = query.Where(f => f.MaritalStatus == filters.MaritalStatus);
             }
 
             if (!string.IsNullOrEmpty(filters.SpouseName))

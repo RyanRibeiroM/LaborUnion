@@ -1,10 +1,8 @@
-﻿using AutoMapper;
-using LaborUnion.Application.Utils;
+﻿using LaborUnion.Application.Utils;
 using LaborUnion.Communication.Requests;
 using LaborUnion.Domain.Repositories;
 using LaborUnion.Domain.Repositories.Farmer;
 using LaborUnion.Domain.Repositories.User;
-using LaborUnion.Domain.Services.LoggedUser;
 using LaborUnion.Exceptions;
 using LaborUnion.Exceptions.ExceptionsBase;
 
@@ -18,12 +16,9 @@ namespace LaborUnion.Application.UseCases.Farmer.Update
         private readonly IUnitOfWork _unitOfWork;
         public UpdateFarmerUseCase(
             IFarmerReadOnlyRepository farmerReadOnlyRepository,
-            IFarmerWriteOnlyRepository farmerWriteOnlyRepository,
             IFarmerUpdateOnlyRepository farmerUpdateOnlyRepository,
             IUserReadOnlyRepository userReadOnlyRepository,
-            IUnitOfWork unitOfWork,
-            IMapper mapper,
-            ILoggedUser loggedUser)
+            IUnitOfWork unitOfWork)
         {
             _farmerReadOnlyRepository = farmerReadOnlyRepository;
             _farmerUpdateOnlyRepository = farmerUpdateOnlyRepository;
@@ -41,6 +36,8 @@ namespace LaborUnion.Application.UseCases.Farmer.Update
             farmer.Email = request.Email;
             farmer.Cpf = CpfUtils.Format(request.Cpf);
             farmer.Registration = request.Registration;
+            farmer.MaritalStatus = (Domain.Enums.MaritalStatus)request.MaritalStatus;
+            farmer.Profession = request.Profession;
             farmer.SpouseName = request.SpouseName;
             farmer.BirthDate = request.BirthDate;
             farmer.IsAlive = request.IsAlive;
@@ -48,7 +45,7 @@ namespace LaborUnion.Application.UseCases.Farmer.Update
             farmer.AddressNeighborhood = request.AddressNeighborhood;
             farmer.AddressCity = request.AddressCity;
             farmer.AddressUf = UfUtils.Format(request.AddressUf);
-            farmer.AddressCep = request.AddressCep;
+            farmer.AddressCep = CepUtils.Format(request.AddressCep);
             farmer.AddressReference = request.AddressReference;
 
 
@@ -89,7 +86,7 @@ namespace LaborUnion.Application.UseCases.Farmer.Update
             {
                 var emailExistsInFarmers = farmer.Email != request.Email && await _farmerReadOnlyRepository.ExistActiveFarmerWithEmail(request.Email);
 
-                var emailExistsInUsers = farmer.Email != request.Email && await _userReadOnlyRepository.ExistWithEmailAsync(request.Email);
+                var emailExistsInUsers = farmer.Email != request.Email && await _userReadOnlyRepository.ExistActiveUserWithEmailAsync(request.Email);
 
                 if (emailExistsInFarmers || emailExistsInUsers)
                 {

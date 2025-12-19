@@ -10,6 +10,9 @@ namespace LaborUnion.Infrastructe.DataAccess
         public DbSet<Farmer> Farmers { get; set; }
         public DbSet<ServiceType> ServicesTypes { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<Sector> Sectors { get; set; }
+        public DbSet<SectorUser> SectorUsers { get; set; }
+        public DbSet<Service> Services { get; set; }
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

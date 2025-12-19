@@ -1,4 +1,5 @@
-﻿using LaborUnion.Application.UseCases.ServiceType.Delete;
+﻿using LaborUnion.Application.UseCases.Sector.GetById;
+using LaborUnion.Application.UseCases.ServiceType.Delete;
 using LaborUnion.Application.UseCases.ServiceType.Filter;
 using LaborUnion.Application.UseCases.ServiceType.GetById;
 using LaborUnion.Application.UseCases.ServiceType.Resgister;

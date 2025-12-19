@@ -44,6 +44,11 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
                 query = query.Where(s => s.Name.Contains(filters.Name));
             }
 
+            if (filters.SectorId.HasValue)
+            {
+                query = query.Where(s => s.SectorId == filters.SectorId.Value);
+            }
+
             return await query.OrderBy(s => s.Name).ToListAsync();
         }
 
@@ -52,6 +57,13 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
             return await _dbContext.ServicesTypes
                 .AsNoTracking()
                 .FirstOrDefaultAsync(s => s.Id == id && s.Active);
+        }
+
+        public async Task<bool> ServiceTypeCanProvidedBySector(int ServiceTypeId, int SectorId)
+        {
+            return await _dbContext.ServicesTypes
+                .AsNoTracking()
+                .AnyAsync(s => s.Id == ServiceTypeId && s.SectorId == SectorId && s.Active);
         }
 
         public void Update(ServiceType serviceType)

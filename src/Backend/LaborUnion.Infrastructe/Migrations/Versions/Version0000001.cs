@@ -20,19 +20,6 @@ namespace GymManager.Infrastructure.Migrations.Versions
                  .WithColumn("PasswordResetTokenExpires").AsDateTime().Nullable()
                  .WithColumn("Role").AsInt32().NotNullable().WithDefaultValue(UserRoles.Administrator);
 
-            Create.Index("IX_Users_Email")
-                  .OnTable("Users")
-                  .OnColumn("Email")
-                  .Ascending()
-                  .WithOptions().Unique();
-
-            Create.Index("IX_Users_UserIdentifier")
-                  .OnTable("Users")
-                  .OnColumn("UserIdentifier")
-                  .Ascending()
-                  .WithOptions().Unique();
-
-
             CreateTable("Farmers")
                 .WithColumn("Name").AsString(200).NotNullable()
                 .WithColumn("Email").AsString(150).Nullable()
@@ -48,18 +35,6 @@ namespace GymManager.Infrastructure.Migrations.Versions
 
                 .WithColumn("RegisteredBy").AsInt32().NotNullable()
                     .ForeignKey("FK_Farmers_Users", "Users", "Id");
-
-            Create.Index("IX_Farmers_Cpf")
-                .OnTable("Farmers")
-                .OnColumn("Cpf")
-                .Ascending()
-                .WithOptions().Unique();
-
-            Create.Index("IX_Farmers_Registration")
-                .OnTable("Farmers")
-                .OnColumn("Registration")
-                .Ascending()
-                .WithOptions().Unique();
 
         }
     }

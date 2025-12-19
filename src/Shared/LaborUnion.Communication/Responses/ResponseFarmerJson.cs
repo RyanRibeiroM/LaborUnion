@@ -1,4 +1,6 @@
-﻿namespace LaborUnion.Communication.Responses
+﻿using LaborUnion.Communication.Enums;
+
+namespace LaborUnion.Communication.Responses
 {
     public class ResponseFarmerJson
     {
@@ -9,6 +11,8 @@
         public string Cpf { get; set; } = string.Empty;
         public string Registration { get; set; } = string.Empty;
         public string? Phone { get; set; }
+        public string Profession { get; set; } = string.Empty;
+        public MaritalStatus MaritalStatus { get; set; }
         public string? SpouseName { get; set; }
         public string? SpouseCpf { get; set; }
         public DateOnly BirthDate { get; set; }

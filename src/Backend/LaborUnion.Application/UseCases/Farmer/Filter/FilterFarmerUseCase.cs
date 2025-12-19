@@ -25,6 +25,9 @@ namespace LaborUnion.Application.UseCases.Farmer.Filter
                 Cpf = request.Cpf,
                 Registration = request.Registration,
                 AddressCity = request.AddressCity,
+                Profission = request.Profission,
+                MaritalStatus = (Domain.Enums.MaritalStatus?)request.MaritalStatus,
+                SpouseName = request.SpouseName,
                 IsAlive = request.IsAlive
             };
 

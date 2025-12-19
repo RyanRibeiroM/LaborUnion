@@ -19,23 +19,28 @@ namespace LaborUnion.Application.Services.Mapper
                 .ForMember(dest => dest.Password, opt => opt.Ignore());
             CreateMap<RequestRegisterFarmerJson, Farmer>();
             CreateMap<RequestRegisterServiceTypeJson, ServiceType>();
+            CreateMap<RequestRegisterSectorJson, Sector>();
         }
 
         private void DomainToResponse()
         {
             CreateMap<User, ResponseUserProfileJson>()
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
-
             CreateMap<User, ResponseUserJson>()
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
 
             CreateMap<Farmer, ResponseRegisteredFarmerJson>();
             CreateMap<Farmer, ResponseFarmerShortJson>();
-            CreateMap<Farmer, ResponseFarmerJson>();
+            CreateMap<Farmer, ResponseFarmerJson>()
+                .ForMember(dest => dest.MaritalStatus, opt => opt.MapFrom(src => src.MaritalStatus.ToString()));
 
             CreateMap<ServiceType, ResponseRegisteredServiceTypeJson>();
             CreateMap<ServiceType, ResponseServiceTypeJson>();
             CreateMap<ServiceType, ResponseServiceTypeShortJson>();
+
+            CreateMap<Sector, ResponseRegisteredSectorJson>();
+            CreateMap<Sector, ResponseSectorJson>();
+            CreateMap<Sector, ResponseSectorShortJson>();
         }
     }
 }

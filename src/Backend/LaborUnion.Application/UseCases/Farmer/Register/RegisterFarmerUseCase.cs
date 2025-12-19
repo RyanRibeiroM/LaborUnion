@@ -46,6 +46,7 @@ namespace LaborUnion.Application.UseCases.Farmer.Register
 
             farmer.Cpf = CpfUtils.Format(request.Cpf);
             farmer.AddressUf = UfUtils.Format(request.AddressUf);
+            farmer.AddressCep = CepUtils.Format(request.AddressCep);
             farmer.RegisteredBy = adminUser.Id;
 
             if (!string.IsNullOrWhiteSpace(request.SpouseCpf))
@@ -87,7 +88,7 @@ namespace LaborUnion.Application.UseCases.Farmer.Register
             {
                 var emailExistsInFarmers = await _farmerReadOnlyRepository.ExistActiveFarmerWithEmail(request.Email);
 
-                var emailExistsInUsers = await _userReadOnlyRepository.ExistWithEmailAsync(request.Email);
+                var emailExistsInUsers = await _userReadOnlyRepository.ExistActiveUserWithEmailAsync(request.Email);
 
                 if (emailExistsInFarmers || emailExistsInUsers)
                 {

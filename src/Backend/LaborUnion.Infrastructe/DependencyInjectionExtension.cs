@@ -1,6 +1,8 @@
 ﻿using FluentMigrator.Runner;
 using LaborUnion.Domain.Repositories;
 using LaborUnion.Domain.Repositories.Farmer;
+using LaborUnion.Domain.Repositories.Sector;
+using LaborUnion.Domain.Repositories.Services;
 using LaborUnion.Domain.Repositories.ServiceType;
 using LaborUnion.Domain.Repositories.Token;
 using LaborUnion.Domain.Repositories.User;
@@ -67,6 +69,14 @@ namespace LaborUnion.Infrastructe
             services.AddScoped<IServiceTypeReadOnlyRepository, ServiceTypeRepository>();
             services.AddScoped<IServiceTypeWriteOnlyRepository, ServiceTypeRepository>();
             services.AddScoped<IServiceTypeUpdateOnlyRepository, ServiceTypeRepository>();
+
+            services.AddScoped<IServiceReadOnlyRepository, ServiceRepository>();
+            services.AddScoped<IServiceWriteOnlyRepository, ServiceRepository>();
+            services.AddScoped<IServiceUpdateOnlyRepository, ServiceRepository>();
+
+            services.AddScoped<ISectorReadOnlyRepository, SectorRepository>();
+            services.AddScoped<ISectorWriteOnlyRepository, SectorRepository>();
+            services.AddScoped<ISectorUpdateOnlyRepository, SectorRepository>();
 
             services.AddScoped<ITokenRepository, TokenRepository>();
             services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();

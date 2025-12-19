@@ -8,9 +8,9 @@ namespace LaborUnion.Domain.Repositories.ServiceType
     {
         public ServiceTypeValidator()
         {
-            RuleFor(farmer => farmer.Name)
+            RuleFor(service => service.Name)
                 .NotEmpty()
-                .Must(name => name.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries).Length >= 2)
+                .Must(name => name.Trim().Length >= 2)
                     .WithMessage(ResourceMessagesException.INVALID_NAME);
         }
     }

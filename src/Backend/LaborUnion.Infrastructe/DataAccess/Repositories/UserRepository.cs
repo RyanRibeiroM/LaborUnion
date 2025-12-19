@@ -17,7 +17,7 @@ namespace LaborUnion.Infrastructure.DataAccess.Repositories
             await _dbContext.Users.AddAsync(user);
         }
 
-        public async Task<bool> ExistWithEmailAsync(string email)
+        public async Task<bool> ExistActiveUserWithEmailAsync(string email)
         {
             return await _dbContext.Users.AnyAsync(user => user.Email.Equals(email) && user.Active);
         }
@@ -43,9 +43,15 @@ namespace LaborUnion.Infrastructure.DataAccess.Repositories
             return await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Email.Equals(email) && user.Active);
         }
 
+        public async Task<User?> GetById(int id)
+        {
+            return await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Id == id && user.Active);
+        }
+
         public async Task<User?> GetByUserIdentifierAsync(Guid userIdentifier)
         {
             return await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(user => user.UserIdentifier == userIdentifier && user.Active);
         }
+
     }
 }

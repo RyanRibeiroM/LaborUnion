@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using LaborUnion.Application.Utils;
+using LaborUnion.Communication.Enums;
 using LaborUnion.Communication.Requests;
 using LaborUnion.Exceptions;
 
@@ -9,6 +10,11 @@ namespace LaborUnion.Application.UseCases.Farmer
     {
         private const string TextOnlyRegex = @"^[a-zA-Z\u00C0-\u017F\s'-]+$";
         private const string TextAndNumbersRegex = @"^[a-zA-Z0-9\u00C0-\u017F\s.,'-]+$";
+        private readonly List<MaritalStatus> NotHaveSpouse =
+        [
+            MaritalStatus.Single,
+            MaritalStatus.Divorced,
+        ];
 
         public FarmerValidator()
         {
@@ -30,6 +36,10 @@ namespace LaborUnion.Application.UseCases.Farmer
 
             When(farmer => !string.IsNullOrWhiteSpace(farmer.SpouseCpf), () =>
             {
+                RuleFor(farmer => farmer.MaritalStatus)
+                    .Must(status => !NotHaveSpouse.Contains(status))
+                    .WithMessage(ResourceMessagesException.MARITAL_STATUS_NOT_COMPATIBLE_WITH_SPOUSE_INFO);
+
                 RuleFor(farmer => farmer.SpouseName)
                     .NotEmpty()
                     .WithMessage(ResourceMessagesException.SPOUSE_NAME_REQUIRED);
@@ -49,6 +59,10 @@ namespace LaborUnion.Application.UseCases.Farmer
 
             When(farmer => !string.IsNullOrWhiteSpace(farmer.SpouseName), () =>
             {
+                RuleFor(farmer => farmer.MaritalStatus)
+                    .Must(status => !NotHaveSpouse.Contains(status))
+                    .WithMessage(ResourceMessagesException.MARITAL_STATUS_NOT_COMPATIBLE_WITH_SPOUSE_INFO);
+
                 RuleFor(farmer => farmer.SpouseCpf)
                     .NotEmpty()
                     .WithMessage(ResourceMessagesException.SPOUSE_CPF_REQUIRED);
@@ -73,6 +87,14 @@ namespace LaborUnion.Application.UseCases.Farmer
                 .Must(date => date <= DateOnly.FromDateTime(DateTime.Today).AddYears(-18))
                     .WithMessage(ResourceMessagesException.UNDERAGE_FARMER);
 
+            RuleFor(farmer => farmer.Profession)
+                .NotEmpty()
+                    .WithMessage(ResourceMessagesException.PROFESSION_EMPTY);
+
+            RuleFor(farmer => farmer.MaritalStatus)
+                .IsInEnum()
+                    .WithMessage(ResourceMessagesException.MARITAL_STATUS_NOT_SUPPORTED);
+
             RuleFor(farmer => farmer.AddressNumber)
                 .NotEmpty()
                     .WithMessage(ResourceMessagesException.INVALID_ADDRESS_NUMBER);
@@ -96,6 +118,7 @@ namespace LaborUnion.Application.UseCases.Farmer
 
             RuleFor(farmer => farmer.AddressCep)
                 .NotEmpty()
+                .Must(CepUtils.IsValideCep)
                     .WithMessage(ResourceMessagesException.INVALID_ADDRESS_CEP);
 
             When(farmer => !string.IsNullOrWhiteSpace(farmer.Email), () =>
@@ -108,7 +131,7 @@ namespace LaborUnion.Application.UseCases.Farmer
             When(farmer => !string.IsNullOrWhiteSpace(farmer.Phone), () =>
             {
                 RuleFor(farmer => farmer.Phone)
-                    .Must(PhoneUtils.IsValidPhoneNumber)
+                    .Must(PhoneUtils.IsValidPhoneNumber!)
                     .WithMessage(ResourceMessagesException.INVALID_PHONE_NUMBER);
             });
         }

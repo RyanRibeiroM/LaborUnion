@@ -1,4 +1,6 @@
-﻿namespace LaborUnion.Communication.Requests
+﻿using LaborUnion.Communication.Enums;
+
+namespace LaborUnion.Communication.Requests
 {
     public class RequestRegisterFarmerJson
     {
@@ -8,6 +10,8 @@
         public string Registration { get; set; } = string.Empty;
         public string? Phone { get; set; }
         public string? SpouseName { get; set; }
+        public string Profession { get; set; } = string.Empty;
+        public MaritalStatus MaritalStatus { get; set; }
         public string? SpouseCpf { get; set; }
         public DateOnly BirthDate { get; set; }
         public bool IsAlive { get; set; } = true;

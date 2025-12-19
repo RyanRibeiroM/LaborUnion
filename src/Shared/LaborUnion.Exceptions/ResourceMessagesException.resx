@@ -139,10 +139,10 @@
     <value>O CPF do cônjuge é obrigatório quando o nome do cônjuge é informado.</value>
   </data>
   <data name="EMAIL_ALREADY_EXISTS" xml:space="preserve">
-    <value>O Email informado já está em uso.</value>
+    <value>O e-mail informado já está em uso.</value>
   </data>
   <data name="EMAIL_EMPTY" xml:space="preserve">
-    <value>O e-mail do aluno é obrigatório.</value>
+    <value>O e-mail do usuário é obrigatório.</value>
   </data>
   <data name="EMAIL_INVALID" xml:space="preserve">
     <value>O e-mail informado não é válido.</value>
@@ -251,5 +251,35 @@
   </data>
   <data name="USER_NOT_FOUND" xml:space="preserve">
     <value>O usuário não foi encontrado.</value>
+  </data>
+  <data name="PROFESSION_EMPTY" xml:space="preserve">
+    <value>A profissão não pode ser vazia.</value>
+  </data>
+  <data name="MARITAL_STATUS_NOT_SUPPORTED" xml:space="preserve">
+    <value>O estado civil fornecido não é suportado.</value>
+  </data>
+  <data name="MARITAL_STATUS_NOT_COMPATIBLE_WITH_SPOUSE_INFO" xml:space="preserve">
+    <value>Estado civil incompatível com as informações do cônjuge.</value>
+  </data>
+  <data name="INVALID_DESCRIPTION" xml:space="preserve">
+    <value>A descrição está inválida.</value>
+  </data>
+  <data name="NAME_SECTOR_ALREADY_REGISTERED" xml:space="preserve">
+    <value>O nome do setor já existe.</value>
+  </data>
+  <data name="SECTOR_NOT_FOUND" xml:space="preserve">
+    <value>Setor não encontrado.</value>
+  </data>
+  <data name="EXISTING_SERVICES_IN_THE_SECTOR" xml:space="preserve">
+    <value>Ação inválida, existe atendimentos nesse setor.</value>
+  </data>
+  <data name="USER_ALREADY_HAS_PERMISSION_IN_SECTOR" xml:space="preserve">
+    <value>O usuário já tem permissão no setor.</value>
+  </data>
+  <data name="NO_PERMISSION_FOUND_FOR_USER" xml:space="preserve">
+    <value>Nenhuma permissão foi encontrada para esse usuário.</value>
+  </data>
+  <data name="SERVICE_STATUS_NOT_SUPPORTED" xml:space="preserve">
+    <value>O valor do status do serviço não é suportado.</value>
   </data>
 </root>

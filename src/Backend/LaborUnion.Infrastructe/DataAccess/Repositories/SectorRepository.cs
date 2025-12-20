@@ -54,6 +54,15 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
             return await query.OrderBy(f => f.Name).ToListAsync();
         }
 
+        public async Task<IList<int>> GetActiveSectorsidsWithUserId(int userId)
+        {
+            return await _dbContext.SectorUsers
+                .AsNoTracking()
+                .Where(su => su.UserId == userId && su.Active && su.Sector.Active)
+                .Select(su => su.SectorId)
+                .ToListAsync();
+        }
+
         public async Task<Sector?> GetById(int id)
         {
             return await _dbContext.Sectors.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id && s.Active);

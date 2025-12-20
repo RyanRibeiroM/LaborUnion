@@ -282,4 +282,19 @@
   <data name="SERVICE_STATUS_NOT_SUPPORTED" xml:space="preserve">
     <value>O valor do status do serviço não é suportado.</value>
   </data>
+  <data name="EXISTING_SERVICES_WITH_SERVICE_TYPE" xml:space="preserve">
+    <value>Ação inválida, existe atendimentos com esse tipo de serviço.</value>
+  </data>
+  <data name="USER_WITHOUT_PERMISSION_IN_THE_SECTOR" xml:space="preserve">
+    <value>O usuário não tem permissão para realizar atendimentos nesse setor.</value>
+  </data>
+  <data name="SERVICE_TYPE_CANNOT_BE_PROVIDED_BY_SECTOR" xml:space="preserve">
+    <value>O tipo de serviço não pode ser fornecido por esse setor.</value>
+  </data>
+  <data name="FARMER_IS_NOT_ALIVE" xml:space="preserve">
+    <value>Ação só é válida para agricultores vivos.</value>
+  </data>
+  <data name="SERVICE_NOT_FOUND" xml:space="preserve">
+    <value>Atendimento não encontrado.</value>
+  </data>
 </root>

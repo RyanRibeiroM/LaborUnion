@@ -1,4 +1,5 @@
-﻿using LaborUnion.Domain.Entities;
+﻿using LaborUnion.Domain.Dtos;
+using LaborUnion.Domain.Entities;
 using LaborUnion.Domain.Repositories.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,9 +30,88 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
             return await _dbContext.Services.AnyAsync(s => s.SectorId == sectorId && s.Active);
         }
 
+        public async Task<bool> ExistServiceWithServiceTypeId(int serviceTypeId)
+        {
+            return await _dbContext.Services.AnyAsync(s => s.ServiceTypeId == serviceTypeId && s.Active);
+        }
+
+        public async Task<IList<Service>> Filter(FilterServiceDto filters)
+        {
+            var query = _dbContext.Services
+                .AsNoTracking()
+                .Include(s => s.ServiceType)
+                .Include(s => s.Farmer)
+                .Include(s => s.Attendant)
+                .Include(s => s.Sector)
+                .Where(s => s.Active);
+
+            if (filters.FarmerId.HasValue)
+            {
+                query = query.Where(s => s.FarmerId == filters.FarmerId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.FarmerName))
+            {
+                query = query.Where(s => s.Farmer.Name.Contains(filters.FarmerName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.FarmerCpf))
+            {
+                query = query.Where(s => s.Farmer.Cpf.Contains(filters.FarmerCpf));
+            }
+
+            if (filters.ServiceDate.HasValue)
+            {
+                var dateToFilter = filters.ServiceDate.Value.ToDateTime(TimeOnly.MinValue);
+                var nextDay = dateToFilter.AddDays(1);
+
+                query = query.Where(s => s.CreatedOn >= dateToFilter && s.CreatedOn < nextDay);
+            }
+
+            if (filters.AttendantId.HasValue)
+            {
+                query = query.Where(s => s.AttendantId == filters.AttendantId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.AttendantName))
+            {
+                query = query.Where(s => s.Attendant.Name.Contains(filters.AttendantName));
+            }
+
+            if (filters.Status.HasValue)
+            {
+                query = query.Where(s => s.Status == filters.Status.Value);
+            }
+
+            if (filters.ServiceTypeId.HasValue)
+            {
+                query = query.Where(s => s.ServiceTypeId == filters.ServiceTypeId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.ServiceTypeName))
+            {
+                query = query.Where(s => s.ServiceType.Name.Contains(filters.ServiceTypeName));
+            }
+
+            if (filters.SectorId.HasValue)
+            {
+                query = query.Where(s => s.SectorId == filters.SectorId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(filters.SectorName))
+            {
+                query = query.Where(s => s.Sector.Name.Contains(filters.SectorName));
+            }
+
+            query = query.OrderByDescending(s => s.CreatedOn);
+
+            return await query.ToListAsync();
+        }
+
         public async Task<Service?> GetById(int id)
         {
             return await _dbContext.Services
+                .AsNoTracking()
                 .Include(s => s.ServiceType)
                 .Include(s => s.Farmer)
                 .Include(s => s.Attendant)

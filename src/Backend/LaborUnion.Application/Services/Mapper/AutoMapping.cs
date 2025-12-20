@@ -20,6 +20,7 @@ namespace LaborUnion.Application.Services.Mapper
             CreateMap<RequestRegisterFarmerJson, Farmer>();
             CreateMap<RequestRegisterServiceTypeJson, ServiceType>();
             CreateMap<RequestRegisterSectorJson, Sector>();
+            CreateMap<RequestRegisterServiceJson, Service>();
         }
 
         private void DomainToResponse()
@@ -37,6 +38,21 @@ namespace LaborUnion.Application.Services.Mapper
             CreateMap<ServiceType, ResponseRegisteredServiceTypeJson>();
             CreateMap<ServiceType, ResponseServiceTypeJson>();
             CreateMap<ServiceType, ResponseServiceTypeShortJson>();
+
+            CreateMap<Service, ResponseServiceJson>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.ServiceTypeName, opt => opt.MapFrom(src => src.ServiceType.Name))
+                .ForMember(dest => dest.FarmerName, opt => opt.MapFrom(src => src.Farmer.Name))
+                .ForMember(dest => dest.FarmerCpf, opt => opt.MapFrom(src => src.Farmer.Cpf))
+                .ForMember(dest => dest.SectorName, opt => opt.MapFrom(src => src.Sector.Name))
+                .ForMember(dest => dest.SectorName, opt => opt.MapFrom(src => src.Sector.Name))
+                .ForMember(dest => dest.AttendantName, opt => opt.MapFrom(src => src.Attendant.Name));
+
+            CreateMap<Service, ResponseServiceShortJson>()
+                .ForMember(dest => dest.FarmerName, opt => opt.MapFrom(src => src.Farmer.Name))
+                .ForMember(dest => dest.SectorName, opt => opt.MapFrom(src => src.Sector.Name))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+
 
             CreateMap<Sector, ResponseRegisteredSectorJson>();
             CreateMap<Sector, ResponseSectorJson>();

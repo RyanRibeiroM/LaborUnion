@@ -9,5 +9,6 @@ namespace LaborUnion.Domain.Repositories.Sector
         public Task<bool> ExistActiveSectorWithName(string name);
         public Task<bool> UserHasPermissionInSector(int sectorId, int userId);
         public Task<IList<Entities.Sector>> Filter(FilterSectorDto filters);
+        public Task<IList<int>> GetActiveSectorsidsWithUserId(int userId);
     }
 }

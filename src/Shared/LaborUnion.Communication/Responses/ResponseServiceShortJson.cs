@@ -1,10 +1,11 @@
 ﻿namespace LaborUnion.Communication.Responses
 {
-    public class ResponseRegisteredServiceJson
+    public class ResponseServiceShortJson
     {
+        public int Id { get; set; }
+        public DateTime CreatedOn { get; set; }
         public string FarmerName { get; set; } = string.Empty;
         public string SectorName { get; set; } = string.Empty;
-        public string ServiceTypeName { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
     }
 }

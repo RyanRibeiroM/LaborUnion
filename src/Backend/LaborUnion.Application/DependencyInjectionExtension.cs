@@ -12,7 +12,11 @@ using LaborUnion.Application.UseCases.Sector.GetById;
 using LaborUnion.Application.UseCases.Sector.Register;
 using LaborUnion.Application.UseCases.Sector.RemovePermission;
 using LaborUnion.Application.UseCases.Sector.Update;
+using LaborUnion.Application.UseCases.Service.Delete;
+using LaborUnion.Application.UseCases.Service.Filter;
+using LaborUnion.Application.UseCases.Service.GetById;
 using LaborUnion.Application.UseCases.Service.Register;
+using LaborUnion.Application.UseCases.Service.Update;
 using LaborUnion.Application.UseCases.ServiceType.Delete;
 using LaborUnion.Application.UseCases.ServiceType.Filter;
 using LaborUnion.Application.UseCases.ServiceType.GetById;
@@ -65,6 +69,10 @@ namespace LaborUnion.Application
             services.AddScoped<IUserRefreshTokenUseCase, UserRefreshTokenUseCase>();
 
             services.AddScoped<IRegisterServiceUseCase, RegisterServiceUseCase>();
+            services.AddScoped<IGetServiceByIdUseCase, GetServiceByIdUseCase>();
+            services.AddScoped<IFilterServiceUseCase, FilterServiceUseCase>();
+            services.AddScoped<IDeleteServiceUseCase, DeleteServiceUseCase>();
+            services.AddScoped<IUpdateServiceUseCase, UpdateServiceUseCase>();
 
         }
     }

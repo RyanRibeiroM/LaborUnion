@@ -160,6 +160,24 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Ação inválida, existe atendimentos com esse tipo de serviço..
+        /// </summary>
+        public static string EXISTING_SERVICES_WITH_SERVICE_TYPE {
+            get {
+                return ResourceManager.GetString("EXISTING_SERVICES_WITH_SERVICE_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Ação só é válida para agricultores vivos..
+        /// </summary>
+        public static string FARMER_IS_NOT_ALIVE {
+            get {
+                return ResourceManager.GetString("FARMER_IS_NOT_ALIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a Agricultor não encontrado..
         /// </summary>
         public static string FARMER_NOT_FOUND {
@@ -448,11 +466,29 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Atendimento não encontrado..
+        /// </summary>
+        public static string SERVICE_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("SERVICE_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a O valor do status do serviço não é suportado..
         /// </summary>
         public static string SERVICE_STATUS_NOT_SUPPORTED {
             get {
                 return ResourceManager.GetString("SERVICE_STATUS_NOT_SUPPORTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O tipo de serviço não pode ser fornecido por esse setor..
+        /// </summary>
+        public static string SERVICE_TYPE_CANNOT_BE_PROVIDED_BY_SECTOR {
+            get {
+                return ResourceManager.GetString("SERVICE_TYPE_CANNOT_BE_PROVIDED_BY_SECTOR", resourceCulture);
             }
         }
         
@@ -552,6 +588,15 @@ namespace LaborUnion.Exceptions {
         public static string USER_NOT_FOUND {
             get {
                 return ResourceManager.GetString("USER_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a O usuário não tem permissão para realizar atendimentos nesse setor..
+        /// </summary>
+        public static string USER_WITHOUT_PERMISSION_IN_THE_SECTOR {
+            get {
+                return ResourceManager.GetString("USER_WITHOUT_PERMISSION_IN_THE_SECTOR", resourceCulture);
             }
         }
     }

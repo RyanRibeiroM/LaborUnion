@@ -26,9 +26,9 @@ namespace LaborUnion.Application.UseCases.Sector.Delete
         {
             var serviceType = await _sectorReadOnlyRepository.GetById(id) ?? throw new NotFoundException(ResourceMessagesException.SECTOR_NOT_FOUND);
 
-            var ExistService = await _serviceReadOnlyRepository.ExistServiceWithSectorId(id);
+            var ExistServiceWithThisSector = await _serviceReadOnlyRepository.ExistServiceWithSectorId(id);
 
-            if (ExistService)
+            if (ExistServiceWithThisSector)
                 throw new ConflictException(ResourceMessagesException.EXISTING_SERVICES_IN_THE_SECTOR);
 
             await _sectorWriteOnlyRepository.Delete(serviceType.Id);

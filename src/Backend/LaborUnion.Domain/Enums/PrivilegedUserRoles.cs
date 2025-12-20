@@ -1,9 +1,8 @@
 ﻿namespace LaborUnion.Domain.Enums
 {
-    public enum UserRoles
+    public enum PrivilegedUserRoles
     {
         Developer = 0,
-        Administrator = 1,
-        Attendant = 2
+        Administrator = 1
     }
 }

@@ -20,6 +20,13 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
                 .AnyAsync(f => f.Cpf.Equals(cpf) && f.Active);
         }
 
+        public Task<bool> ActiveFarmerWithIdIsAlive(int id)
+        {
+            return _dbContext.Farmers
+                .AsNoTracking()
+                .AnyAsync(f => f.Id == id && f.Active && f.IsAlive);
+        }
+
         public async Task<bool> ExistActiveFarmerWithRegistration(string registration)
         {
             return await _dbContext.Farmers
@@ -64,7 +71,6 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
             {
                 query = query.Where(f => f.Name.Contains(filters.Name));
             }
-
 
             if (!string.IsNullOrWhiteSpace(filters.Cpf))
             {

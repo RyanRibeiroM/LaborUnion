@@ -1,8 +1,8 @@
-﻿using LaborUnion.Domain.Enums;
+﻿using LaborUnion.Communication.Enums;
 
-namespace LaborUnion.Domain.Dtos
+namespace LaborUnion.Communication.Requests
 {
-    public class FilterServiceDto
+    public class RequestFilterServiceJson
     {
         public int? FarmerId { get; set; }
         public string? FarmerName { get; set; }

@@ -1,4 +1,9 @@
 ﻿using LaborUnion.Application.Services.Mapper;
+using LaborUnion.Application.UseCases.Document.Delete;
+using LaborUnion.Application.UseCases.Document.Filter;
+using LaborUnion.Application.UseCases.Document.GetById;
+using LaborUnion.Application.UseCases.Document.Register;
+using LaborUnion.Application.UseCases.Document.Update;
 using LaborUnion.Application.UseCases.Farmer.Delete;
 using LaborUnion.Application.UseCases.Farmer.Filter;
 using LaborUnion.Application.UseCases.Farmer.GetById;
@@ -87,6 +92,12 @@ namespace LaborUnion.Application
             services.AddScoped<IFilterServiceUseCase, FilterServiceUseCase>();
             services.AddScoped<IDeleteServiceUseCase, DeleteServiceUseCase>();
             services.AddScoped<IUpdateServiceUseCase, UpdateServiceUseCase>();
+
+            services.AddScoped<IRegisterDocumentUseCase, RegisterDocumentUseCase>();
+            services.AddScoped<IDeleteDocumentUseCase, DeleteDocumentUseCase>();
+            services.AddScoped<IFilterDocumentUseCase, FilterDocumentUseCase>();
+            services.AddScoped<IUpdateDocumentUseCase, UpdateDocumentUseCase>();
+            services.AddScoped<IGetDocumentByIdUseCase, GetDocumentByIdUseCase>();
         }
     }
 }

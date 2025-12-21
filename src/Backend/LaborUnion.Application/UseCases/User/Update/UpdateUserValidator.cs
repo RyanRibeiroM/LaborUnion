@@ -5,7 +5,7 @@ using LaborUnion.Exceptions;
 
 namespace LaborUnion.Application.UseCases.User.Update
 {
-    internal class UpdateUserValidator : AbstractValidator<RequestRegisterUserJson>
+    internal class UpdateUserValidator : AbstractValidator<RequestUpdateUserJson>
     {
         public UpdateUserValidator()
         {
@@ -13,7 +13,7 @@ namespace LaborUnion.Application.UseCases.User.Update
                 .NotEmpty()
                 .WithMessage(ResourceMessagesException.NAME_EMPTY);
 
-            Include(new EmailValidator<RequestRegisterUserJson>());
+            Include(new EmailValidator<RequestUpdateUserJson>());
 
             RuleFor(user => user.Role)
                 .IsInEnum()
@@ -21,7 +21,7 @@ namespace LaborUnion.Application.UseCases.User.Update
 
             When(user => !string.IsNullOrWhiteSpace(user.Password), () =>
             {
-                Include(new PasswordValidator<RequestRegisterUserJson>());
+                Include(new PasswordValidator<RequestUpdateUserJson>());
             });
         }
 

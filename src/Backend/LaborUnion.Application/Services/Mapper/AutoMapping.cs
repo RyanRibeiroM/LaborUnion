@@ -21,6 +21,7 @@ namespace LaborUnion.Application.Services.Mapper
             CreateMap<RequestRegisterServiceTypeJson, ServiceType>();
             CreateMap<RequestRegisterSectorJson, Sector>();
             CreateMap<RequestRegisterServiceJson, Service>();
+            CreateMap<RequestRegisterDocumentJson, Document>();
         }
 
         private void DomainToResponse()
@@ -58,6 +59,15 @@ namespace LaborUnion.Application.Services.Mapper
             CreateMap<Sector, ResponseRegisteredSectorJson>();
             CreateMap<Sector, ResponseSectorJson>();
             CreateMap<Sector, ResponseSectorShortJson>();
+
+            CreateMap<Document, ResponseRegisteredDocumentJson>();
+            CreateMap<Document, ResponseDocumentShortJson>()
+                .ForMember(dest => dest.FarmerName, opt => opt.MapFrom(src => src.Farmer.Name));
+
+            CreateMap<Document, ResponseDocumentJson>()
+                .ForMember(dest => dest.FarmerName, opt => opt.MapFrom(src => src.Farmer.Name))
+                .ForMember(dest => dest.FarmerCpf, opt => opt.MapFrom(src => src.Farmer.Cpf));
+
         }
     }
 }

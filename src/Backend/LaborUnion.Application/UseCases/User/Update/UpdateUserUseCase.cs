@@ -31,7 +31,7 @@ namespace LaborUnion.Application.UseCases.User.Update
             _passwordEncrypter = passwordEncrypter;
             _unitOfWork = unitOfWork;
         }
-        public async Task Execute(int id, RequestRegisterUserJson request)
+        public async Task Execute(int id, RequestUpdateUserJson request)
         {
             var user = await _userUpdateOnlyRepository.GetById(id) ?? throw new NotFoundException(ResourceMessagesException.USER_NOT_FOUND);
 
@@ -50,7 +50,7 @@ namespace LaborUnion.Application.UseCases.User.Update
             await _unitOfWork.Commit();
         }
 
-        private async Task Validate(RequestRegisterUserJson request, Domain.Entities.User user)
+        private async Task Validate(RequestUpdateUserJson request, Domain.Entities.User user)
         {
             var validator = new UpdateUserValidator();
             var result = validator.Validate(request);

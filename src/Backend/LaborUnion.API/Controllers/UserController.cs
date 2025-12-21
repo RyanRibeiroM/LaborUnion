@@ -111,7 +111,7 @@ namespace LaborUnion.API.Controllers
         public async Task<IActionResult> Update(
             [FromServices] IUpdateUserUseCase useCase,
             [FromRoute] int id,
-            [FromBody] RequestRegisterUserJson request
+            [FromBody] RequestUpdateUserJson request
             )
         {
             await useCase.Execute(id, request);

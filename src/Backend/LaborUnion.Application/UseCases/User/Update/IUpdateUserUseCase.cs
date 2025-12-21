@@ -4,6 +4,6 @@ namespace LaborUnion.Application.UseCases.User.Update
 {
     public interface IUpdateUserUseCase
     {
-        public Task Execute(int id, RequestRegisterUserJson request);
+        public Task Execute(int id, RequestUpdateUserJson request);
     }
 }

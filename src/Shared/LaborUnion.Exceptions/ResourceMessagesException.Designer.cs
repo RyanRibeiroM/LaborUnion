@@ -124,6 +124,24 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a Documento não encontrado..
+        /// </summary>
+        public static string DOCUMENT_NOT_FOUND {
+            get {
+                return ResourceManager.GetString("DOCUMENT_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a A data de vencimento é obrigatória..
+        /// </summary>
+        public static string DUE_DATE_EMPTY {
+            get {
+                return ResourceManager.GetString("DUE_DATE_EMPTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a O e-mail informado já está em uso..
         /// </summary>
         public static string EMAIL_ALREADY_EXISTS {
@@ -264,6 +282,15 @@ namespace LaborUnion.Exceptions {
         public static string INVALID_DESCRIPTION {
             get {
                 return ResourceManager.GetString("INVALID_DESCRIPTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a A data de vencimento não pode ser marcada para hoje ou inferior..
+        /// </summary>
+        public static string INVALID_DUE_DATE {
+            get {
+                return ResourceManager.GetString("INVALID_DUE_DATE", resourceCulture);
             }
         }
         

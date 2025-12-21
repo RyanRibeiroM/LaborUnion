@@ -303,4 +303,13 @@
   <data name="USER_ROLE_NOT_SUPPORTED" xml:space="preserve">
     <value>A função do usuário fornecida não é suportada.</value>
   </data>
+  <data name="DUE_DATE_EMPTY" xml:space="preserve">
+    <value>A data de vencimento é obrigatória.</value>
+  </data>
+  <data name="INVALID_DUE_DATE" xml:space="preserve">
+    <value>A data de vencimento não pode ser marcada para hoje ou inferior.</value>
+  </data>
+  <data name="DOCUMENT_NOT_FOUND" xml:space="preserve">
+    <value>Documento não encontrado.</value>
+  </data>
 </root>

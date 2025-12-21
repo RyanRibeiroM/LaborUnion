@@ -7,13 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\LaborUnion.Communication\LaborUnion.Communication.csproj" />
-    <ProjectReference Include="..\..\Shared\LaborUnion.Exceptions\LaborUnion.Exceptions.csproj" />
-    <ProjectReference Include="..\LaborUnion.Domain\LaborUnion.Domain.csproj" />
+    <Compile Remove="Services\Configuration\**" />
+    <EmbeddedResource Remove="Services\Configuration\**" />
+    <None Remove="Services\Configuration\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\Configuration\" />
+    <ProjectReference Include="..\..\Shared\LaborUnion.Communication\LaborUnion.Communication.csproj" />
+    <ProjectReference Include="..\..\Shared\LaborUnion.Exceptions\LaborUnion.Exceptions.csproj" />
+    <ProjectReference Include="..\LaborUnion.Domain\LaborUnion.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

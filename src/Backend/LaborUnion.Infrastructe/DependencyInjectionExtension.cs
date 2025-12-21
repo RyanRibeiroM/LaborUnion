@@ -1,5 +1,6 @@
 ﻿using FluentMigrator.Runner;
 using LaborUnion.Domain.Repositories;
+using LaborUnion.Domain.Repositories.Document;
 using LaborUnion.Domain.Repositories.Farmer;
 using LaborUnion.Domain.Repositories.Sector;
 using LaborUnion.Domain.Repositories.Services;
@@ -80,6 +81,10 @@ namespace LaborUnion.Infrastructe
             services.AddScoped<ISectorWriteOnlyRepository, SectorRepository>();
             services.AddScoped<ISectorUpdateOnlyRepository, SectorRepository>();
 
+            services.AddScoped<IDocumentReadOnlyRepository, DocumentRepository>();
+            services.AddScoped<IDocumentWriteOnlyRepository, DocumentRepository>();
+            services.AddScoped<IDocumentUpdateOnlyRepository, DocumentRepository>();
+
             services.AddScoped<ITokenRepository, TokenRepository>();
             services.AddScoped<IRefreshTokenGenerator, RefreshTokenGenerator>();
         }
@@ -97,11 +102,9 @@ namespace LaborUnion.Infrastructe
             services.AddScoped<IAccessTokenGenerate>(option => new JwtTokenGenerator(expirationInMinutes, securityKey));
             services.AddScoped<IActivationTokenGenerator, ActivationTokenGenerator>();
         }
-
         private static void AddLoggedUser(IServiceCollection services)
         {
             services.AddScoped<ILoggedUser, LoggedUser>();
         }
-
     }
 }

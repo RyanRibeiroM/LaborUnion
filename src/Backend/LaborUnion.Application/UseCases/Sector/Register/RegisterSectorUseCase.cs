@@ -3,14 +3,8 @@ using LaborUnion.Communication.Requests;
 using LaborUnion.Communication.Responses;
 using LaborUnion.Domain.Repositories;
 using LaborUnion.Domain.Repositories.Sector;
-using LaborUnion.Domain.Repositories.ServiceType;
 using LaborUnion.Exceptions;
 using LaborUnion.Exceptions.ExceptionsBase;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LaborUnion.Application.UseCases.Sector.Register
 {

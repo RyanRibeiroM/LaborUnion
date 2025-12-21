@@ -1,9 +1,12 @@
-﻿namespace LaborUnion.Communication.Requests
+﻿using LaborUnion.Communication.Enums;
+
+namespace LaborUnion.Communication.Requests
 {
     public class RequestRegisterUserJson
     {
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public UserRoles Role { get; set; }
     }
 }

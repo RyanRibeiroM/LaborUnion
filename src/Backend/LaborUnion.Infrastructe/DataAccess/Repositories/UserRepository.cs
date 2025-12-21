@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LaborUnion.Infrastructure.DataAccess.Repositories
 {
-    public class UserRepository : IUserReadOnlyRepository, IUserWriteOnlyRepository
+    public class UserRepository : IUserReadOnlyRepository, IUserWriteOnlyRepository, IUserUpdateOnlyRepository
     {
         private readonly LaborUnionDbContext _dbContext;
 
@@ -35,6 +35,11 @@ namespace LaborUnion.Infrastructure.DataAccess.Repositories
             if (!string.IsNullOrEmpty(filter.Email))
                 query = query.Where(user => user.Email.Contains(filter.Email));
 
+            if (filter.SectorId.HasValue)
+            {
+                query = query.Where(user => user.SectorUsers.Any(su => su.SectorId == filter.SectorId));
+            }
+
             return await query.ToListAsync();
         }
 
@@ -48,10 +53,30 @@ namespace LaborUnion.Infrastructure.DataAccess.Repositories
             return await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(user => user.Id == id && user.Active);
         }
 
+        async Task<User?> IUserUpdateOnlyRepository.GetById(int id)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(user => user.Id == id && user.Active);
+        }
+
         public async Task<User?> GetByUserIdentifierAsync(Guid userIdentifier)
         {
             return await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(user => user.UserIdentifier == userIdentifier && user.Active);
         }
 
+        public async Task Delete(int id)
+        {
+            var entity = await _dbContext.Users.FindAsync(id);
+
+            if (entity is not null)
+            {
+                entity.Active = false;
+                _dbContext.Users.Update(entity);
+
+            }
+        }
+        public void Update(User user)
+        {
+            _dbContext.Users.Update(user);
+        }
     }
 }

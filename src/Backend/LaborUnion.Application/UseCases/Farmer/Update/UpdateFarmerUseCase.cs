@@ -82,7 +82,7 @@ namespace LaborUnion.Application.UseCases.Farmer.Update
                 result.Errors.Add(new FluentValidation.Results.ValidationFailure(nameof(request.Registration), ResourceMessagesException.REGISTRATION_ALREADY_EXISTS));
             }
 
-            if (!string.IsNullOrWhiteSpace(request.Email))
+            if (!string.IsNullOrWhiteSpace(request.Email) && request.Email != farmer.Email)
             {
                 var emailExistsInFarmers = farmer.Email != request.Email && await _farmerReadOnlyRepository.ExistActiveFarmerWithEmail(request.Email);
 
@@ -94,7 +94,7 @@ namespace LaborUnion.Application.UseCases.Farmer.Update
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(request.SpouseCpf))
+            if (!string.IsNullOrWhiteSpace(request.SpouseCpf) && CpfUtils.Format(request.SpouseCpf) != farmer.SpouseCpf)
             {
                 var cleanSpouseCpf = CpfUtils.Format(request.SpouseCpf);
                 var spouseCpfExists = farmer.SpouseCpf != cleanSpouseCpf && await _farmerReadOnlyRepository.ExistActiveFarmerWithSpouseCpf(cleanSpouseCpf);

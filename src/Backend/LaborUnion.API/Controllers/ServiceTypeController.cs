@@ -1,8 +1,10 @@
 ﻿using LaborUnion.Application.UseCases.Sector.GetById;
+using LaborUnion.Application.UseCases.Service.Update;
 using LaborUnion.Application.UseCases.ServiceType.Delete;
 using LaborUnion.Application.UseCases.ServiceType.Filter;
 using LaborUnion.Application.UseCases.ServiceType.GetById;
 using LaborUnion.Application.UseCases.ServiceType.Resgister;
+using LaborUnion.Application.UseCases.ServiceType.Update;
 using LaborUnion.Communication.Requests;
 using LaborUnion.Communication.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -50,6 +52,22 @@ namespace LaborUnion.API.Controllers
             [FromRoute] int id)
         {
             await useCase.Execute(id);
+
+            return NoContent();
+        }
+
+        [HttpPut]
+        [Route("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Administrator, Attendant")]
+        public async Task<IActionResult> Update(
+            [FromServices] IUpdateServiceTypeUseCase useCase,
+            [FromRoute] int id,
+            [FromBody] RequestUpdateServiceTypeJson request
+            )
+        {
+            await useCase.Execute(id, request);
 
             return NoContent();
         }

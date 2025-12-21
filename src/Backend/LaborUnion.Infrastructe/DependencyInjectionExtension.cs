@@ -60,6 +60,8 @@ namespace LaborUnion.Infrastructe
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             services.AddScoped<IUserReadOnlyRepository, UserRepository>();
+            services.AddScoped<IUserUpdateOnlyRepository, UserRepository>();
+            services.AddScoped<IUserWriteOnlyRepository, UserRepository>();
 
             services.AddScoped<IUserWriteOnlyRepository, UserRepository>();
             services.AddScoped<IFarmerReadOnlyRepository, FarmerRepository>();

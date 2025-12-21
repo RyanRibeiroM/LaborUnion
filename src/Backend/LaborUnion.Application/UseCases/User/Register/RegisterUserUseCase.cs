@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using LaborUnion.Communication.Requests;
 using LaborUnion.Communication.Responses;
+using LaborUnion.Domain.Entities;
+using LaborUnion.Domain.Enums;
 using LaborUnion.Domain.Repositories;
 using LaborUnion.Domain.Repositories.Farmer;
 using LaborUnion.Domain.Repositories.Token;
@@ -46,7 +48,7 @@ namespace LaborUnion.Application.UseCases.User.Register
 
             user.Password = _passwordEncrypter.Encrypt(request.Password);
 
-            user.Role = Domain.Enums.UserRoles.Administrator;
+            user.Role = UserRoles.Administrator;
             user.UserIdentifier = Guid.NewGuid();
 
             var token = _accessTokenGenerate.Generate(user);
@@ -68,7 +70,7 @@ namespace LaborUnion.Application.UseCases.User.Register
         }
         public async Task<string> CreateAndSaveRefreshToken(Domain.Entities.User usuario)
         {
-            var refreshToken = new Domain.Entities.RefreshToken
+            var refreshToken = new RefreshToken
             {
                 Value = _refreshTokenGenerator.Generate(),
                 UserId = usuario.Id
@@ -85,6 +87,9 @@ namespace LaborUnion.Application.UseCases.User.Register
         {
             var validator = new RegisterUserValidator();
             var result = await validator.ValidateAsync(request);
+
+            //if (Enum.IsDefined(typeof(PrivilegedUserRoles), (int)request.Role))
+            //    throw new NotFoundException(ResourceMessagesException.USER_ROLE_NOT_SUPPORTED);
 
             var emailExists = await _readOnlyRepository.ExistActiveUserWithEmailAsync(request.Email);
             var emailExistsInFarmers = await _farmerReadOnlyRepository.ExistActiveFarmerWithEmail(request.Email);

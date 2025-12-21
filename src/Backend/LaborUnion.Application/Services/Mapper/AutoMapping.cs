@@ -29,6 +29,7 @@ namespace LaborUnion.Application.Services.Mapper
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
             CreateMap<User, ResponseUserJson>()
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
+            CreateMap<User, ResponseUserShortJson>();
 
             CreateMap<Farmer, ResponseRegisteredFarmerJson>();
             CreateMap<Farmer, ResponseFarmerShortJson>();

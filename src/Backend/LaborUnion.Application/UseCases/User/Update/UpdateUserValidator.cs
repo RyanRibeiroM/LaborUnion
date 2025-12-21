@@ -3,22 +3,27 @@ using LaborUnion.Application.Shared.Validators;
 using LaborUnion.Communication.Requests;
 using LaborUnion.Exceptions;
 
-namespace LaborUnion.Application.UseCases.User.Register
+namespace LaborUnion.Application.UseCases.User.Update
 {
-    public class RegisterUserValidator : AbstractValidator<RequestRegisterUserJson>
+    internal class UpdateUserValidator : AbstractValidator<RequestRegisterUserJson>
     {
-        public RegisterUserValidator()
+        public UpdateUserValidator()
         {
             RuleFor(user => user.Name)
                 .NotEmpty()
                 .WithMessage(ResourceMessagesException.NAME_EMPTY);
 
             Include(new EmailValidator<RequestRegisterUserJson>());
-            Include(new PasswordValidator<RequestRegisterUserJson>());
 
             RuleFor(user => user.Role)
                 .IsInEnum()
-                    .WithMessage(ResourceMessagesException.USER_ROLE_NOT_SUPPORTED);
+                .WithMessage(ResourceMessagesException.USER_ROLE_NOT_SUPPORTED);
+
+            When(user => !string.IsNullOrWhiteSpace(user.Password), () =>
+            {
+                Include(new PasswordValidator<RequestRegisterUserJson>());
+            });
         }
+
     }
 }

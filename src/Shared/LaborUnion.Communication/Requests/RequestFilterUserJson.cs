@@ -1,8 +1,8 @@
-﻿using LaborUnion.Domain.Enums;
+﻿using LaborUnion.Communication.Enums;
 
-namespace LaborUnion.Domain.Dtos
+namespace LaborUnion.Communication.Requests
 {
-    public record FilterUserDto
+    public class RequestFilterUserJson
     {
         public string? Name { get; set; }
         public string? Email { get; set; }

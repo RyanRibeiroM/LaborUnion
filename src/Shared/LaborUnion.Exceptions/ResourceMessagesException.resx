@@ -297,4 +297,10 @@
   <data name="SERVICE_NOT_FOUND" xml:space="preserve">
     <value>Atendimento não encontrado.</value>
   </data>
+  <data name="INCORRECT_PASSWORD_PROVIDED" xml:space="preserve">
+    <value>A senha atual que foi fornecida está incorreta.</value>
+  </data>
+  <data name="USER_ROLE_NOT_SUPPORTED" xml:space="preserve">
+    <value>A função do usuário fornecida não é suportada.</value>
+  </data>
 </root>

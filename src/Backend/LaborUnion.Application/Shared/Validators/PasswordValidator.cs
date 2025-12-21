@@ -6,9 +6,9 @@ namespace LaborUnion.Application.Shared.Validators
 {
     public class PasswordValidator<T> : AbstractValidator<T> where T : class
     {
-        public PasswordValidator()
+        public PasswordValidator(string propertyName = "Password")
         {
-            RuleFor(x => PasswordValidator<T>.GetPasswordValue(x))
+            RuleFor(x => PasswordValidator<T>.GetPasswordValue(x, propertyName))
                 .NotEmpty().WithMessage(ResourceMessagesException.PASSWORD_EMPTY)
                 .MinimumLength(8).WithMessage(ResourceMessagesException.PASSWORD_MINIMUM_LENGTH_EIGTH_CHAR)
                 .Matches("[A-Z]").WithMessage(ResourceMessagesException.PASSWORD_MUST_CONTAIN_UPPERCASE)
@@ -17,9 +17,9 @@ namespace LaborUnion.Application.Shared.Validators
                 .Matches("[^a-zA-Z0-9]").WithMessage(ResourceMessagesException.PASSWORD_MUST_CONTAIN_SPECIAL_CHAR);
         }
 
-        private static string GetPasswordValue(T instance)
+        private static string GetPasswordValue(T instance, string propertyName)
         {
-            var prop = typeof(T).GetProperty("Password", BindingFlags.Public | BindingFlags.Instance);
+            var prop = typeof(T).GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
             return prop?.GetValue(instance) as string ?? string.Empty;
         }
     }

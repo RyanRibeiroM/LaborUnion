@@ -22,9 +22,16 @@ using LaborUnion.Application.UseCases.ServiceType.Filter;
 using LaborUnion.Application.UseCases.ServiceType.GetById;
 using LaborUnion.Application.UseCases.ServiceType.Register;
 using LaborUnion.Application.UseCases.ServiceType.Resgister;
+using LaborUnion.Application.UseCases.ServiceType.Update;
 using LaborUnion.Application.UseCases.Token.RefreshToken;
+using LaborUnion.Application.UseCases.User.ChangePassword;
+using LaborUnion.Application.UseCases.User.Delete;
+using LaborUnion.Application.UseCases.User.Filter;
+using LaborUnion.Application.UseCases.User.GetById;
 using LaborUnion.Application.UseCases.User.Profile;
 using LaborUnion.Application.UseCases.User.Register;
+using LaborUnion.Application.UseCases.User.Update;
+using LaborUnion.Application.UseCases.User.UpdateProfile;
 using Microsoft.Extensions.DependencyInjection;
 namespace LaborUnion.Application
 {
@@ -46,6 +53,12 @@ namespace LaborUnion.Application
 
             services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
             services.AddScoped<IGetUserProfileUseCase, GetUserProfileUseCase>();
+            services.AddScoped<IGetUserByIdUseCase, GetUserByIdUseCase>();
+            services.AddScoped<IChangePasswordUseCase, ChangePasswordUseCase>();
+            services.AddScoped<IFilterUserUseCase, FilterUserUseCase>();
+            services.AddScoped<IDeleteUserUseCase, DeleteUserUseCase>();
+            services.AddScoped<IUpdateUserUseCase, UpdateUserUseCase>();
+            services.AddScoped<IUpdateUserProfileUseCase, UpdateUserProfileUseCase>();
 
             services.AddScoped<IRegisterFarmerUseCase, RegisterFarmerUseCase>();
             services.AddScoped<IUpdateFarmerUseCase, UpdateFarmerUseCase>();
@@ -57,6 +70,7 @@ namespace LaborUnion.Application
             services.AddScoped<IGetServiceTypeByIdUseCase, GetServiceTypeByIdUseCase>();
             services.AddScoped<IFilterServiceTypeUseCase, FilterServiceTypeUseCase>();
             services.AddScoped<IDeleteServiceTypeUseCase, DeleteServiceTypeUseCase>();
+            services.AddScoped<IUpdateServiceTypeUseCase, UpdateServiceTypeUseCase>();
 
             services.AddScoped<IRegisterSectorUseCase, RegisterSectorUseCase>();
             services.AddScoped<IGetSectorByIdUseCase, GetSectorByIdUseCase>();
@@ -73,7 +87,6 @@ namespace LaborUnion.Application
             services.AddScoped<IFilterServiceUseCase, FilterServiceUseCase>();
             services.AddScoped<IDeleteServiceUseCase, DeleteServiceUseCase>();
             services.AddScoped<IUpdateServiceUseCase, UpdateServiceUseCase>();
-
         }
     }
 }

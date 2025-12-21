@@ -187,6 +187,15 @@ namespace LaborUnion.Exceptions {
         }
         
         /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a A senha atual que foi fornecida está incorreta..
+        /// </summary>
+        public static string INCORRECT_PASSWORD_PROVIDED {
+            get {
+                return ResourceManager.GetString("INCORRECT_PASSWORD_PROVIDED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Consulta uma cadeia de caracteres localizada semelhante a O CEP do endereço é inválido..
         /// </summary>
         public static string INVALID_ADDRESS_CEP {
@@ -588,6 +597,15 @@ namespace LaborUnion.Exceptions {
         public static string USER_NOT_FOUND {
             get {
                 return ResourceManager.GetString("USER_NOT_FOUND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta uma cadeia de caracteres localizada semelhante a A função do usuário fornecida não é suportada..
+        /// </summary>
+        public static string USER_ROLE_NOT_SUPPORTED {
+            get {
+                return ResourceManager.GetString("USER_ROLE_NOT_SUPPORTED", resourceCulture);
             }
         }
         

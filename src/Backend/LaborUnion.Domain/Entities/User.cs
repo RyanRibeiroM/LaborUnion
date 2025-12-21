@@ -8,5 +8,6 @@ namespace LaborUnion.Domain.Entities
         public string Password { get; set; } = string.Empty;
         public Guid UserIdentifier { get; set; } = Guid.NewGuid();
         public UserRoles Role { get; set; }
+        public virtual ICollection<SectorUser> SectorUsers { get; set; } = new List<SectorUser>();
     }
 }

@@ -1,5 +1,4 @@
-﻿using LaborUnion.Application.UseCases.Farmer.Update;
-using LaborUnion.Application.UseCases.Service.Delete;
+﻿using LaborUnion.Application.UseCases.Service.Delete;
 using LaborUnion.Application.UseCases.Service.Filter;
 using LaborUnion.Application.UseCases.Service.GetById;
 using LaborUnion.Application.UseCases.Service.Register;

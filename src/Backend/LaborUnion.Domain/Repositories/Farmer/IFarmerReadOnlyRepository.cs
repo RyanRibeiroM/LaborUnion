@@ -13,7 +13,7 @@ namespace LaborUnion.Domain.Repositories.Farmer
         Task<Entities.Farmer?> GetById(int id);
         Task<Entities.Farmer?> GetByCpf(string cpf);
         Task<IList<Entities.Farmer>> Filter(FilterFarmerDto filters);
-        Task<int> CountTotalFarmers();
+        Task<int> CountAllFarmers();
         Task<int> CountFarmersByCity(string city);
         Task<int> CountFarmersRegisteredInTheLastMonth();
     }

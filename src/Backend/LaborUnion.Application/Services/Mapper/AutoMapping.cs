@@ -2,6 +2,7 @@
 using LaborUnion.Communication.Responses;
 using LaborUnion.Communication.Requests;
 using LaborUnion.Domain.Entities;
+using LaborUnion.Domain.Dtos;
 
 namespace LaborUnion.Application.Services.Mapper
 {
@@ -11,6 +12,7 @@ namespace LaborUnion.Application.Services.Mapper
         {
             RequestToDomain();
             DomainToResponse();
+            DtoToResponse();
         }
 
         private void RequestToDomain()
@@ -22,6 +24,11 @@ namespace LaborUnion.Application.Services.Mapper
             CreateMap<RequestRegisterSectorJson, Sector>();
             CreateMap<RequestRegisterServiceJson, Service>();
             CreateMap<RequestRegisterDocumentJson, Document>();
+        }
+
+        private void DtoToResponse()
+        {
+            CreateMap<DashboardChartDto, ResponseChartDataJson>();
         }
 
         private void DomainToResponse()

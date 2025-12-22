@@ -1,4 +1,8 @@
 ﻿using LaborUnion.Application.Services.Mapper;
+using LaborUnion.Application.UseCases.Dashboard.Accountant;
+using LaborUnion.Application.UseCases.Dashboard.GetDocument;
+using LaborUnion.Application.UseCases.Dashboard.GetSector;
+using LaborUnion.Application.UseCases.Dashboard.GetServiceType;
 using LaborUnion.Application.UseCases.Document.Delete;
 using LaborUnion.Application.UseCases.Document.Filter;
 using LaborUnion.Application.UseCases.Document.GetById;
@@ -98,6 +102,11 @@ namespace LaborUnion.Application
             services.AddScoped<IFilterDocumentUseCase, FilterDocumentUseCase>();
             services.AddScoped<IUpdateDocumentUseCase, UpdateDocumentUseCase>();
             services.AddScoped<IGetDocumentByIdUseCase, GetDocumentByIdUseCase>();
+
+            services.AddScoped<IGetDashboardAccountantsUseCase, GetDashboardAccountantsUseCase>();
+            services.AddScoped<IGetDashboardDocumentUseCase, GetDashboardDocumentUseCase>();
+            services.AddScoped<IGetDashboardSectorUseCase, GetDashboardSectorUseCase>();
+            services.AddScoped<IGetDashboardServiceTypeUseCase, GetDashboardServiceTypeUseCase>();
         }
     }
 }

@@ -110,7 +110,7 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
             return await query.OrderBy(f => f.Name).ToListAsync();
         }
 
-        public async Task<int> CountTotalFarmers()
+        public async Task<int> CountAllFarmers()
         {
             return await _dbContext.Farmers
                 .AsNoTracking()

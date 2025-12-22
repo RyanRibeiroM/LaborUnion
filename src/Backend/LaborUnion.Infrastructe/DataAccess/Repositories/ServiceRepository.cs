@@ -15,6 +15,20 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
             await _dbContext.Services.AddAsync(service);
         }
 
+        public async Task<int> CountServicesRegistered()
+        {
+            return await _dbContext.Services.AsNoTracking().Where(s => s.Active).CountAsync();
+        }
+
+        public async Task<int> CountServicesRegisteredInTheLastMonth()
+        {
+            var lastMonth = DateTime.UtcNow.AddDays(-30);
+
+            return await _dbContext.Services
+                .AsNoTracking()
+                .CountAsync(f => f.Active && f.CreatedOn >= lastMonth);
+        }
+
         public async Task Delete(int id)
         {
             var entity = await _dbContext.Services.FindAsync(id);
@@ -117,6 +131,51 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
                 .Include(s => s.Attendant)
                 .Include(s => s.Sector)
                 .FirstOrDefaultAsync(s => s.Id == id && s.Active);
+        }
+
+        public async Task<IList<DashboardChartDto>> GetCountBySector()
+        {
+            var today = DateTime.Today;
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+            var startOfYear = new DateTime(today.Year, 1, 1);
+
+            return await _dbContext.Services
+                .AsNoTracking()
+                .Where(s => s.Active)
+                .GroupBy(s => new { s.Sector.Id, s.Sector.Name })
+                .Select(g => new DashboardChartDto
+                {
+                    Id = g.Key.Id,
+                    Name = g.Key.Name,
+                    AllCount = g.Count(),
+                    MonthCount = g.Count(s => s.CreatedOn >= startOfMonth),
+                    YearCount = g.Count(s => s.CreatedOn >= startOfYear)
+
+                })
+                .OrderByDescending(x => x.AllCount)
+                .ToListAsync();
+        }
+
+        public async Task<IList<DashboardChartDto>> GetCountByServiceType()
+        {
+            var today = DateTime.Today;
+            var startOfMonth = new DateTime(today.Year, today.Month, 1);
+            var startOfYear = new DateTime(today.Year, 1, 1);
+
+            return await _dbContext.Services
+                .AsNoTracking()
+                .Where(s => s.Active)
+                .GroupBy(s => new { s.ServiceType.Id, s.ServiceType.Name })
+                .Select(g => new DashboardChartDto
+                {
+                    Id = g.Key.Id,
+                    Name = g.Key.Name,
+                    AllCount = g.Count(),
+                    MonthCount = g.Count(s => s.CreatedOn >= startOfMonth),
+                    YearCount = g.Count(s => s.CreatedOn >= startOfYear)
+                })
+                .OrderByDescending(x => x.AllCount)
+                .ToListAsync();
         }
 
         public void Update(Service service)

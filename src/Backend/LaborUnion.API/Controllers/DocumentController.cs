@@ -3,7 +3,6 @@ using LaborUnion.Application.UseCases.Document.Filter;
 using LaborUnion.Application.UseCases.Document.GetById;
 using LaborUnion.Application.UseCases.Document.Register;
 using LaborUnion.Application.UseCases.Document.Update;
-using LaborUnion.Application.UseCases.Farmer.GetById;
 using LaborUnion.Communication.Requests;
 using LaborUnion.Communication.Responses;
 using Microsoft.AspNetCore.Authorization;

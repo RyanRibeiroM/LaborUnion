@@ -18,11 +18,17 @@ namespace LaborUnion.Infrastructe.DataAccess.Repositories
 
         public async Task<int> CountDocumentsThatExpiredThisMonth()
         {
-            var lastMonth = DateOnly.FromDateTime(DateTime.Today.AddDays(-30));
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
+            var firstDayOfMonth = new DateOnly(today.Year, today.Month, 1);
+
+            var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
 
             return await _dbContext.Documents
                 .AsNoTracking()
-                .CountAsync(f => f.Active && f.DueDate >= lastMonth);
+                .CountAsync(d => d.Active &&
+                                 d.DueDate >= firstDayOfMonth &&
+                                 d.DueDate <= lastDayOfMonth);  
         }
 
         public async Task<int> CountExpiredDocuments()

@@ -14,14 +14,6 @@
     box-sizing: border-box;
 }
 
-/* Base styles */
-.configuracao-content {
-    padding: 20px;
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-}
-
 .page-title {
     font-size: 2rem;
     margin-top: 0;

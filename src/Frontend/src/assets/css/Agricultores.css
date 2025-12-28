@@ -603,9 +603,6 @@
 /* ============================================= */
 
 @media (max-width: 768px) {
-    .agricultores-main {
-        padding: 20px;
-    }
 
     .page-title {
         font-size: 1.75rem;
@@ -779,26 +776,28 @@
 
     /* Pagination Mobile */
     .pagination-container {
-        flex-wrap: wrap;
-        gap: 10px;
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
         padding-top: 15px;
+        justify-content: center;
     }
 
     .pagination-btn {
-        padding: 10px 15px;
-        font-size: 0.85rem;
+        padding: 8px 12px !important;
+        font-size: 0.8rem !important;
     }
 
     .pagination-numbers {
-        order: 3;
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
+        display: flex !important;
+        order: unset !important;
+        width: auto !important;
+        gap: 4px;
     }
 
     .pagination-number {
-        width: 36px;
-        height: 36px;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.85rem;
     }
 
     .status-badge {

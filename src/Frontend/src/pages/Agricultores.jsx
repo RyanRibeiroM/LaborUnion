@@ -4,12 +4,21 @@ import { Edit, Trash2, Eye, Loader2, ArrowLeft } from 'lucide-react';
 import '../assets/css/Agricultores.css';
 import ModalConfirmacao from '../components/ModalConfirmacao';
 import Toast from '../components/Toast';
+import MobileCard from '../components/MobileCard';
 
 const Agricultores = () => {
     const location = useLocation();
     const [activeTab, setActiveTab] = useState('lista');
     const [busca, setBusca] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    // Detectar mudança de tamanho da tela
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const [formData, setFormData] = useState({
         nome: '',
@@ -527,49 +536,85 @@ const Agricultores = () => {
                                 />
                             </div>
 
-                            <div className="table-responsive">
-                                <table className="farmers-table">
-                                    <thead>
-                                        <tr>
-                                            <th>id</th>
-                                            <th>Nome Completo</th>
-                                            <th>CPF</th>
-                                            <th>Cidade</th>
-                                            <th>Status</th>
-                                            <th>Ações</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {currentItems.map((item) => (
-                                            <tr key={item.id}>
-                                                <td><strong>{item.id}</strong></td>
-                                                <td><strong>{item.nome}</strong></td>
-                                                <td>{item.cpf}</td>
-                                                <td>{item.cidade}</td>
-                                                <td><span className={`status-badge ${item.status.toLowerCase()}`}>{item.status}</span></td>
-                                                <td>
-                                                    <div className="action-buttons-row">
-                                                        <button
-                                                            className="icon-btn view"
-                                                            onClick={() => handleView(item)}
-                                                            title="Visualizar"
-                                                        >
-                                                            <Eye size={18} />
-                                                        </button>
-                                                        <button
-                                                            className="icon-btn delete"
-                                                            onClick={() => handleDelete(item.id)}
-                                                            title="Excluir"
-                                                        >
-                                                            <Trash2 size={18} />
-                                                        </button>
-                                                    </div>
-                                                </td>
+                            {/* Renderização condicional: Cards no mobile, Tabela no desktop */}
+                            {isMobile ? (
+                                <div className="mobile-cards-container">
+                                    {currentItems.map((item) => (
+                                        <MobileCard
+                                            key={item.id}
+                                            fields={[
+                                                { label: 'ID', value: item.id },
+                                                { label: 'Nome', value: item.nome, highlight: true },
+                                                { label: 'CPF', value: item.cpf },
+                                                { label: 'Cidade', value: item.cidade },
+                                                { label: 'Status', value: <span className={`status-badge ${item.status.toLowerCase()}`}>{item.status}</span> }
+                                            ]}
+                                            actions={
+                                                <>
+                                                    <button
+                                                        className="icon-action"
+                                                        onClick={() => handleView(item)}
+                                                        title="Visualizar"
+                                                    >
+                                                        <Eye size={20} />
+                                                    </button>
+                                                    <button
+                                                        className="icon-action danger"
+                                                        onClick={() => handleDelete(item.id)}
+                                                        title="Excluir"
+                                                    >
+                                                        <Trash2 size={20} />
+                                                    </button>
+                                                </>
+                                            }
+                                        />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="table-responsive">
+                                    <table className="farmers-table">
+                                        <thead>
+                                            <tr>
+                                                <th>id</th>
+                                                <th>Nome Completo</th>
+                                                <th>CPF</th>
+                                                <th>Cidade</th>
+                                                <th>Status</th>
+                                                <th>Ações</th>
                                             </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            {currentItems.map((item) => (
+                                                <tr key={item.id}>
+                                                    <td><strong>{item.id}</strong></td>
+                                                    <td><strong>{item.nome}</strong></td>
+                                                    <td>{item.cpf}</td>
+                                                    <td>{item.cidade}</td>
+                                                    <td><span className={`status-badge ${item.status.toLowerCase()}`}>{item.status}</span></td>
+                                                    <td>
+                                                        <div className="action-buttons-row">
+                                                            <button
+                                                                className="icon-btn view"
+                                                                onClick={() => handleView(item)}
+                                                                title="Visualizar"
+                                                            >
+                                                                <Eye size={18} />
+                                                            </button>
+                                                            <button
+                                                                className="icon-btn delete"
+                                                                onClick={() => handleDelete(item.id)}
+                                                                title="Excluir"
+                                                            >
+                                                                <Trash2 size={18} />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
 
                             {/* Controles de PaginaÃ§Ã£o */}
                             {totalPages > 1 && (

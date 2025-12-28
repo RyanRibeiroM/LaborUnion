@@ -212,6 +212,7 @@ footer {
         margin-right: 10px;
         padding-right: 0;
     }
+
     .sidebar.collapsed {
         background-color: transparent;
         border: none;
@@ -219,6 +220,7 @@ footer {
         width: auto;
         height: 100%;
     }
+
     .sidebar.collapsed .sidebar-header {
         padding: 0;
     }

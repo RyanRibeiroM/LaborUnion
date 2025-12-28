@@ -1,0 +1,125 @@
+/* =========================================
+   MOBILE CARD - Componente Reutilizável
+   Padroniza cards de tabela em mobile
+   ========================================= */
+
+.mobile-card {
+    background-color: #fff;
+    border: 1px solid #e1e1e1;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    padding: 18px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
+}
+
+.mobile-card:hover {
+    border-color: #c8e6c9;
+    box-shadow: 0 4px 12px rgba(74, 139, 88, 0.08);
+}
+
+.mobile-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.mobile-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.mobile-card-row:last-child {
+    border-bottom: none;
+}
+
+.mobile-card-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #4a8b58;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mobile-card-value {
+    font-size: 0.95rem;
+    color: #333;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
+}
+
+.mobile-card-value.highlight {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #2d2d2d;
+}
+
+/* Actions Container */
+.mobile-card-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding-top: 15px;
+    margin-top: 5px;
+    border-top: 1px solid #eee;
+}
+
+.mobile-card-actions button,
+.mobile-card-actions .icon-action {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-card-actions button:hover,
+.mobile-card-actions .icon-action:hover {
+    background-color: #f0f5f1;
+    color: #4a8b58;
+}
+
+.mobile-card-actions .icon-action.danger:hover {
+    background-color: #fee;
+    color: #dc3545;
+}
+
+/* Status Tags dentro do card */
+.mobile-card .status-badge,
+.mobile-card .status-tag {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+/* Status Regular/Ativo */
+.mobile-card .status-badge.regular,
+.mobile-card .status-tag.concluído {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+/* Status Inativo/Pendente */
+.mobile-card .status-badge.inativo,
+.mobile-card .status-tag.pendente {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Status Em Andamento */
+.mobile-card .status-tag.em-andamento {
+    background-color: #fff3cd;
+    color: #856404;
+}

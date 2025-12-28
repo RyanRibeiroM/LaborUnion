@@ -715,26 +715,3 @@
         grid-template-columns: 1fr;
     }
 }
-
-.pagination-container {
-    flex-wrap: wrap;
-    gap: 10px;
-    padding-top: 15px;
-}
-
-.pagination-btn {
-    padding: 10px 15px;
-    font-size: 0.85rem;
-}
-
-.pagination-numbers {
-    order: 3;
-    width: 100%;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.pagination-number {
-    width: 36px;
-    height: 36px;
-}

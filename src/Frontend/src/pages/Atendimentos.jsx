@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Eye, FileText, CheckCircle, AlertCircle, AlertTriangle, X, ArrowLeft, Printer } from 'lucide-react';
+import { Eye, FileText, ArrowLeft, Printer } from 'lucide-react';
 import '../assets/css/Atendimentos.css';
+import Toast from '../components/Toast';
 
 const Atendimentos = () => {
     const [activeTab, setActiveTab] = useState('registrar');
@@ -223,9 +224,10 @@ const Atendimentos = () => {
     // Toast function
     const showToast = (message, type = 'info') => {
         setToast({ show: true, message, type });
-        setTimeout(() => {
-            setToast({ show: false, message: '', type: 'info' });
-        }, 3500);
+    };
+
+    const closeToast = () => {
+        setToast({ show: false, message: '', type: 'info' });
     };
 
     // Simular carregamento inicial
@@ -507,21 +509,12 @@ const Atendimentos = () => {
     return (
         <div className="atendimentos-content">
             {/* Toast Notification */}
-            {toast.show && (
-                <div className={`toast-notification toast-${toast.type}`}>
-                    {toast.type === 'success' && <CheckCircle size={20} />}
-                    {toast.type === 'error' && <AlertCircle size={20} />}
-                    {toast.type === 'warning' && <AlertTriangle size={20} />}
-                    {toast.type === 'info' && <AlertCircle size={20} />}
-                    <span className="toast-message">{toast.message}</span>
-                    <button
-                        className="toast-close-btn"
-                        onClick={() => setToast({ show: false, message: '', type: 'info' })}
-                    >
-                        <X size={16} />
-                    </button>
-                </div>
-            )}
+            <Toast
+                show={toast.show}
+                message={toast.message}
+                type={toast.type}
+                onClose={closeToast}
+            />
 
             <h1 className="page-title">Atendimentos</h1>
 

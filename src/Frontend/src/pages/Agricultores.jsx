@@ -1,8 +1,9 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Edit, Trash2, Eye, Save, Eraser, Loader2, X, ArrowLeft, CheckCircle, AlertCircle, AlertTriangle } from 'lucide-react';
+import { Edit, Trash2, Eye, Loader2, ArrowLeft } from 'lucide-react';
 import '../assets/css/Agricultores.css';
 import ModalConfirmacao from '../components/ModalConfirmacao';
+import Toast from '../components/Toast';
 
 const Agricultores = () => {
     const location = useLocation();
@@ -107,9 +108,10 @@ const Agricultores = () => {
 
     const showToast = (message, type = 'info') => {
         setToast({ show: true, message, type });
-        setTimeout(() => {
-            setToast({ show: false, message: '', type: 'info' });
-        }, 3500);
+    };
+
+    const closeToast = () => {
+        setToast({ show: false, message: '', type: 'info' });
     };
 
     const handleDelete = (id) => {
@@ -487,20 +489,12 @@ const Agricultores = () => {
     return (
         <>
             {/* Toast Notification */}
-            {toast.show && (
-                <div className={`toast-notification toast-${toast.type}`}>
-                    {toast.type === 'success' && <CheckCircle size={20} />}
-                    {toast.type === 'error' && <AlertCircle size={20} />}
-                    {toast.type === 'warning' && <AlertTriangle size={20} />}
-                    <span className="toast-message">{toast.message}</span>
-                    <button
-                        className="toast-close-btn"
-                        onClick={() => setToast({ show: false, message: '', type: 'info' })}
-                    >
-                        <X size={16} />
-                    </button>
-                </div>
-            )}
+            <Toast
+                show={toast.show}
+                message={toast.message}
+                type={toast.type}
+                onClose={closeToast}
+            />
             <div className="agricultores-main">
                 <h1 className="page-title">Agricultores</h1>
 
@@ -999,9 +993,9 @@ const Agricultores = () => {
 
                     {activeTab === 'visualizar' && viewingAgricultor && (
                         <div className="form-container fade-in">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                                <h2 className="form-title">Ficha do Agricultor</h2>
-                                <div style={{ display: 'flex', gap: '10px' }}>
+                            <div className="view-header">
+                                <h2 className="form-title" style={{ margin: 0 }}>Ficha do Agricultor</h2>
+                                <div className="view-header-buttons">
                                     <button
                                         type="button"
                                         className="btn-solid-green"
@@ -1257,14 +1251,14 @@ const Agricultores = () => {
                 </div>
 
                 {/* Modal de Exclusão */}
-                <ModalConfirmacao 
-                isOpen={showDeleteModal}
-                onCancel={cancelDelete}
-                onConfirm={confirmDelete}
-                title="Confirmar Exclusão"
-                message="Tem certeza que deseja excluir este agricultor? Esta ação não pode ser desfeita."
-                confirmText="Excluir"
-                tipo="delete"
+                <ModalConfirmacao
+                    isOpen={showDeleteModal}
+                    onCancel={cancelDelete}
+                    onConfirm={confirmDelete}
+                    title="Confirmar Exclusão"
+                    message="Tem certeza que deseja excluir este agricultor? Esta ação não pode ser desfeita."
+                    confirmText="Excluir"
+                    tipo="delete"
                 />
             </div>
         </>

@@ -104,7 +104,7 @@ export function formToApiData(formData, conjuge) {
         spouseName: conjuge?.nome || null,
         spouseCpf: cleanCpf(conjuge?.cpf),
         birthDate: formatDate(formData.dataNascimento),
-        isAlive: true,
+        isAlive: formData.isAlive !== undefined ? formData.isAlive : true,
         addressNumber: formData.numero || null,
         addressNeighborhood: formData.bairro || null,
         addressCity: formData.cidade || null,
@@ -141,10 +141,7 @@ export function apiToFormData(apiData) {
         id: apiData.id,
         nome: apiData.name || '',
         cpf: formatCpf(apiData.cpf),
-        rg: '',
         dataNascimento: apiData.birthDate || '',
-        cidadeNascimento: '',
-        ufNascimento: '',
         estadoCivil: apiData.maritalStatus ? MaritalStatusLabels[apiData.maritalStatus] : '',
         profissao: apiData.profession || '',
         matricula: apiData.registration || '',
@@ -152,20 +149,15 @@ export function apiToFormData(apiData) {
         email: apiData.email || '',
         dataCadastro: apiData.createdOn ? apiData.createdOn.split('T')[0] : '',
         cep: formatCep(apiData.addressCep),
-        rua: '',
         numero: apiData.addressNumber || '',
-        complemento: '',
         pontoReferencia: apiData.addressReference || '',
         bairro: apiData.addressNeighborhood || '',
         cidade: apiData.addressCity || '',
         estado: apiData.addressUf || '',
+        isAlive: apiData.isAlive !== undefined ? apiData.isAlive : true,
         conjuge: apiData.spouseName ? {
             nome: apiData.spouseName,
-            cpf: formatCpf(apiData.spouseCpf),
-            rg: '',
-            cidadeNascimento: '',
-            ufNascimento: '',
-            profissao: ''
+            cpf: formatCpf(apiData.spouseCpf)
         } : null
     };
 }

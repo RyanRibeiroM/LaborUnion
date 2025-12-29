@@ -36,7 +36,8 @@ const Agricultores = () => {
         pontoReferencia: '',
         bairro: '',
         cidade: '',
-        estado: ''
+        estado: '',
+        isAlive: true
     });
 
     const [conjuge, setConjuge] = useState({
@@ -388,7 +389,8 @@ const Agricultores = () => {
             pontoReferencia: '',
             bairro: '',
             cidade: '',
-            estado: ''
+            estado: '',
+            isAlive: true
         });
         setConjuge({
             nome: '',
@@ -470,7 +472,8 @@ const Agricultores = () => {
                     id: farmer.id,
                     nome: farmer.name || '',
                     cpf: farmer.cpf ? farmer.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '',
-                    cidade: farmer.registration || '',
+                    cidade: farmer.addressCity || '',
+                    matricula: farmer.registration || '',
                     status: 'Regular'
                 }));
                 setDadosAgricultores(formattedFarmers);
@@ -554,7 +557,7 @@ const Agricultores = () => {
                                                 { label: 'ID', value: item.id },
                                                 { label: 'Nome', value: item.nome, highlight: true },
                                                 { label: 'CPF', value: item.cpf },
-                                                { label: 'Cidade', value: item.cidade },
+                                                { label: 'Matricula', value: item.matricula },
                                                 { label: 'Status', value: <span className={`status-badge ${item.status.toLowerCase()}`}>{item.status}</span> }
                                             ]}
                                             actions={
@@ -586,7 +589,7 @@ const Agricultores = () => {
                                                 <th>id</th>
                                                 <th>Nome Completo</th>
                                                 <th>CPF</th>
-                                                <th>Cidade</th>
+                                                <th>Matrícula</th>
                                                 <th>Status</th>
                                                 <th>Ações</th>
                                             </tr>
@@ -597,7 +600,7 @@ const Agricultores = () => {
                                                     <td><strong>{item.id}</strong></td>
                                                     <td><strong>{item.nome}</strong></td>
                                                     <td>{item.cpf}</td>
-                                                    <td>{item.cidade}</td>
+                                                    <td>{item.matricula}</td>
                                                     <td><span className={`status-badge ${item.status.toLowerCase()}`}>{item.status}</span></td>
                                                     <td>
                                                         <div className="action-buttons-row">
@@ -737,6 +740,21 @@ const Agricultores = () => {
                                                 value={formData.profissao}
                                                 onChange={handleChange}
                                             />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group half-width">
+                                            <label>Situação</label>
+                                            <select
+                                                name="isAlive"
+                                                className="form-input form-select"
+                                                value={formData.isAlive}
+                                                onChange={(e) => setFormData({ ...formData, isAlive: e.target.value === 'true' })}
+                                            >
+                                                <option value="true">Vivo</option>
+                                                <option value="false">Falecido</option>
+                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -1001,6 +1019,17 @@ const Agricultores = () => {
                                             {viewingAgricultor.estadoCivil || '-'}
                                         </div>
                                     </div>
+                                    <div className="form-group half-width">
+                                        <label>Situação</label>
+                                        <div style={{ marginTop: '8px' }}>
+                                            <span className={`status-badge ${viewingAgricultor.isAlive ? 'regular' : 'bloqueado'}`}>
+                                                {viewingAgricultor.isAlive ? 'Vivo' : 'Falecido'}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
                                     <div className="form-group half-width">
                                         <label>Status</label>
                                         <div style={{ marginTop: '8px' }}>

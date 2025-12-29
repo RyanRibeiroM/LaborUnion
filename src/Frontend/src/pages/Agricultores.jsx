@@ -5,6 +5,7 @@ import '../assets/css/Agricultores.css';
 import ModalConfirmacao from '../components/ModalConfirmacao';
 import Toast from '../components/Toast';
 import MobileCard from '../components/MobileCard';
+import { filterFarmers, createFarmer, updateFarmer, deleteFarmer, getFarmerById, formToApiData, apiToFormData } from '../services/farmerService';
 
 const Agricultores = () => {
     const location = useLocation();
@@ -23,10 +24,7 @@ const Agricultores = () => {
     const [formData, setFormData] = useState({
         nome: '',
         cpf: '',
-        rg: '',
         dataNascimento: '',
-        cidadeNascimento: '',
-        ufNascimento: '',
         estadoCivil: '',
         profissao: '',
         matricula: '',
@@ -34,9 +32,7 @@ const Agricultores = () => {
         email: '',
         dataCadastro: new Date().toISOString().split('T')[0],
         cep: '',
-        rua: '',
         numero: '',
-        complemento: '',
         pontoReferencia: '',
         bairro: '',
         cidade: '',
@@ -45,11 +41,7 @@ const Agricultores = () => {
 
     const [conjuge, setConjuge] = useState({
         nome: '',
-        cpf: '',
-        rg: '',
-        cidadeNascimento: '',
-        ufNascimento: '',
-        profissao: ''
+        cpf: ''
     });
 
     const estadosBrasileiros = [
@@ -91,23 +83,9 @@ const Agricultores = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
 
-    const [dadosAgricultores, setDadosAgricultores] = useState([
-        { id: 1, nome: 'Francisco Antônio da Silva', cpf: '123.456.789-00', cidade: 'Crateús', status: 'Regular' },
-        { id: 2, nome: 'Maria Fernanda', cpf: '987.654.321-11', cidade: 'Novo Oriente', status: 'Pendente' },
-        { id: 3, nome: 'Caio Tiberius Mourão', cpf: '456.123.789-22', cidade: 'Crateús', status: 'Regular' },
-        { id: 4, nome: 'Vicente Neto', cpf: '456.123.789-22', cidade: 'Crateús', status: 'Regular' },
-        { id: 5, nome: 'Ana Paula Souza', cpf: '111.222.333-44', cidade: 'Independência', status: 'Regular' },
-        { id: 6, nome: 'João Pedro Alves', cpf: '555.666.777-88', cidade: 'Crateús', status: 'Bloqueado' },
-        { id: 7, nome: 'Mariana Costa', cpf: '999.888.777-66', cidade: 'Novo Oriente', status: 'Regular' },
-        { id: 8, nome: 'Mariana Costa', cpf: '999.888.777-66', cidade: 'Novo Oriente', status: 'Regular' },
-        { id: 9, nome: 'Mariana Costa', cpf: '999.888.777-66', cidade: 'Novo Oriente', status: 'Regular' },
-        { id: 10, nome: 'Mariana Costa', cpf: '999.888.777-66', cidade: 'Novo Oriente', status: 'Regular' },
-        { id: 11, nome: 'Mariana Costa', cpf: '999.888.777-66', cidade: 'Novo Oriente', status: 'Regular' },
-        { id: 12, nome: 'Mariana Costa', cpf: '999.888.777-66', cidade: 'Novo Oriente', status: 'Regular' },
-        { id: 13, nome: 'Mariana Costa', cpf: '999.888.777-66', cidade: 'Novo Oriente', status: 'Regular' },
-        { id: 14, nome: 'Mariana Costa', cpf: '999.888.777-66', cidade: 'Novo Oriente', status: 'Regular' },
-        { id: 15, nome: 'Mariana Costa', cpf: '999.888.777-66', cidade: 'Novo Oriente', status: 'Regular' },
-    ]);
+    const [dadosAgricultores, setDadosAgricultores] = useState([]);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
@@ -128,16 +106,25 @@ const Agricultores = () => {
         setShowDeleteModal(true);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (itemToDelete) {
-            setDadosAgricultores(dadosAgricultores.filter(agricultor => agricultor.id !== itemToDelete));
-            setShowDeleteModal(false);
-            setItemToDelete(null);
-            showToast('Agricultor excluído com sucesso!', 'success');
+            setIsDeleting(true);
+            try {
+                await deleteFarmer(itemToDelete);
+                setDadosAgricultores(dadosAgricultores.filter(agricultor => agricultor.id !== itemToDelete));
+                setShowDeleteModal(false);
+                setItemToDelete(null);
+                showToast('Agricultor excluído com sucesso!', 'success');
 
-            // Ajustar página se o último item da página for deletado
-            if (currentItems.length === 1 && currentPage > 1) {
-                setCurrentPage(currentPage - 1);
+                // Ajustar página se o último item da página for deletado
+                if (currentItems.length === 1 && currentPage > 1) {
+                    setCurrentPage(currentPage - 1);
+                }
+            } catch (error) {
+                showToast('Erro ao excluir agricultor: ' + error.message, 'error');
+                setShowDeleteModal(false);
+            } finally {
+                setIsDeleting(false);
             }
         }
     };
@@ -147,9 +134,15 @@ const Agricultores = () => {
         setItemToDelete(null);
     };
 
-    const handleView = (agricultor) => {
-        setViewingAgricultor(agricultor);
-        setActiveTab('visualizar');
+    const handleView = async (agricultor) => {
+        try {
+            const fullData = await getFarmerById(agricultor.id);
+            const formattedData = apiToFormData(fullData);
+            setViewingAgricultor(formattedData);
+            setActiveTab('visualizar');
+        } catch (error) {
+            showToast('Erro ao carregar dados: ' + error.message, 'error');
+        }
     };
 
     const closeView = () => {
@@ -163,46 +156,53 @@ const Agricultores = () => {
         return date.toLocaleDateString('pt-BR');
     };
 
-    const handleEdit = (agricultor) => {
-        setFormData({
-            nome: agricultor.nome,
-            cpf: agricultor.cpf,
-            rg: agricultor.rg || '',
-            dataNascimento: agricultor.dataNascimento || '',
-            cidadeNascimento: agricultor.cidadeNascimento || '',
-            ufNascimento: agricultor.ufNascimento || '',
-            estadoCivil: agricultor.estadoCivil || '',
-            profissao: agricultor.profissao || '',
-            matricula: agricultor.matricula || '',
-            telefone: agricultor.telefone || '',
-            email: agricultor.email || '',
-            dataCadastro: agricultor.dataCadastro || new Date().toISOString().split('T')[0],
-            cep: agricultor.cep || '',
-            rua: agricultor.rua || '',
-            numero: agricultor.numero || '',
-            complemento: agricultor.complemento || '',
-            pontoReferencia: agricultor.pontoReferencia || '',
-            bairro: agricultor.bairro || '',
-            cidade: agricultor.cidade || '',
-            estado: agricultor.estado || ''
-        });
+    const handleEdit = async (agricultor) => {
+        try {
+            const fullData = await getFarmerById(agricultor.id);
+            const formattedData = apiToFormData(fullData);
 
-        if (agricultor.conjuge) {
-            setConjuge(agricultor.conjuge);
-        } else {
-            setConjuge({
-                nome: '',
-                cpf: '',
-                rg: '',
-                cidadeNascimento: '',
-                ufNascimento: '',
-                profissao: ''
+            setFormData({
+                nome: formattedData.nome,
+                cpf: formattedData.cpf,
+                rg: formattedData.rg || '',
+                dataNascimento: formattedData.dataNascimento || '',
+                cidadeNascimento: formattedData.cidadeNascimento || '',
+                ufNascimento: formattedData.ufNascimento || '',
+                estadoCivil: formattedData.estadoCivil || '',
+                profissao: formattedData.profissao || '',
+                matricula: formattedData.matricula || '',
+                telefone: formattedData.telefone || '',
+                email: formattedData.email || '',
+                dataCadastro: formattedData.dataCadastro || new Date().toISOString().split('T')[0],
+                cep: formattedData.cep || '',
+                rua: formattedData.rua || '',
+                numero: formattedData.numero || '',
+                complemento: formattedData.complemento || '',
+                pontoReferencia: formattedData.pontoReferencia || '',
+                bairro: formattedData.bairro || '',
+                cidade: formattedData.cidade || '',
+                estado: formattedData.estado || ''
             });
-        }
 
-        setEditingId(agricultor.id);
-        setViewingAgricultor(agricultor);
-        setActiveTab('cadastro');
+            if (formattedData.conjuge) {
+                setConjuge(formattedData.conjuge);
+            } else {
+                setConjuge({
+                    nome: '',
+                    cpf: '',
+                    rg: '',
+                    cidadeNascimento: '',
+                    ufNascimento: '',
+                    profissao: ''
+                });
+            }
+
+            setEditingId(agricultor.id);
+            setViewingAgricultor(formattedData);
+            setActiveTab('cadastro');
+        } catch (error) {
+            showToast('Erro ao carregar dados para edição: ' + error.message, 'error');
+        }
     };
     // Função para cancelar edição e voltar para a ficha
     const handleCancelEdit = () => {
@@ -214,34 +214,33 @@ const Agricultores = () => {
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!formData.nome || !formData.cpf) {
             showToast('Por favor, preencha pelo menos Nome e CPF.', 'error');
             return;
         }
 
-        const dadosCompletos = {
-            ...formData,
-            conjuge: formData.estadoCivil === 'Casado(a)' ? conjuge : null
-        };
+        setIsSaving(true);
+        try {
+            const apiData = formToApiData(formData, formData.estadoCivil === 'Casado(a)' ? conjuge : null);
 
-        if (editingId) {
-            setDadosAgricultores(dadosAgricultores.map(item =>
-                item.id === editingId ? { ...item, ...dadosCompletos, id: editingId, status: item.status } : item
-            ));
-            showToast('Agricultor atualizado com sucesso!', 'success');
-        } else {
-            const novoId = Math.max(...dadosAgricultores.map(a => a.id), 0) + 1;
-            setDadosAgricultores([...dadosAgricultores, {
-                id: novoId,
-                ...dadosCompletos,
-                status: 'Regular'
-            }]);
-            showToast('Agricultor cadastrado com sucesso!', 'success');
+            if (editingId) {
+                await updateFarmer(editingId, apiData);
+                showToast('Agricultor atualizado com sucesso!', 'success');
+            } else {
+                await createFarmer(apiData);
+                showToast('Agricultor cadastrado com sucesso!', 'success');
+            }
+
+            // Recarregar lista
+            await loadFarmers();
+            limparFormulario();
+            setActiveTab('lista');
+        } catch (error) {
+            showToast('Erro ao salvar agricultor: ' + error.message, 'error');
+        } finally {
+            setIsSaving(false);
         }
-
-        limparFormulario();
-        setActiveTab('lista');
     };
 
     const mascaraCPF = (value) => {
@@ -377,10 +376,7 @@ const Agricultores = () => {
         setFormData({
             nome: '',
             cpf: '',
-            rg: '',
             dataNascimento: '',
-            cidadeNascimento: '',
-            ufNascimento: '',
             estadoCivil: '',
             profissao: '',
             matricula: '',
@@ -388,9 +384,7 @@ const Agricultores = () => {
             email: '',
             dataCadastro: new Date().toISOString().split('T')[0],
             cep: '',
-            rua: '',
             numero: '',
-            complemento: '',
             pontoReferencia: '',
             bairro: '',
             cidade: '',
@@ -398,11 +392,7 @@ const Agricultores = () => {
         });
         setConjuge({
             nome: '',
-            cpf: '',
-            rg: '',
-            cidadeNascimento: '',
-            ufNascimento: '',
-            profissao: ''
+            cpf: ''
         });
         setCpfError(null);
         setCpfConjugeError(null);
@@ -471,11 +461,29 @@ const Agricultores = () => {
         setCurrentPage(1);
     }, [busca]);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
+    // Função para carregar agricultores
+    const loadFarmers = async () => {
+        try {
+            const response = await filterFarmers({});
+            if (response && response.farmers) {
+                const formattedFarmers = response.farmers.map(farmer => ({
+                    id: farmer.id,
+                    nome: farmer.name || '',
+                    cpf: farmer.cpf ? farmer.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4') : '',
+                    cidade: farmer.registration || '',
+                    status: 'Regular'
+                }));
+                setDadosAgricultores(formattedFarmers);
+            }
+        } catch (error) {
+            showToast('Erro ao carregar agricultores: ' + error.message, 'error');
+        } finally {
             setIsLoading(false);
-        }, 1000);
-        return () => clearTimeout(timer);
+        }
+    };
+
+    useEffect(() => {
+        loadFarmers();
     }, []);
 
     useEffect(() => {
@@ -678,17 +686,6 @@ const Agricultores = () => {
                                             {cpfError === 'invalido' && <span className="error-msg">CPF Inválido</span>}
                                             {cpfError === 'valido' && <span className="success-msg">CPF Válido</span>}
                                         </div>
-                                        <div className="form-group half-width">
-                                            <label>RG</label>
-                                            <input
-                                                type="text"
-                                                name="rg"
-                                                className="form-input"
-                                                placeholder="0000000-0"
-                                                value={formData.rg}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
                                     </div>
 
                                     <div className="form-row">
@@ -711,36 +708,6 @@ const Agricultores = () => {
                                                 value={formData.matricula}
                                                 onChange={handleChange}
                                             />
-                                        </div>
-                                    </div>
-
-                                    <div className="form-row">
-                                        <div className="form-group half-width">
-                                            <label>Cidade de Nascimento</label>
-                                            <input
-                                                type="text"
-                                                name="cidadeNascimento"
-                                                className="form-input"
-                                                placeholder="Ex: Crateús"
-                                                value={formData.cidadeNascimento}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                        <div className="form-group half-width">
-                                            <label>UF de Nascimento</label>
-                                            <select
-                                                name="ufNascimento"
-                                                className="form-input form-select"
-                                                value={formData.ufNascimento}
-                                                onChange={handleChange}
-                                            >
-                                                <option value="">Selecione...</option>
-                                                {estadosBrasileiros.map((est) => (
-                                                    <option key={est.sigla} value={est.sigla}>
-                                                        {est.sigla} - {est.nome}
-                                                    </option>
-                                                ))}
-                                            </select>
                                         </div>
                                     </div>
 
@@ -779,18 +746,17 @@ const Agricultores = () => {
                                     <div className="form-section">
                                         <h3 className="section-title">Dados do Cônjuge</h3>
 
-                                        <div className="form-group full-width">
-                                            <label>Nome Completo do Cônjuge</label>
-                                            <input
-                                                type="text"
-                                                name="nome"
-                                                className="form-input"
-                                                value={conjuge.nome}
-                                                onChange={handleConjugeChange}
-                                            />
-                                        </div>
-
                                         <div className="form-row">
+                                            <div className="form-group half-width">
+                                                <label>Nome Completo do Cônjuge</label>
+                                                <input
+                                                    type="text"
+                                                    name="nome"
+                                                    className="form-input"
+                                                    value={conjuge.nome}
+                                                    onChange={handleConjugeChange}
+                                                />
+                                            </div>
                                             <div className="form-group half-width">
                                                 <label>CPF do Cônjuge</label>
                                                 <input
@@ -802,62 +768,9 @@ const Agricultores = () => {
                                                     onChange={handleConjugeChange}
                                                     maxLength={14}
                                                 />
-                                                {cpfConjugeError === 'invalido' && <span className="error-msg">CPF InvÃ¡lido</span>}
-                                                {cpfConjugeError === 'valido' && <span className="success-msg">CPF VÃ¡lido</span>}
+                                                {cpfConjugeError === 'invalido' && <span className="error-msg">CPF Inválido</span>}
+                                                {cpfConjugeError === 'valido' && <span className="success-msg">CPF Válido</span>}
                                             </div>
-                                            <div className="form-group half-width">
-                                                <label>RG do Cônjuge</label>
-                                                <input
-                                                    type="text"
-                                                    name="rg"
-                                                    className="form-input"
-                                                    placeholder="0000000-0"
-                                                    value={conjuge.rg}
-                                                    onChange={handleConjugeChange}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="form-row">
-                                            <div className="form-group half-width">
-                                                <label>Cidade de Nascimento do Cônjuge</label>
-                                                <input
-                                                    type="text"
-                                                    name="cidadeNascimento"
-                                                    className="form-input"
-                                                    placeholder="Ex: Crateús"
-                                                    value={conjuge.cidadeNascimento}
-                                                    onChange={handleConjugeChange}
-                                                />
-                                            </div>
-                                            <div className="form-group half-width">
-                                                <label>UF de Nascimento do Cônjuge</label>
-                                                <select
-                                                    name="ufNascimento"
-                                                    className="form-input form-select"
-                                                    value={conjuge.ufNascimento}
-                                                    onChange={handleConjugeChange}
-                                                >
-                                                    <option value="">Selecione...</option>
-                                                    {estadosBrasileiros.map((est) => (
-                                                        <option key={est.sigla} value={est.sigla}>
-                                                            {est.sigla} - {est.nome}
-                                                        </option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="form-group full-width">
-                                            <label>Profissão do Cônjuge</label>
-                                            <input
-                                                type="text"
-                                                name="profissao"
-                                                className="form-input"
-                                                placeholder="Ex: Agricultora Familiar"
-                                                value={conjuge.profissao}
-                                                onChange={handleConjugeChange}
-                                            />
                                         </div>
                                     </div>
                                 )}
@@ -909,7 +822,7 @@ const Agricultores = () => {
                                 <div className="form-section no-border">
                                     <h3 className="section-title">Endereço</h3>
 
-                                    {/* Linha 1: CEP | Endereço | Número */}
+                                    {/* Linha 1: CEP | Número */}
                                     <div className="form-row">
                                         <div className="form-group">
                                             <label>CEP</label>
@@ -933,19 +846,8 @@ const Agricultores = () => {
                                             {cepError && cepError !== 'valido' && <span className="error-msg">{cepError}</span>}
                                             {cepError === 'valido' && <span className="success-msg">CEP encontrado!</span>}
                                         </div>
-                                        <div className="form-group half-width">
-                                            <label>Endereço</label>
-                                            <input
-                                                type="text"
-                                                name="rua"
-                                                className="form-input"
-                                                placeholder="Rua, Avenida, etc."
-                                                value={formData.rua}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                        <div className="form-group sixth-width">
-                                            <label>Numero</label>
+                                        <div className="form-group">
+                                            <label>Número</label>
                                             <input
                                                 type="text"
                                                 name="numero"
@@ -957,20 +859,9 @@ const Agricultores = () => {
                                         </div>
                                     </div>
 
-                                    {/* Linha 2: Complemento | Ponto de Referência */}
+                                    {/* Linha 2: Ponto de Referência */}
                                     <div className="form-row">
-                                        <div className="form-group half-width">
-                                            <label>Complemento</label>
-                                            <input
-                                                type="text"
-                                                name="complemento"
-                                                className="form-input"
-                                                placeholder="Apartamento, Bloco, etc."
-                                                value={formData.complemento}
-                                                onChange={handleChange}
-                                            />
-                                        </div>
-                                        <div className="form-group half-width">
+                                        <div className="form-group full-width">
                                             <label>Ponto de Referência</label>
                                             <input
                                                 type="text"
@@ -1081,9 +972,9 @@ const Agricultores = () => {
                                         </div>
                                     </div>
                                     <div className="form-group half-width">
-                                        <label>RG</label>
+                                        <label>Matrícula</label>
                                         <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
-                                            {viewingAgricultor.rg || '-'}
+                                            {viewingAgricultor.matricula || '-'}
                                         </div>
                                     </div>
                                 </div>
@@ -1096,24 +987,9 @@ const Agricultores = () => {
                                         </div>
                                     </div>
                                     <div className="form-group half-width">
-                                        <label>Matrícula</label>
+                                        <label>Profissão</label>
                                         <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
-                                            {viewingAgricultor.matricula || '-'}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="form-row">
-                                    <div className="form-group half-width">
-                                        <label>Cidade de Nascimento</label>
-                                        <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
-                                            {viewingAgricultor.cidadeNascimento || '-'}
-                                        </div>
-                                    </div>
-                                    <div className="form-group half-width">
-                                        <label>UF de Nascimento</label>
-                                        <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
-                                            {viewingAgricultor.ufNascimento || '-'}
+                                            {viewingAgricultor.profissao || '-'}
                                         </div>
                                     </div>
                                 </div>
@@ -1125,15 +1001,6 @@ const Agricultores = () => {
                                             {viewingAgricultor.estadoCivil || '-'}
                                         </div>
                                     </div>
-                                    <div className="form-group half-width">
-                                        <label>Profissão</label>
-                                        <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
-                                            {viewingAgricultor.profissao || '-'}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="form-row">
                                     <div className="form-group half-width">
                                         <label>Status</label>
                                         <div style={{ marginTop: '8px' }}>
@@ -1151,49 +1018,16 @@ const Agricultores = () => {
                                     <h3 className="section-title">Dados do Cônjuge</h3>
 
                                     <div className="form-row">
-                                        <div className="form-group full-width">
+                                        <div className="form-group half-width">
                                             <label>Nome Completo do Cônjuge</label>
                                             <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
                                                 {viewingAgricultor.conjuge.nome || '-'}
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <div className="form-row">
                                         <div className="form-group half-width">
                                             <label>CPF do Cônjuge</label>
                                             <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
                                                 {viewingAgricultor.conjuge.cpf || '-'}
-                                            </div>
-                                        </div>
-                                        <div className="form-group half-width">
-                                            <label>RG do Cônjuge</label>
-                                            <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
-                                                {viewingAgricultor.conjuge.rg || '-'}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="form-row">
-                                        <div className="form-group half-width">
-                                            <label>Cidade de Nascimento do Cônjuge</label>
-                                            <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
-                                                {viewingAgricultor.conjuge.cidadeNascimento || '-'}
-                                            </div>
-                                        </div>
-                                        <div className="form-group half-width">
-                                            <label>UF de Nascimento do Cônjuge</label>
-                                            <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
-                                                {viewingAgricultor.conjuge.ufNascimento || '-'}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="form-row">
-                                        <div className="form-group full-width">
-                                            <label>Profissão do Cônjuge</label>
-                                            <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
-                                                {viewingAgricultor.conjuge.profissao || '-'}
                                             </div>
                                         </div>
                                     </div>
@@ -1240,13 +1074,7 @@ const Agricultores = () => {
                                             {viewingAgricultor.cep || '-'}
                                         </div>
                                     </div>
-                                    <div className="form-group half-width">
-                                        <label>Endereço</label>
-                                        <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
-                                            {viewingAgricultor.rua || '-'}
-                                        </div>
-                                    </div>
-                                    <div className="form-group sixth-width">
+                                    <div className="form-group">
                                         <label>Número</label>
                                         <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
                                             {viewingAgricultor.numero || '-'}
@@ -1255,13 +1083,7 @@ const Agricultores = () => {
                                 </div>
 
                                 <div className="form-row">
-                                    <div className="form-group half-width">
-                                        <label>Complemento</label>
-                                        <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
-                                            {viewingAgricultor.complemento || '-'}
-                                        </div>
-                                    </div>
-                                    <div className="form-group half-width">
+                                    <div className="form-group full-width">
                                         <label>Ponto de Referência</label>
                                         <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
                                             {viewingAgricultor.pontoReferencia || '-'}

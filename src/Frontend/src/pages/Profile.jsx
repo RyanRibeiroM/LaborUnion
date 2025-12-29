@@ -9,39 +9,38 @@ import {
     Camera,
     Save,
     Lock,
-    Clock
+    Clock,
+    Loader2
 } from 'lucide-react';
 import '../assets/css/Profile.css';
 import Toast from '../components/Toast';
+import { getProfile, updateProfile } from '../services/userService';
 
 const Profile = () => {
     const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
     const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
     const [isEditing, setIsEditing] = useState(false);
 
     // Dados do usuário logado
     const [userData, setUserData] = useState({
-        nome: 'João Paulo Santos',
-        email: 'joao.paulo@sindicato.org.br',
-        telefone: '(88) 99999-0000',
-        cargo: 'Secretário',
-        setor: 'Secretaria',
-        dataCadastro: '2024-01-15',
-        ultimoAcesso: '2025-12-28 00:20:00',
+        nome: '',
+        email: '',
+        cargo: '',
         avatar: null
     });
 
     // Estado editável
     const [editData, setEditData] = useState({ ...userData });
 
-    // Estatísticas do usuário
+    // Estatísticas do usuário (mantido como mock por enquanto)
     const [stats, setStats] = useState({
         atendimentosHoje: 12,
         atendimentosMes: 156,
         cadastrosRealizados: 45
     });
 
-    // Atividades recentes
+    // Atividades recentes (mantido como mock por enquanto)
     const [atividades, setAtividades] = useState([
         { id: 1, acao: 'Registrou atendimento', descricao: 'Francisco Antônio - Emissão de DAP', tempo: 'Há 15 min' },
         { id: 2, acao: 'Cadastrou agricultor', descricao: 'Maria das Graças Silva', tempo: 'Há 1 hora' },
@@ -59,12 +58,27 @@ const Profile = () => {
         setToast({ show: false, message: '', type: 'info' });
     };
 
-    // Simular carregamento
+    // Carregar dados do perfil da API
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 800);
-        return () => clearTimeout(timer);
+        const loadProfile = async () => {
+            try {
+                const profile = await getProfile();
+                const profileData = {
+                    nome: profile.name || '',
+                    email: profile.email || '',
+                    cargo: profile.role || '',
+                    avatar: null
+                };
+                setUserData(profileData);
+                setEditData(profileData);
+            } catch (error) {
+                showToast('Erro ao carregar perfil: ' + error.message, 'error');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadProfile();
     }, []);
 
     // Handlers
@@ -83,14 +97,26 @@ const Profile = () => {
         setIsEditing(false);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!editData.nome || !editData.email) {
             showToast('Nome e e-mail são obrigatórios.', 'warning');
             return;
         }
-        setUserData({ ...editData });
-        setIsEditing(false);
-        showToast('Perfil atualizado com sucesso!', 'success');
+
+        setIsSaving(true);
+        try {
+            await updateProfile({
+                name: editData.nome,
+                email: editData.email
+            });
+            setUserData({ ...editData });
+            setIsEditing(false);
+            showToast('Perfil atualizado com sucesso!', 'success');
+        } catch (error) {
+            showToast('Erro ao atualizar perfil: ' + error.message, 'error');
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const formatDate = (dateString) => {
@@ -106,6 +132,7 @@ const Profile = () => {
     };
 
     const getInitials = (name) => {
+        if (!name) return '?';
         return name
             .split(' ')
             .map(word => word[0])
@@ -154,12 +181,8 @@ const Profile = () => {
                             </button>
                         </div>
                         <div className="profile-header-info">
-                            <h2>{userData.nome}</h2>
-                            <span className="cargo-badge">{userData.cargo}</span>
-                            <p className="setor-text">
-                                <Shield size={14} />
-                                {userData.setor}
-                            </p>
+                            <h2>{userData.nome || 'Usuário'}</h2>
+                            <span className="cargo-badge">{userData.cargo || 'Colaborador'}</span>
                         </div>
                         {!isEditing && (
                             <button className="btn-outline-primary" onClick={handleEdit}>
@@ -180,9 +203,10 @@ const Profile = () => {
                                         className="form-input"
                                         value={editData.nome}
                                         onChange={handleChange}
+                                        disabled={isSaving}
                                     />
                                 </div>
-                                <div className="form-group">
+                                <div className="form-group full-width">
                                     <label>E-mail</label>
                                     <input
                                         type="email"
@@ -190,48 +214,26 @@ const Profile = () => {
                                         className="form-input"
                                         value={editData.email}
                                         onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Telefone</label>
-                                    <input
-                                        type="text"
-                                        name="telefone"
-                                        className="form-input"
-                                        value={editData.telefone}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Cargo</label>
-                                    <input
-                                        type="text"
-                                        name="cargo"
-                                        className="form-input"
-                                        value={editData.cargo}
-                                        onChange={handleChange}
-                                        disabled
-                                    />
-                                </div>
-                                <div className="form-group">
-                                    <label>Setor</label>
-                                    <input
-                                        type="text"
-                                        name="setor"
-                                        className="form-input"
-                                        value={editData.setor}
-                                        onChange={handleChange}
-                                        disabled
+                                        disabled={isSaving}
                                     />
                                 </div>
                             </div>
                             <div className="form-actions">
-                                <button className="btn-outline-gray" onClick={handleCancel}>
+                                <button className="btn-outline-gray" onClick={handleCancel} disabled={isSaving}>
                                     Cancelar
                                 </button>
-                                <button className="btn-solid-green" onClick={handleSave}>
-                                    <Save size={18} />
-                                    Salvar Alterações
+                                <button className="btn-solid-green" onClick={handleSave} disabled={isSaving}>
+                                    {isSaving ? (
+                                        <>
+                                            <Loader2 size={18} className="spin-icon" />
+                                            Salvando...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Save size={18} />
+                                            Salvar Alterações
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>
@@ -242,28 +244,14 @@ const Profile = () => {
                                     <Mail size={18} />
                                     <div>
                                         <label>E-mail</label>
-                                        <span>{userData.email}</span>
+                                        <span>{userData.email || '-'}</span>
                                     </div>
                                 </div>
                                 <div className="detail-item">
-                                    <Phone size={18} />
+                                    <Shield size={18} />
                                     <div>
-                                        <label>Telefone</label>
-                                        <span>{userData.telefone}</span>
-                                    </div>
-                                </div>
-                                <div className="detail-item">
-                                    <Calendar size={18} />
-                                    <div>
-                                        <label>Membro desde</label>
-                                        <span>{formatDate(userData.dataCadastro)}</span>
-                                    </div>
-                                </div>
-                                <div className="detail-item">
-                                    <Clock size={18} />
-                                    <div>
-                                        <label>Último acesso</label>
-                                        <span>{formatDateTime(userData.ultimoAcesso)}</span>
+                                        <label>Cargo</label>
+                                        <span>{userData.cargo || '-'}</span>
                                     </div>
                                 </div>
                             </div>

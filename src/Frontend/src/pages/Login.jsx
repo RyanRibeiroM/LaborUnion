@@ -1,16 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, Loader2, Eye, EyeOff } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import '../assets/css/Login.css';
 import logo from '../assets/img/logo-straaf.svg';
 
 function Login() {
     const navigate = useNavigate();
+    const { login } = useAuth();
 
-    const handleLogin = (e) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+
+    const handleLogin = async (e) => {
         e.preventDefault();
-        // API
-        navigate('/dashboard');
+        setError('');
+        setLoading(true);
+
+        try {
+            await login(email, password);
+            navigate('/dashboard');
+        } catch (err) {
+            setError(err.message || 'Erro ao fazer login. Verifique suas credenciais.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -38,31 +55,57 @@ function Login() {
                     </div>
 
                     <form onSubmit={handleLogin} className="login-form">
+                        {error && (
+                            <div className="login-error">
+                                {error}
+                            </div>
+                        )}
 
                         <div className="input-group">
                             <Mail className="input-icon" size={20} />
                             <input
                                 type="email"
                                 placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
                                 required
+                                disabled={loading}
                             />
                         </div>
 
                         <div className="input-group">
                             <Lock className="input-icon" size={20} />
                             <input
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 placeholder="Senha"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 required
+                                disabled={loading}
                             />
+                            <button
+                                type="button"
+                                className="password-toggle"
+                                onClick={() => setShowPassword(!showPassword)}
+                                tabIndex={-1}
+                            >
+                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            </button>
                         </div>
 
                         <div className="forgot-password">
                             <Link to="/recuperar-senha">Esqueceu a senha?</Link>
                         </div>
 
-                        <button type="submit" className="btn-login">
-                            ENTRAR
+                        <button type="submit" className="btn-login" disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <Loader2 className="spin-icon" size={20} />
+                                    ENTRANDO...
+                                </>
+                            ) : (
+                                'ENTRAR'
+                            )}
                         </button>
                     </form>
                 </div>

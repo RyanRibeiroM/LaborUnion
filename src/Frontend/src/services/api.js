@@ -25,14 +25,62 @@ export async function apiRequest(endpoint, options = {}) {
         },
     };
 
-    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+    const fullUrl = `${API_BASE_URL}${endpoint}`;
+
+    // 🔍 DEBUG: Mostra detalhes da requisição
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log('🔍 DEBUG API REQUEST');
+    console.log('📍 URL Completa:', fullUrl);
+    console.log('📍 URL Base:', API_BASE_URL);
+    console.log('📍 Endpoint:', endpoint);
+    console.log('📍 Método:', config.method || 'GET');
+    console.log('📍 Headers:', config.headers);
+    if (config.body) {
+        console.log('📍 Body:', config.body);
+    }
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+
+    let response;
+    try {
+        response = await fetch(fullUrl, config);
+    } catch (fetchError) {
+        // ❌ Erro de conexão - API não alcançável
+        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.error('❌ ERRO DE CONEXÃO COM A API');
+        console.error('❌ Mensagem:', fetchError.message);
+        console.error('❌ A PORTA DA API PODE ESTAR ERRADA!');
+        console.error('❌ Verifique o arquivo: vite.config.js');
+        console.error('❌ Procure por: target: "https://localhost:PORTA"');
+        console.error('❌ URL tentada:', fullUrl);
+        console.error('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        throw new Error(`A PORTA DA API ESTÁ ERRADA! Verifique vite.config.js. O servidor não está respondendo na URL: ${fullUrl}`);
+    }
+
+    // 🔍 DEBUG: Mostra detalhes da resposta
+    console.log('📥 RESPONSE STATUS:', response.status, response.statusText);
+    console.log('📥 RESPONSE URL:', response.url);
 
     // Se a resposta for 204 (No Content), retorna null
     if (response.status === 204) {
         return null;
     }
 
-    const data = await response.json();
+    // Tenta fazer o parse do JSON, mas trata erros se a resposta estiver vazia
+    let data = null;
+    const contentType = response.headers.get('content-type');
+    const text = await response.text();
+
+    if (text && contentType && contentType.includes('application/json')) {
+        try {
+            data = JSON.parse(text);
+        } catch (parseError) {
+            console.error('Erro ao fazer parse do JSON:', parseError, 'Texto recebido:', text);
+            // Se falhar o parse e a resposta não for ok, lança erro genérico
+            if (!response.ok) {
+                throw new Error(`Erro ${response.status}: O servidor retornou uma resposta inválida`);
+            }
+        }
+    }
 
     if (!response.ok) {
         // Lança erro com mensagens da API (suporta diferentes formatos)

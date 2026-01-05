@@ -41,7 +41,7 @@ namespace LaborUnion.API.Controllers
         }
 
         [HttpPost("filter")]
-        [ProducesResponseType(typeof(ResponseFarmersJson), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseDocumentsJson), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Filter(

@@ -76,7 +76,7 @@ namespace LaborUnion.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status400BadRequest)]
         [Authorize]
-        public async Task<IActionResult> ChangeSenha(
+        public async Task<IActionResult> ChangePassword(
             [FromServices] IChangePasswordUseCase usecase,
             [FromBody] RequestChangePasswordJson request)
         {

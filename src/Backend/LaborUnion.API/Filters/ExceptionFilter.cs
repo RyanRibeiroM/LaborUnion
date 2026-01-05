@@ -12,8 +12,8 @@ namespace LaborUnion.API.Filters
         {
             if (context.Exception is LaborUnionException exception)
                 HandleProjectException(context, exception);
-            //else
-            //    ThrowUnknownError(context);
+            else
+                ThrowUnknownError(context);
         }
 
         private void HandleProjectException(ExceptionContext context, LaborUnionException exception)

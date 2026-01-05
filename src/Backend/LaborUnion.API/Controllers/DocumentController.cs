@@ -76,7 +76,7 @@ namespace LaborUnion.API.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        [ProducesResponseType(typeof(ResponseFarmerJson), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseDocumentJson), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> GetById(

@@ -1,14 +1,59 @@
+/**
+ * =============================================================================
+ * 📋 TODO BACKEND - MELHORIAS NECESSÁRIAS
+ * =============================================================================
+ * 
+ * O endpoint POST /service/filter atualmente retorna apenas:
+ * - id, createdOn, farmerName, sectorName, status
+ * 
+ * SUGESTÃO: Incluir os seguintes campos na resposta para evitar múltiplas
+ * chamadas de API no frontend:
+ * 
+ * {
+ *   "services": [
+ *     {
+ *       "id": 0,
+ *       "createdOn": "2026-01-14T05:23:37.090Z",
+ *       "farmerName": "string",
+ *       "farmerCpf": "string",           // <-- ADICIONAR
+ *       "sectorName": "string",
+ *       "serviceTypeName": "string",     // <-- ADICIONAR
+ *       "attendantName": "string",       // <-- ADICIONAR (nome do usuário que atendeu)
+ *       "status": "string"
+ *     }
+ *   ]
+ * }
+ * 
+ * Isso permitirá exibir todos os dados na listagem e nos detalhes do
+ * atendimento sem precisar fazer chamadas extras a /farmer/{id}, 
+ * /servicetype/{id} e /user/{id}.
+ * 
+ * =============================================================================
+ */
+
 import React, { useState, useEffect, useRef } from 'react';
-import { Eye, FileText, ArrowLeft, Printer } from 'lucide-react';
+import { Eye, FileText, ArrowLeft, Printer, Plus, X } from 'lucide-react';
 import '../assets/css/Atendimentos.css';
 import Toast from '../components/Toast';
+import { filterServices, createService, getServiceById, filterServiceTypes, createServiceType } from '../services/serviceService';
+import { filterSectors, createSector } from '../services/sectorService';
+import { filterFarmers } from '../services/farmerService';
 
 const Atendimentos = () => {
     const [activeTab, setActiveTab] = useState('registrar');
     const [isLoading, setIsLoading] = useState(true);
     const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
     const [viewingAtendimento, setViewingAtendimento] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
     const printRef = useRef(null);
+
+    // Dados carregados da API
+    const [historicoData, setHistoricoData] = useState([]);
+    const [sectors, setSectors] = useState([]);
+    const [serviceTypes, setServiceTypes] = useState([]);
+    const [farmers, setFarmers] = useState([]);
+    const [farmerSearch, setFarmerSearch] = useState('');
+    const [showFarmerDropdown, setShowFarmerDropdown] = useState(false);
 
     // Paginação
     const [currentPage, setCurrentPage] = useState(1);
@@ -16,159 +61,20 @@ const Atendimentos = () => {
 
     // States do formulário
     const [formData, setFormData] = useState({
-        agricultor: '',
-        setor: '',
-        demanda: '',
+        farmerId: '',
+        farmerName: '',
+        sectorId: '',
+        serviceTypeId: '',
         observacoes: ''
     });
 
-    // Dados simulados para o histórico
-    const historicoData = [
-        {
-            id: 1,
-            data: '04/12/2025',
-            hora: '14:30',
-            agricultor: 'Francisco Antônio da Silva',
-            cpfAgricultor: '123.456.789-00',
-            servico: 'Emissão de DAP',
-            setor: 'Presidência',
-            status: 'Concluído',
-            atendente: 'João Paulo',
-            observacoes: 'Atendimento realizado com sucesso. Documento emitido e entregue ao agricultor.'
-        },
-        {
-            id: 2,
-            data: '03/12/2025',
-            hora: '10:15',
-            agricultor: 'Maria Fernanda Costa',
-            cpfAgricultor: '987.654.321-11',
-            servico: 'Consulta Jurídica',
-            setor: 'Jurídico',
-            status: 'Em Andamento',
-            atendente: 'Ana Clara',
-            observacoes: 'Agricultor solicitou orientação sobre questões trabalhistas. Caso em análise.'
-        },
-        {
-            id: 3,
-            data: '01/12/2025',
-            hora: '09:00',
-            agricultor: 'Caio Tiberius Mourão',
-            cpfAgricultor: '456.123.789-22',
-            servico: 'Solicitação de Benefício',
-            setor: 'Financeiro',
-            status: 'Pendente',
-            atendente: 'Pedro Henrique',
-            observacoes: 'Aguardando documentação complementar do agricultor para dar prosseguimento.'
-        },
-        {
-            id: 4,
-            data: '28/11/2025',
-            hora: '16:45',
-            agricultor: 'Ana Clara Sousa',
-            cpfAgricultor: '111.222.333-44',
-            servico: 'Atualização Cadastral',
-            setor: 'Secretaria',
-            status: 'Concluído',
-            atendente: 'Maria Lucia',
-            observacoes: 'Dados cadastrais atualizados no sistema conforme solicitação.'
-        },
-        {
-            id: 5,
-            data: '25/11/2025',
-            hora: '11:30',
-            agricultor: 'José Pedro Alves',
-            cpfAgricultor: '555.666.777-88',
-            servico: 'Emissão de Boleto',
-            setor: 'Financeiro',
-            status: 'Concluído',
-            atendente: 'Carlos Eduardo',
-            observacoes: 'Boleto de anuidade emitido e enviado por e-mail.'
-        },
-        {
-            id: 6,
-            data: '24/11/2025',
-            hora: '15:00',
-            agricultor: 'Raimundo Nonato',
-            cpfAgricultor: '222.333.444-55',
-            servico: 'Emissão de DAP',
-            setor: 'Presidência',
-            status: 'Concluído',
-            atendente: 'João Paulo',
-            observacoes: 'DAP emitida e entregue.'
-        },
-        {
-            id: 7,
-            data: '23/11/2025',
-            hora: '08:45',
-            agricultor: 'Francisca Maria Lima',
-            cpfAgricultor: '333.444.555-66',
-            servico: 'Consulta Trabalhista',
-            setor: 'Jurídico',
-            status: 'Concluído',
-            atendente: 'Ana Clara',
-            observacoes: 'Orientação sobre direitos trabalhistas realizada.'
-        },
-        {
-            id: 8,
-            data: '22/11/2025',
-            hora: '14:15',
-            agricultor: 'Antônio Carlos Souza',
-            cpfAgricultor: '444.555.666-77',
-            servico: 'Emissão de Boleto',
-            setor: 'Financeiro',
-            status: 'Pendente',
-            atendente: 'Carlos Eduardo',
-            observacoes: 'Aguardando confirmação de dados bancários.'
-        },
-        {
-            id: 9,
-            data: '21/11/2025',
-            hora: '10:30',
-            agricultor: 'Maria das Graças',
-            cpfAgricultor: '555.666.777-88',
-            servico: 'Atualização Cadastral',
-            setor: 'Secretaria',
-            status: 'Concluído',
-            atendente: 'Maria Lucia',
-            observacoes: 'Cadastro atualizado com novo endereço.'
-        },
-        {
-            id: 10,
-            data: '20/11/2025',
-            hora: '16:00',
-            agricultor: 'João Batista Ferreira',
-            cpfAgricultor: '666.777.888-99',
-            servico: 'Emissão de DAP',
-            setor: 'Presidência',
-            status: 'Concluído',
-            atendente: 'João Paulo',
-            observacoes: 'DAP emitida sem pendências.'
-        },
-        {
-            id: 11,
-            data: '19/11/2025',
-            hora: '09:15',
-            agricultor: 'Vicente de Paulo',
-            cpfAgricultor: '777.888.999-00',
-            servico: 'Solicitação de Benefício',
-            setor: 'Financeiro',
-            status: 'Em Andamento',
-            atendente: 'Pedro Henrique',
-            observacoes: 'Documentação em análise para aprovação do benefício.'
-        },
-        {
-            id: 12,
-            data: '18/11/2025',
-            hora: '11:45',
-            agricultor: 'Teresa Cristina Oliveira',
-            cpfAgricultor: '888.999.000-11',
-            servico: 'Consulta Jurídica',
-            setor: 'Jurídico',
-            status: 'Concluído',
-            atendente: 'Ana Clara',
-            observacoes: 'Esclarecimentos sobre questões de aposentadoria rural.'
-        },
-    ];
+    // Estados para modais de cadastro rápido
+    const [showSectorModal, setShowSectorModal] = useState(false);
+    const [showServiceTypeModal, setShowServiceTypeModal] = useState(false);
+    const [newSectorName, setNewSectorName] = useState('');
+    const [newServiceTypeName, setNewServiceTypeName] = useState('');
+    const [isSavingSector, setIsSavingSector] = useState(false);
+    const [isSavingServiceType, setIsSavingServiceType] = useState(false);
 
     // Lógica de Paginação
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -230,12 +136,144 @@ const Atendimentos = () => {
         setToast({ show: false, message: '', type: 'info' });
     };
 
-    // Simular carregamento inicial
+    // Formatar data para exibição
+    const formatDateToBR = (dateString) => {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR');
+    };
+
+    const formatTimeToBR = (dateString) => {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    };
+
+    // Formatar CPF com máscara XXX.XXX.XXX-XX
+    const formatCPF = (cpf) => {
+        if (!cpf) return '-';
+        // Remove tudo que não é número
+        const numbers = cpf.replace(/\D/g, '');
+        if (numbers.length !== 11) return cpf; // Retorna original se não tiver 11 dígitos
+        return numbers.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    };
+
+    // Converter status numérico para label
+    const getStatusLabel = (status) => {
+        const statusMap = {
+            1: 'Pendente',
+            2: 'Em Andamento',
+            3: 'Concluído',
+            4: 'Cancelado'
+        };
+        return statusMap[status] || 'Pendente';
+    };
+
+    // Carregar dados da API
+    const loadHistorico = async () => {
+        try {
+            const response = await filterServices({});
+            console.log('📝 Resposta de serviços:', response);
+
+            if (response && response.services) {
+                const formattedServices = response.services.map(service => {
+                    console.log('📌 Serviço:', service);
+                    return {
+                        id: service.id,
+                        data: formatDateToBR(service.createdOn || service.date),
+                        hora: formatTimeToBR(service.createdOn || service.date),
+                        agricultor: service.farmerName || service.farmer?.name || '-',
+                        cpfAgricultor: formatCPF(service.farmerCpf || service.farmer?.cpf),
+                        servico: service.serviceTypeName || service.serviceType?.name || '-',
+                        setor: service.sectorName || service.sector?.name || '-',
+                        status: getStatusLabel(service.status),
+                        atendente: service.userName || service.user?.name || service.attendantName || '-',
+                        observacoes: service.observations || service.description || ''
+                    };
+                });
+                setHistoricoData(formattedServices);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar histórico:', error);
+            showToast('Erro ao carregar histórico de atendimentos.', 'error');
+        }
+    };
+
+    const loadSectors = async () => {
+        try {
+            const response = await filterSectors({});
+            if (response && response.sectors) {
+                setSectors(response.sectors);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar setores:', error);
+        }
+    };
+
+    const loadServiceTypes = async () => {
+        try {
+            const response = await filterServiceTypes({});
+            console.log('📋 Resposta serviceTypes:', response);
+            // A API retorna "servicesTypes" (com 's' no meio)
+            if (response && response.servicesTypes) {
+                setServiceTypes(response.servicesTypes);
+            } else if (response && response.serviceTypes) {
+                setServiceTypes(response.serviceTypes);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar tipos de serviço:', error);
+        }
+    };
+
+    const searchFarmers = async (query) => {
+        if (query.length < 2) {
+            setFarmers([]);
+            return;
+        }
+        try {
+            // Remove caracteres especiais do CPF se houver
+            const cleanedQuery = query.replace(/\D/g, '');
+
+            console.log('🔍 Buscando agricultor:', { query, cleanedQuery });
+
+            // Faz busca por nome
+            const nameResponse = await filterFarmers({ name: query });
+            console.log('📋 Resposta busca por nome:', nameResponse);
+            let results = nameResponse?.farmers || [];
+
+            // Se o query tem números, também busca por CPF
+            if (cleanedQuery.length >= 3) {
+                console.log('🔢 Buscando por CPF:', cleanedQuery);
+                const cpfResponse = await filterFarmers({ cpf: cleanedQuery });
+                console.log('📋 Resposta busca por CPF:', cpfResponse);
+                if (cpfResponse?.farmers) {
+                    // Combina resultados, removendo duplicados
+                    const cpfResults = cpfResponse.farmers.filter(
+                        f => !results.some(r => r.id === f.id)
+                    );
+                    results = [...results, ...cpfResults];
+                }
+            }
+
+            console.log('✅ Resultados finais:', results);
+
+            setFarmers(results);
+        } catch (error) {
+            console.error('Erro ao buscar agricultores:', error);
+        }
+    };
+
+    // Carregar dados iniciais
     useEffect(() => {
-        const timer = setTimeout(() => {
+        const init = async () => {
+            await Promise.all([
+                loadHistorico(),
+                loadSectors(),
+                loadServiceTypes()
+            ]);
             setIsLoading(false);
-        }, 1000);
-        return () => clearTimeout(timer);
+        };
+        init();
     }, []);
 
     // Handlers do formulário
@@ -244,27 +282,136 @@ const Atendimentos = () => {
         setFormData({ ...formData, [name]: value });
     };
 
+    const handleFarmerSearch = (e) => {
+        const value = e.target.value;
+        setFarmerSearch(value);
+        setFormData({ ...formData, farmerName: value, farmerId: '' });
+        searchFarmers(value);
+        setShowFarmerDropdown(true);
+    };
+
+    const selectFarmer = (farmer) => {
+        setFormData({
+            ...formData,
+            farmerId: farmer.id,
+            farmerName: farmer.name
+        });
+        setFarmerSearch(farmer.name);
+        setShowFarmerDropdown(false);
+        setFarmers([]);
+    };
+
     const handleLimpar = () => {
         setFormData({
-            agricultor: '',
-            setor: '',
-            demanda: '',
+            farmerId: '',
+            farmerName: '',
+            sectorId: '',
+            serviceTypeId: '',
             observacoes: ''
         });
+        setFarmerSearch('');
         showToast('Formulário limpo!', 'info');
     };
 
-    const handleSalvar = () => {
-        if (!formData.agricultor || !formData.setor || !formData.demanda) {
+    const handleSalvar = async () => {
+        if (!formData.farmerId || !formData.sectorId || !formData.serviceTypeId) {
             showToast('Preencha todos os campos obrigatórios!', 'error');
             return;
         }
-        showToast('Atendimento registrado com sucesso!', 'success');
-        handleLimpar();
+
+        setIsSaving(true);
+        try {
+            await createService({
+                farmerId: parseInt(formData.farmerId),
+                sectorId: parseInt(formData.sectorId),
+                serviceTypeId: parseInt(formData.serviceTypeId),
+                observations: formData.observacoes,
+                status: 1 // Pendente
+            });
+
+            showToast('Atendimento registrado com sucesso!', 'success');
+
+            // Limpa o formulário sem mostrar toast
+            setFormData({
+                farmerId: '',
+                farmerName: '',
+                sectorId: '',
+                serviceTypeId: '',
+                observacoes: ''
+            });
+            setFarmerSearch('');
+
+            await loadHistorico(); // Recarrega a lista
+        } catch (error) {
+            showToast('Erro ao registrar atendimento: ' + error.message, 'error');
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    // Função para salvar novo setor via modal
+    const handleSaveNewSector = async () => {
+        if (!newSectorName.trim()) {
+            showToast('Digite o nome do setor!', 'warning');
+            return;
+        }
+
+        setIsSavingSector(true);
+        try {
+            const response = await createSector({ name: newSectorName.trim() });
+            showToast('Setor cadastrado com sucesso!', 'success');
+            setNewSectorName('');
+            setShowSectorModal(false);
+            await loadSectors(); // Recarrega lista de setores
+
+            // Seleciona automaticamente o setor recém-criado
+            if (response && response.id) {
+                setFormData(prev => ({ ...prev, sectorId: response.id.toString() }));
+            }
+        } catch (error) {
+            showToast('Erro ao cadastrar setor: ' + error.message, 'error');
+        } finally {
+            setIsSavingSector(false);
+        }
+    };
+
+    // Função para salvar novo tipo de serviço via modal
+    const handleSaveNewServiceType = async () => {
+        if (!newServiceTypeName.trim()) {
+            showToast('Digite o nome do serviço!', 'warning');
+            return;
+        }
+
+        // ServiceType precisa de um setor associado
+        if (!formData.sectorId) {
+            showToast('Selecione um setor primeiro!', 'warning');
+            return;
+        }
+
+        setIsSavingServiceType(true);
+        try {
+            const response = await createServiceType({
+                name: newServiceTypeName.trim(),
+                sectorId: parseInt(formData.sectorId)  // Obrigatório!
+            });
+            showToast('Tipo de serviço cadastrado com sucesso!', 'success');
+            setNewServiceTypeName('');
+            setShowServiceTypeModal(false);
+            await loadServiceTypes(); // Recarrega lista
+
+            // Seleciona automaticamente o tipo recém-criado
+            if (response && response.id) {
+                setFormData(prev => ({ ...prev, serviceTypeId: response.id.toString() }));
+            }
+        } catch (error) {
+            showToast('Erro ao cadastrar tipo de serviço: ' + error.message, 'error');
+        } finally {
+            setIsSavingServiceType(false);
+        }
     };
 
     // Funções de visualização
-    const handleView = (atendimento) => {
+    const handleView = async (atendimento) => {
         setViewingAtendimento(atendimento);
         setActiveTab('visualizar');
     };
@@ -543,47 +690,148 @@ const Atendimentos = () => {
                 {activeTab === 'registrar' && (
                     <form className="atendimento-form" onSubmit={(e) => e.preventDefault()}>
                         <div className="form-grid-2">
-                            <div className="form-group">
-                                <label>Agricultor (nome/CPF)</label>
+                            <div className="form-group" style={{ position: 'relative' }}>
+                                <label>Agricultor (nome/CPF) <span style={{ color: '#dc3545' }}>*</span></label>
                                 <input
                                     type="text"
-                                    name="agricultor"
                                     className="form-input"
-                                    placeholder="Nome ou CPF ..."
-                                    value={formData.agricultor}
-                                    onChange={handleChange}
+                                    placeholder="Digite o nome do agricultor..."
+                                    value={farmerSearch}
+                                    onChange={handleFarmerSearch}
+                                    onFocus={() => farmers.length > 0 && setShowFarmerDropdown(true)}
+                                    onBlur={() => setTimeout(() => setShowFarmerDropdown(false), 200)}
                                 />
+                                {showFarmerDropdown && farmers.length > 0 && (
+                                    <div className="farmer-dropdown" style={{
+                                        position: 'absolute',
+                                        top: '100%',
+                                        left: 0,
+                                        right: 0,
+                                        background: 'white',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        maxHeight: '200px',
+                                        overflowY: 'auto',
+                                        zIndex: 1000,
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                                    }}>
+                                        {farmers.map(farmer => (
+                                            <div
+                                                key={farmer.id}
+                                                onClick={() => selectFarmer(farmer)}
+                                                style={{
+                                                    padding: '10px 12px',
+                                                    cursor: 'pointer',
+                                                    borderBottom: '1px solid #eee'
+                                                }}
+                                                onMouseEnter={(e) => e.target.style.background = '#f5f5f5'}
+                                                onMouseLeave={(e) => e.target.style.background = 'white'}
+                                            >
+                                                <strong>{farmer.name}</strong>
+                                                {farmer.cpf && <span style={{ marginLeft: '10px', color: '#666' }}>{formatCPF(farmer.cpf)}</span>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                             <div className="form-group">
-                                <label>Setor / Diretoria</label>
-                                <select
-                                    name="setor"
-                                    className="form-select"
-                                    value={formData.setor}
-                                    onChange={handleChange}
-                                >
-                                    <option value="" disabled>Selecionar Setor</option>
-                                    <option value="presidencia">Presidência</option>
-                                    <option value="juridico">Jurídico</option>
-                                    <option value="financeiro">Financeiro</option>
-                                </select>
+                                <label>Setor / Diretoria <span style={{ color: '#dc3545' }}>*</span></label>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <select
+                                        name="sectorId"
+                                        className="form-select"
+                                        value={formData.sectorId}
+                                        onChange={handleChange}
+                                        style={{ flex: 1 }}
+                                    >
+                                        <option value="" disabled>Selecionar Setor</option>
+                                        {sectors.map(sector => (
+                                            <option key={sector.id} value={sector.id}>
+                                                {sector.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <button
+                                        type="button"
+                                        className="btn-icon-add"
+                                        onClick={() => setShowSectorModal(true)}
+                                        title="Adicionar novo setor"
+                                        style={{
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: '8px',
+                                            border: '1px solid #4a8b58',
+                                            background: '#fff',
+                                            color: '#4a8b58',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            transition: 'all 0.2s'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.background = '#4a8b58';
+                                            e.target.style.color = '#fff';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.background = '#fff';
+                                            e.target.style.color = '#4a8b58';
+                                        }}
+                                    >
+                                        <Plus size={20} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         <div className="form-row">
                             <div className="form-group full-width">
-                                <label>Demanda / Serviço solicitado</label>
-                                <select
-                                    name="demanda"
-                                    className="form-select"
-                                    value={formData.demanda}
-                                    onChange={handleChange}
-                                >
-                                    <option value="" disabled>Selecione o serviço</option>
-                                    <option value="emissao">Emissão de Documento</option>
-                                    <option value="consulta">Consulta Técnica</option>
-                                    <option value="beneficio">Solicitação de Benefício</option>
-                                </select>
+                                <label>Demanda / Serviço solicitado <span style={{ color: '#dc3545' }}>*</span></label>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <select
+                                        name="serviceTypeId"
+                                        className="form-select"
+                                        value={formData.serviceTypeId}
+                                        onChange={handleChange}
+                                        style={{ flex: 1 }}
+                                    >
+                                        <option value="" disabled>Selecione o serviço</option>
+                                        {serviceTypes.map(serviceType => (
+                                            <option key={serviceType.id} value={serviceType.id}>
+                                                {serviceType.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <button
+                                        type="button"
+                                        className="btn-icon-add"
+                                        onClick={() => setShowServiceTypeModal(true)}
+                                        title="Adicionar novo tipo de serviço"
+                                        style={{
+                                            width: '40px',
+                                            height: '40px',
+                                            borderRadius: '8px',
+                                            border: '1px solid #4a8b58',
+                                            background: '#fff',
+                                            color: '#4a8b58',
+                                            cursor: 'pointer',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            transition: 'all 0.2s'
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.background = '#4a8b58';
+                                            e.target.style.color = '#fff';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.background = '#fff';
+                                            e.target.style.color = '#4a8b58';
+                                        }}
+                                    >
+                                        <Plus size={20} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -604,8 +852,13 @@ const Atendimentos = () => {
                             <button type="button" className="btn-outline-gray" onClick={handleLimpar}>
                                 Limpar
                             </button>
-                            <button type="button" className="btn-solid-green" onClick={handleSalvar}>
-                                Salvar Atendimento
+                            <button
+                                type="button"
+                                className="btn-solid-green"
+                                onClick={handleSalvar}
+                                disabled={isSaving}
+                            >
+                                {isSaving ? 'Salvando...' : 'Salvar Atendimento'}
                             </button>
                         </div>
                     </form>
@@ -627,42 +880,50 @@ const Atendimentos = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {currentItems.map((item) => (
-                                        <tr key={item.id}>
-                                            <td>{item.data}</td>
-                                            <td><strong>{item.agricultor}</strong></td>
-                                            <td>{item.servico}</td>
-                                            <td>{item.setor}</td>
-                                            <td>
-                                                <span className={`status-tag ${item.status.toLowerCase().replace(' ', '-')}`}>
-                                                    {item.status}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div className="actions-cell">
-                                                    <button
-                                                        className="icon-action"
-                                                        title="Ver Detalhes"
-                                                        onClick={() => handleView(item)}
-                                                    >
-                                                        <Eye size={18} />
-                                                    </button>
-                                                    <button
-                                                        className="icon-action"
-                                                        title="Gerar Comprovante"
-                                                        onClick={() => {
-                                                            setViewingAtendimento(item);
-                                                            setTimeout(() => {
-                                                                handlePrint();
-                                                            }, 100);
-                                                        }}
-                                                    >
-                                                        <FileText size={18} />
-                                                    </button>
-                                                </div>
+                                    {currentItems.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
+                                                Nenhum atendimento encontrado.
                                             </td>
                                         </tr>
-                                    ))}
+                                    ) : (
+                                        currentItems.map((item) => (
+                                            <tr key={item.id}>
+                                                <td>{item.data}</td>
+                                                <td><strong>{item.agricultor}</strong></td>
+                                                <td>{item.servico}</td>
+                                                <td>{item.setor}</td>
+                                                <td>
+                                                    <span className={`status-tag ${item.status.toLowerCase().replace(' ', '-')}`}>
+                                                        {item.status}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div className="actions-cell">
+                                                        <button
+                                                            className="icon-action"
+                                                            title="Ver Detalhes"
+                                                            onClick={() => handleView(item)}
+                                                        >
+                                                            <Eye size={18} />
+                                                        </button>
+                                                        <button
+                                                            className="icon-action"
+                                                            title="Gerar Comprovante"
+                                                            onClick={() => {
+                                                                setViewingAtendimento(item);
+                                                                setTimeout(() => {
+                                                                    handlePrint();
+                                                                }, 100);
+                                                            }}
+                                                        >
+                                                            <FileText size={18} />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
                                 </tbody>
                             </table>
                         </div>
@@ -789,6 +1050,136 @@ const Atendimentos = () => {
                     </div>
                 )}
             </div>
+
+            {/* Modal - Cadastrar Novo Setor */}
+            {showSectorModal && (
+                <div className="modal-overlay" style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 9999
+                }}>
+                    <div className="modal-content" style={{
+                        background: '#fff',
+                        borderRadius: '12px',
+                        padding: '24px',
+                        width: '100%',
+                        maxWidth: '400px',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                            <h3 style={{ margin: 0, color: '#333' }}>Novo Setor / Diretoria</h3>
+                            <button
+                                onClick={() => { setShowSectorModal(false); setNewSectorName(''); }}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                            >
+                                <X size={24} color="#666" />
+                            </button>
+                        </div>
+                        <div style={{ marginBottom: '20px' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#555' }}>
+                                Nome do Setor
+                            </label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                placeholder="Digite o nome do setor..."
+                                value={newSectorName}
+                                onChange={(e) => setNewSectorName(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && handleSaveNewSector()}
+                                autoFocus
+                                style={{ width: '100%' }}
+                            />
+                        </div>
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                            <button
+                                className="btn-outline-gray"
+                                onClick={() => { setShowSectorModal(false); setNewSectorName(''); }}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                className="btn-solid-green"
+                                onClick={handleSaveNewSector}
+                                disabled={isSavingSector}
+                            >
+                                {isSavingSector ? 'Salvando...' : 'Salvar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Modal - Cadastrar Novo Tipo de Serviço */}
+            {showServiceTypeModal && (
+                <div className="modal-overlay" style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    zIndex: 9999
+                }}>
+                    <div className="modal-content" style={{
+                        background: '#fff',
+                        borderRadius: '12px',
+                        padding: '24px',
+                        width: '100%',
+                        maxWidth: '400px',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.15)'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                            <h3 style={{ margin: 0, color: '#333' }}>Novo Tipo de Serviço</h3>
+                            <button
+                                onClick={() => { setShowServiceTypeModal(false); setNewServiceTypeName(''); }}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}
+                            >
+                                <X size={24} color="#666" />
+                            </button>
+                        </div>
+                        <div style={{ marginBottom: '20px' }}>
+                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#555' }}>
+                                Nome do Serviço
+                            </label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                placeholder="Digite o nome do serviço..."
+                                value={newServiceTypeName}
+                                onChange={(e) => setNewServiceTypeName(e.target.value)}
+                                onKeyPress={(e) => e.key === 'Enter' && handleSaveNewServiceType()}
+                                autoFocus
+                                style={{ width: '100%' }}
+                            />
+                        </div>
+                        <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                            <button
+                                className="btn-outline-gray"
+                                onClick={() => { setShowServiceTypeModal(false); setNewServiceTypeName(''); }}
+                            >
+                                Cancelar
+                            </button>
+                            <button
+                                className="btn-solid-green"
+                                onClick={handleSaveNewServiceType}
+                                disabled={isSavingServiceType}
+                            >
+                                {isSavingServiceType ? 'Salvando...' : 'Salvar'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

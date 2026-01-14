@@ -1,8 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FileText, Download, Calendar, Printer, Filter, Search, Eye } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { FileText, Download, Calendar, Printer, Filter, Search } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 import '../assets/css/Relatorio.css';
 import Toast from '../components/Toast';
+import { filterServices } from '../services/serviceService';
+import { filterFarmers } from '../services/farmerService';
+import { filterSectors } from '../services/sectorService';
 
 const Relatorio = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -10,6 +13,7 @@ const Relatorio = () => {
     const [activeReport, setActiveReport] = useState(null);
     const [reportData, setReportData] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
+    const [sectors, setSectors] = useState([]);
 
     // Filtros
     const [filters, setFilters] = useState({
@@ -41,15 +45,6 @@ const Relatorio = () => {
         }
     ];
 
-    // Dados simulados de atendimentos para o relatório
-    const atendimentosData = [
-        { id: 1, data: '04/12/2025', agricultor: 'Francisco Antônio da Silva', servico: 'Emissão de DAP', setor: 'Presidência', status: 'Concluído' },
-        { id: 2, data: '03/12/2025', agricultor: 'Maria Fernanda Costa', servico: 'Consulta Jurídica', setor: 'Jurídico', status: 'Em Andamento' },
-        { id: 3, data: '01/12/2025', agricultor: 'Caio Tiberius Mourão', servico: 'Solicitação de Benefício', setor: 'Financeiro', status: 'Pendente' },
-        { id: 4, data: '28/11/2025', agricultor: 'Ana Clara Sousa', servico: 'Atualização Cadastral', setor: 'Secretaria', status: 'Concluído' },
-        { id: 5, data: '25/11/2025', agricultor: 'José Pedro Alves', servico: 'Emissão de Boleto', setor: 'Financeiro', status: 'Concluído' },
-    ];
-
     // Toast functions
     const showToast = (message, type = 'info') => {
         setToast({ show: true, message, type });
@@ -59,12 +54,32 @@ const Relatorio = () => {
         setToast({ show: false, message: '', type: 'info' });
     };
 
-    // Simular carregamento inicial
+    // Formatar data para exibição
+    const formatDateToBR = (dateString) => {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('pt-BR');
+    };
+
+    // Carregar setores para o dropdown
+    const loadSectors = async () => {
+        try {
+            const response = await filterSectors({});
+            if (response && response.sectors) {
+                setSectors(response.sectors);
+            }
+        } catch (error) {
+            console.error('Erro ao carregar setores:', error);
+        }
+    };
+
+    // Carregar dados iniciais
     useEffect(() => {
-        const timer = setTimeout(() => {
+        const init = async () => {
+            await loadSectors();
             setIsLoading(false);
-        }, 800);
-        return () => clearTimeout(timer);
+        };
+        init();
     }, []);
 
     // Handlers
@@ -78,7 +93,7 @@ const Relatorio = () => {
         setReportData([]);
     };
 
-    const handleGenerateReport = () => {
+    const handleGenerateReport = async () => {
         if (!filters.dataInicio || !filters.dataFim) {
             showToast('Por favor, selecione as datas de início e fim.', 'warning');
             return;
@@ -86,12 +101,71 @@ const Relatorio = () => {
 
         setIsGenerating(true);
 
-        // Simular geração de relatório
-        setTimeout(() => {
-            setReportData(atendimentosData);
+        try {
+            let data = [];
+
+            if (activeReport === 'atendimentos' || activeReport === 'servicos') {
+                // Buscar serviços/atendimentos
+                const apiFilters = {
+                    startDate: filters.dataInicio,
+                    endDate: filters.dataFim
+                };
+
+                if (filters.setor) {
+                    apiFilters.sectorId = parseInt(filters.setor);
+                }
+
+                const response = await filterServices(apiFilters);
+
+                if (response && response.services) {
+                    data = response.services.map(service => ({
+                        id: service.id,
+                        data: formatDateToBR(service.createdOn || service.date),
+                        agricultor: service.farmerName || service.farmer?.name || '-',
+                        servico: service.serviceTypeName || service.serviceType?.name || '-',
+                        setor: service.sectorName || service.sector?.name || '-',
+                        status: getStatusLabel(service.status)
+                    }));
+                }
+            } else if (activeReport === 'agricultores') {
+                // Buscar agricultores
+                const response = await filterFarmers({});
+
+                if (response && response.farmers) {
+                    data = response.farmers.map(farmer => ({
+                        id: farmer.id,
+                        data: formatDateToBR(farmer.createdOn),
+                        agricultor: farmer.name || '-',
+                        servico: '-',
+                        setor: '-',
+                        status: farmer.isAlive ? 'Ativo' : 'Inativo'
+                    }));
+                }
+            }
+
+            setReportData(data);
+
+            if (data.length === 0) {
+                showToast('Nenhum registro encontrado para o período selecionado.', 'info');
+            } else {
+                showToast('Relatório gerado com sucesso!', 'success');
+            }
+        } catch (error) {
+            showToast('Erro ao gerar relatório: ' + error.message, 'error');
+        } finally {
             setIsGenerating(false);
-            showToast('Relatório gerado com sucesso!', 'success');
-        }, 1500);
+        }
+    };
+
+    // Converter status numérico para label
+    const getStatusLabel = (status) => {
+        const statusMap = {
+            1: 'Pendente',
+            2: 'Em Andamento',
+            3: 'Concluído',
+            4: 'Cancelado'
+        };
+        return statusMap[status] || 'Pendente';
     };
 
     const handlePrint = () => {
@@ -177,7 +251,7 @@ const Relatorio = () => {
                     </div>
                     
                     <div class="info-row">
-                        <span><strong>Período:</strong> ${filters.dataInicio} a ${filters.dataFim}</span>
+                        <span><strong>Período:</strong> ${formatDateToBR(filters.dataInicio)} a ${formatDateToBR(filters.dataFim)}</span>
                         <span><strong>Total de registros:</strong> ${reportData.length}</span>
                     </div>
                     
@@ -240,7 +314,7 @@ const Relatorio = () => {
                 </div>
                 
                 <div style="display: flex; justify-content: space-between; margin-bottom: 15px; padding: 10px; background: #f5f5f5; border-radius: 6px;">
-                    <span style="font-size: 12px;"><strong>Período:</strong> ${filters.dataInicio} a ${filters.dataFim}</span>
+                    <span style="font-size: 12px;"><strong>Período:</strong> ${formatDateToBR(filters.dataInicio)} a ${formatDateToBR(filters.dataFim)}</span>
                     <span style="font-size: 12px;"><strong>Total:</strong> ${reportData.length} registros</span>
                 </div>
                 
@@ -276,7 +350,7 @@ const Relatorio = () => {
         // Configurações do PDF
         const opt = {
             margin: 10,
-            filename: `relatorio_${filters.tipo}_${new Date().toISOString().split('T')[0]}.pdf`,
+            filename: `relatorio_${activeReport}_${new Date().toISOString().split('T')[0]}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { scale: 2, useCORS: true },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -387,10 +461,11 @@ const Relatorio = () => {
                                         onChange={handleFilterChange}
                                     >
                                         <option value="">Todos os setores</option>
-                                        <option value="presidencia">Presidência</option>
-                                        <option value="juridico">Jurídico</option>
-                                        <option value="financeiro">Financeiro</option>
-                                        <option value="secretaria">Secretaria</option>
+                                        {sectors.map(sector => (
+                                            <option key={sector.id} value={sector.id}>
+                                                {sector.name}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                             </div>

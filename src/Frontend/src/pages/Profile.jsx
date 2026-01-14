@@ -15,6 +15,7 @@ import {
 import '../assets/css/Profile.css';
 import Toast from '../components/Toast';
 import { getProfile, updateProfile } from '../services/userService';
+import { get } from '../services/api';
 
 const Profile = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -33,21 +34,15 @@ const Profile = () => {
     // Estado editável
     const [editData, setEditData] = useState({ ...userData });
 
-    // Estatísticas do usuário (mantido como mock por enquanto)
+    // Estatísticas do usuário - agora carregadas da API
     const [stats, setStats] = useState({
-        atendimentosHoje: 12,
-        atendimentosMes: 156,
-        cadastrosRealizados: 45
+        atendimentosHoje: 0,
+        atendimentosMes: 0,
+        cadastrosRealizados: 0
     });
 
-    // Atividades recentes (mantido como mock por enquanto)
-    const [atividades, setAtividades] = useState([
-        { id: 1, acao: 'Registrou atendimento', descricao: 'Francisco Antônio - Emissão de DAP', tempo: 'Há 15 min' },
-        { id: 2, acao: 'Cadastrou agricultor', descricao: 'Maria das Graças Silva', tempo: 'Há 1 hora' },
-        { id: 3, acao: 'Atualizou cadastro', descricao: 'José Pedro Alves', tempo: 'Há 2 horas' },
-        { id: 4, acao: 'Gerou relatório', descricao: 'Atendimentos por período', tempo: 'Há 3 horas' },
-        { id: 5, acao: 'Registrou atendimento', descricao: 'Ana Clara - Consulta Jurídica', tempo: 'Ontem' }
-    ]);
+    // Atividades recentes - será carregado da API
+    const [atividades, setAtividades] = useState([]);
 
     // Toast functions
     const showToast = (message, type = 'info') => {
@@ -56,6 +51,44 @@ const Profile = () => {
 
     const closeToast = () => {
         setToast({ show: false, message: '', type: 'info' });
+    };
+
+    // Carregar estatísticas do usuário da API
+    const loadUserStats = async () => {
+        try {
+            // Usa o mesmo endpoint do dashboard que já tem os dados
+            const response = await get('/dashboard/accountants');
+
+            console.log('📊 Stats do Profile:', response);
+
+            if (response) {
+                setStats({
+                    // Serviços realizados hoje (se disponível) ou 0
+                    atendimentosHoje: response.numberOfServicesProvidedToday || 0,
+                    // Serviços realizados este mês
+                    atendimentosMes: response.numberOfServicesProvidedThisMonth || response.numberOfServicesProvided || 0,
+                    // Agricultores cadastrados (total)
+                    cadastrosRealizados: response.numberOfFarmers || 0
+                });
+            }
+        } catch (error) {
+            console.error('Erro ao carregar estatísticas:', error);
+        }
+    };
+
+    // Carregar atividades recentes (se houver endpoint)
+    const loadAtividades = async () => {
+        try {
+            // Por enquanto, tenta buscar os últimos serviços como atividades
+            const response = await get('/service/filter');
+
+            if (response) {
+                // Vamos usar POST com filtro vazio para pegar os últimos
+            }
+        } catch (error) {
+            // Se não tiver endpoint, mantém vazio
+            console.log('Atividades: endpoint não disponível');
+        }
     };
 
     // Carregar dados do perfil da API
@@ -71,6 +104,9 @@ const Profile = () => {
                 };
                 setUserData(profileData);
                 setEditData(profileData);
+
+                // Carrega também as estatísticas
+                await loadUserStats();
             } catch (error) {
                 showToast('Erro ao carregar perfil: ' + error.message, 'error');
             } finally {

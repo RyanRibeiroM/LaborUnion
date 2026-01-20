@@ -1,7 +1,7 @@
 import { get, put } from './api';
 
 /**
- * Busca o perfil do usuário logado
+ * Busca o perfil do usuário
  * @returns {Promise<{name: string, email: string, role: string}>}
  */
 export async function getProfile() {
@@ -9,7 +9,7 @@ export async function getProfile() {
 }
 
 /**
- * Atualiza o perfil do usuário logado
+ * Atualiza o perfil
  * @param {object} data - { name, email, password? }
  * @returns {Promise<void>}
  */
@@ -19,8 +19,8 @@ export async function updateProfile(data) {
 
 /**
  * Altera a senha do usuário
- * @param {string} currentPassword - Senha atual
- * @param {string} newPassword - Nova senha
+ * @param {string} currentPassword
+ * @param {string} newPassword
  * @returns {Promise<void>}
  */
 export async function changePassword(currentPassword, newPassword) {

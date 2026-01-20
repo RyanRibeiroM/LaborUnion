@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Eye, FileText, ArrowLeft, Printer } from 'lucide-react';
+import { Eye, FileText, ArrowLeft, Printer, Plus } from 'lucide-react';
 import '../assets/css/Atendimentos.css';
+import '../assets/css/Modal.css';
 import Toast from '../components/Toast';
+import Modal from '../components/Modal';
+import FarmerAutocomplete from '../components/FarmerAutocomplete';
+import { filterSectors, createSector } from '../services/sectorService';
+import { filterServiceTypes, createServiceType } from '../services/serviceTypeService';
 
 const Atendimentos = () => {
     const [activeTab, setActiveTab] = useState('registrar');
@@ -15,12 +20,23 @@ const Atendimentos = () => {
     const [itemsPerPage] = useState(10);
 
     // States do formulário
+    const [selectedFarmer, setSelectedFarmer] = useState(null);
     const [formData, setFormData] = useState({
-        agricultor: '',
         setor: '',
         demanda: '',
         observacoes: ''
     });
+
+    // Dados dinâmicos da API
+    const [setores, setSetores] = useState([]);
+    const [tiposServico, setTiposServico] = useState([]);
+
+    // Estados dos modais
+    const [showModalSetor, setShowModalSetor] = useState(false);
+    const [showModalDemanda, setShowModalDemanda] = useState(false);
+    const [novoSetor, setNovoSetor] = useState({ name: '', description: '' });
+    const [novaDemanda, setNovaDemanda] = useState({ name: '', description: '', sectorId: '' });
+    const [savingModal, setSavingModal] = useState(false);
 
     // Dados simulados para o histórico
     const historicoData = [
@@ -230,12 +246,29 @@ const Atendimentos = () => {
         setToast({ show: false, message: '', type: 'info' });
     };
 
-    // Simular carregamento inicial
+    // Carregar setores e tipos de serviço da API
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 1000);
-        return () => clearTimeout(timer);
+        const loadData = async () => {
+            try {
+                // Carregar setores
+                const setoresResponse = await filterSectors({});
+                if (setoresResponse && setoresResponse.sectors) {
+                    setSetores(setoresResponse.sectors);
+                }
+
+                // Carregar tipos de serviço
+                const tiposResponse = await filterServiceTypes({});
+                if (tiposResponse && tiposResponse.servicesTypes) {
+                    setTiposServico(tiposResponse.servicesTypes);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+                showToast('Erro ao carregar dados', 'error');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadData();
     }, []);
 
     // Handlers do formulário
@@ -245,8 +278,8 @@ const Atendimentos = () => {
     };
 
     const handleLimpar = () => {
+        setSelectedFarmer(null);
         setFormData({
-            agricultor: '',
             setor: '',
             demanda: '',
             observacoes: ''
@@ -255,10 +288,12 @@ const Atendimentos = () => {
     };
 
     const handleSalvar = () => {
-        if (!formData.agricultor || !formData.setor || !formData.demanda) {
+        if (!selectedFarmer || !formData.setor || !formData.demanda) {
             showToast('Preencha todos os campos obrigatórios!', 'error');
             return;
         }
+        // TODO: Enviar para API com selectedFarmer.id
+        console.log('Salvando atendimento para agricultor:', selectedFarmer);
         showToast('Atendimento registrado com sucesso!', 'success');
         handleLimpar();
     };
@@ -272,6 +307,59 @@ const Atendimentos = () => {
     const closeView = () => {
         setViewingAtendimento(null);
         setActiveTab('historico');
+    };
+
+    // Funções dos modais de adicionar
+    const handleSaveNovoSetor = async () => {
+        if (!novoSetor.name.trim()) {
+            showToast('Informe o nome do setor', 'warning');
+            return;
+        }
+        setSavingModal(true);
+        try {
+            await createSector(novoSetor);
+            // Recarregar setores
+            const response = await filterSectors({});
+            if (response && response.sectors) {
+                setSetores(response.sectors);
+            }
+            setNovoSetor({ name: '', description: '' });
+            setShowModalSetor(false);
+            showToast('Setor criado com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao criar setor:', error);
+            showToast('Erro ao criar setor: ' + error.message, 'error');
+        } finally {
+            setSavingModal(false);
+        }
+    };
+
+    const handleSaveNovaDemanda = async () => {
+        if (!novaDemanda.name.trim()) {
+            showToast('Informe o nome do serviço', 'warning');
+            return;
+        }
+        if (!novaDemanda.sectorId) {
+            showToast('Selecione o setor do serviço', 'warning');
+            return;
+        }
+        setSavingModal(true);
+        try {
+            await createServiceType(novaDemanda);
+            // Recarregar tipos de serviço
+            const response = await filterServiceTypes({});
+            if (response && response.servicesTypes) {
+                setTiposServico(response.servicesTypes);
+            }
+            setNovaDemanda({ name: '', description: '', sectorId: '' });
+            setShowModalDemanda(false);
+            showToast('Tipo de serviço criado com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao criar tipo de serviço:', error);
+            showToast('Erro ao criar serviço: ' + error.message, 'error');
+        } finally {
+            setSavingModal(false);
+        }
     };
 
     // Função de impressão
@@ -545,45 +633,62 @@ const Atendimentos = () => {
                         <div className="form-grid-2">
                             <div className="form-group">
                                 <label>Agricultor (nome/CPF)</label>
-                                <input
-                                    type="text"
-                                    name="agricultor"
-                                    className="form-input"
-                                    placeholder="Nome ou CPF ..."
-                                    value={formData.agricultor}
-                                    onChange={handleChange}
+                                <FarmerAutocomplete
+                                    value={selectedFarmer}
+                                    onSelect={setSelectedFarmer}
+                                    placeholder="Digite nome ou CPF do agricultor..."
                                 />
                             </div>
                             <div className="form-group">
                                 <label>Setor / Diretoria</label>
-                                <select
-                                    name="setor"
-                                    className="form-select"
-                                    value={formData.setor}
-                                    onChange={handleChange}
-                                >
-                                    <option value="" disabled>Selecionar Setor</option>
-                                    <option value="presidencia">Presidência</option>
-                                    <option value="juridico">Jurídico</option>
-                                    <option value="financeiro">Financeiro</option>
-                                </select>
+                                <div className="select-with-btn">
+                                    <select
+                                        name="setor"
+                                        className="form-select"
+                                        value={formData.setor}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="" disabled>Selecionar Setor</option>
+                                        {setores.map(setor => (
+                                            <option key={setor.id} value={setor.id}>{setor.name}</option>
+                                        ))}
+                                    </select>
+                                    <button
+                                        type="button"
+                                        className="btn-add-inline"
+                                        onClick={() => setShowModalSetor(true)}
+                                        title="Adicionar novo setor"
+                                    >
+                                        <Plus size={18} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         <div className="form-row">
                             <div className="form-group full-width">
                                 <label>Demanda / Serviço solicitado</label>
-                                <select
-                                    name="demanda"
-                                    className="form-select"
-                                    value={formData.demanda}
-                                    onChange={handleChange}
-                                >
-                                    <option value="" disabled>Selecione o serviço</option>
-                                    <option value="emissao">Emissão de Documento</option>
-                                    <option value="consulta">Consulta Técnica</option>
-                                    <option value="beneficio">Solicitação de Benefício</option>
-                                </select>
+                                <div className="select-with-btn">
+                                    <select
+                                        name="demanda"
+                                        className="form-select"
+                                        value={formData.demanda}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="" disabled>Selecione o serviço</option>
+                                        {tiposServico.map(tipo => (
+                                            <option key={tipo.id} value={tipo.id}>{tipo.name}</option>
+                                        ))}
+                                    </select>
+                                    <button
+                                        type="button"
+                                        className="btn-add-inline"
+                                        onClick={() => setShowModalDemanda(true)}
+                                        title="Adicionar novo tipo de serviço"
+                                    >
+                                        <Plus size={18} />
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -789,6 +894,103 @@ const Atendimentos = () => {
                     </div>
                 )}
             </div>
+
+            {/* Modal Adicionar Setor */}
+            <Modal
+                isOpen={showModalSetor}
+                onClose={() => setShowModalSetor(false)}
+                title="Adicionar Novo Setor"
+                footer={
+                    <>
+                        <button className="btn-secondary" onClick={() => setShowModalSetor(false)}>
+                            Cancelar
+                        </button>
+                        <button
+                            className="btn-solid-green"
+                            onClick={handleSaveNovoSetor}
+                            disabled={savingModal}
+                        >
+                            {savingModal ? 'Salvando...' : 'Salvar Setor'}
+                        </button>
+                    </>
+                }
+            >
+                <div className="form-group">
+                    <label>Nome do Setor <span className="required">*</span></label>
+                    <input
+                        type="text"
+                        className="form-input"
+                        placeholder="Ex: Presidência"
+                        value={novoSetor.name}
+                        onChange={(e) => setNovoSetor({ ...novoSetor, name: e.target.value })}
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Descrição</label>
+                    <input
+                        type="text"
+                        className="form-input"
+                        placeholder="Breve descrição do setor"
+                        value={novoSetor.description}
+                        onChange={(e) => setNovoSetor({ ...novoSetor, description: e.target.value })}
+                    />
+                </div>
+            </Modal>
+
+            {/* Modal Adicionar Demanda/Tipo de Serviço */}
+            <Modal
+                isOpen={showModalDemanda}
+                onClose={() => setShowModalDemanda(false)}
+                title="Adicionar Novo Tipo de Serviço"
+                footer={
+                    <>
+                        <button className="btn-secondary" onClick={() => setShowModalDemanda(false)}>
+                            Cancelar
+                        </button>
+                        <button
+                            className="btn-solid-green"
+                            onClick={handleSaveNovaDemanda}
+                            disabled={savingModal}
+                        >
+                            {savingModal ? 'Salvando...' : 'Salvar Serviço'}
+                        </button>
+                    </>
+                }
+            >
+                <div className="form-group">
+                    <label>Nome do Serviço <span className="required">*</span></label>
+                    <input
+                        type="text"
+                        className="form-input"
+                        placeholder="Ex: Emissão de DAP"
+                        value={novaDemanda.name}
+                        onChange={(e) => setNovaDemanda({ ...novaDemanda, name: e.target.value })}
+                    />
+                </div>
+                <div className="form-group">
+                    <label>Setor <span className="required">*</span></label>
+                    <select
+                        className="form-select"
+                        value={novaDemanda.sectorId}
+                        onChange={(e) => setNovaDemanda({ ...novaDemanda, sectorId: e.target.value })}
+                    >
+                        <option value="" disabled>Selecionar Setor</option>
+                        {setores.map(setor => (
+                            <option key={setor.id} value={setor.id}>{setor.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="form-group">
+                    <label>Descrição</label>
+                    <input
+                        type="text"
+                        className="form-input"
+                        placeholder="Breve descrição do serviço"
+                        value={novaDemanda.description}
+                        onChange={(e) => setNovaDemanda({ ...novaDemanda, description: e.target.value })}
+                    />
+                </div>
+            </Modal>
         </div>
     );
 };

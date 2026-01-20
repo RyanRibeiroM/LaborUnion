@@ -14,6 +14,8 @@ import {
 import '../assets/css/Configuracao.css';
 import Toast from '../components/Toast';
 import ModalConfirmacao from '../components/ModalConfirmacao';
+import { filterSectors, createSector } from '../services/sectorService';
+import { del } from '../services/api';
 
 const Configuracao = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -47,12 +49,7 @@ const Configuracao = () => {
         sistemaAlerta: true
     });
 
-    const [setores, setSetores] = useState([
-        { id: 1, nome: 'Presidência', descricao: 'Atendimentos gerais e emissão de documentos', ativo: true },
-        { id: 2, nome: 'Jurídico', descricao: 'Consultas e assessoria jurídica', ativo: true },
-        { id: 3, nome: 'Financeiro', descricao: 'Boletos, contribuições e benefícios', ativo: true },
-        { id: 4, nome: 'Secretaria', descricao: 'Atualizações cadastrais e arquivo', ativo: true }
-    ]);
+    const [setores, setSetores] = useState([]);
 
     const [novoSetor, setNovoSetor] = useState({ nome: '', descricao: '' });
 
@@ -74,12 +71,29 @@ const Configuracao = () => {
         setToast({ show: false, message: '', type: 'info' });
     };
 
-    // Simular carregamento
+    // Carregar setores da API
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsLoading(false);
-        }, 800);
-        return () => clearTimeout(timer);
+        const loadSetores = async () => {
+            try {
+                const response = await filterSectors({});
+                if (response && response.sectors) {
+                    // Mapear para o formato esperado pelo componente
+                    const setoresFormatados = response.sectors.map(s => ({
+                        id: s.id,
+                        nome: s.name,
+                        descricao: s.description || '',
+                        ativo: true
+                    }));
+                    setSetores(setoresFormatados);
+                }
+            } catch (error) {
+                console.error('Erro ao carregar setores:', error);
+                showToast('Erro ao carregar setores', 'error');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadSetores();
     }, []);
 
     // Handlers
@@ -123,15 +137,33 @@ const Configuracao = () => {
         showToast('Preferências de notificação salvas!', 'success');
     };
 
-    const handleAddSetor = () => {
+    const handleAddSetor = async () => {
         if (!novoSetor.nome.trim()) {
             showToast('Informe o nome do setor.', 'warning');
             return;
         }
-        const newId = Math.max(...setores.map(s => s.id), 0) + 1;
-        setSetores([...setores, { ...novoSetor, id: newId, ativo: true }]);
-        setNovoSetor({ nome: '', descricao: '' });
-        showToast('Setor adicionado com sucesso!', 'success');
+        try {
+            const response = await createSector({
+                name: novoSetor.nome,
+                description: novoSetor.descricao
+            });
+            // Recarregar lista de setores
+            const updatedResponse = await filterSectors({});
+            if (updatedResponse && updatedResponse.sectors) {
+                const setoresFormatados = updatedResponse.sectors.map(s => ({
+                    id: s.id,
+                    nome: s.name,
+                    descricao: s.description || '',
+                    ativo: true
+                }));
+                setSetores(setoresFormatados);
+            }
+            setNovoSetor({ nome: '', descricao: '' });
+            showToast('Setor adicionado com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao adicionar setor:', error);
+            showToast('Erro ao adicionar setor: ' + error.message, 'error');
+        }
     };
 
     const handleDeleteSetor = (id) => {
@@ -139,11 +171,18 @@ const Configuracao = () => {
         setShowModal(true);
     };
 
-    const confirmDeleteSetor = () => {
-        setSetores(setores.filter(s => s.id !== itemToDelete));
-        setShowModal(false);
-        setItemToDelete(null);
-        showToast('Setor removido com sucesso!', 'success');
+    const confirmDeleteSetor = async () => {
+        try {
+            await del(`/sector/${itemToDelete}`);
+            setSetores(setores.filter(s => s.id !== itemToDelete));
+            setShowModal(false);
+            setItemToDelete(null);
+            showToast('Setor removido com sucesso!', 'success');
+        } catch (error) {
+            console.error('Erro ao excluir setor:', error);
+            showToast('Erro ao excluir setor: ' + error.message, 'error');
+            setShowModal(false);
+        }
     };
 
     const handleToggleSetor = (id) => {

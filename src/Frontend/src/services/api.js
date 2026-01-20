@@ -83,6 +83,18 @@ export async function apiRequest(endpoint, options = {}) {
     }
 
     if (!response.ok) {
+        // Se for erro 401 (não autorizado), redirecionar para login
+        if (response.status === 401) {
+            console.warn('🔒 Token expirado ou inválido. Redirecionando para login...');
+            // Limpar tokens
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            // Redirecionar para login
+            window.location.href = '/';
+            throw new Error('Acesso não autorizado. Redirecionando para login...');
+        }
+
         // Lança erro com mensagens da API (suporta diferentes formatos)
         let errorMessage = 'Erro na requisição';
 

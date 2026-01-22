@@ -16,14 +16,14 @@ namespace LaborUnion.API.Filters
                 ThrowUnknownError(context);
         }
 
-        private void HandleProjectException(ExceptionContext context, LaborUnionException exception)
+        private static void HandleProjectException(ExceptionContext context, LaborUnionException exception)
         {
             context.HttpContext.Response.StatusCode = (int)exception.GetStatusCode();
             var responseJson = new ResponseErrorJson(exception.GetErrorMessages());
             context.Result = new ObjectResult(responseJson);
         }
 
-        private void ThrowUnknownError(ExceptionContext context)
+        private static void ThrowUnknownError(ExceptionContext context)
         {
             context.HttpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
             var responseJson = new ResponseErrorJson(ResourceMessagesException.UNKNOWN_ERROR);

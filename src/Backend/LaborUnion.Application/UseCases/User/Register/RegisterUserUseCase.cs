@@ -9,6 +9,7 @@ using LaborUnion.Domain.Repositories.Token;
 using LaborUnion.Domain.Repositories.User;
 using LaborUnion.Domain.Security.Criptography;
 using LaborUnion.Domain.Security.Tokens;
+using LaborUnion.Domain.Services.LoggedUser;
 using LaborUnion.Exceptions;
 using LaborUnion.Exceptions.ExceptionsBase;
 
@@ -21,12 +22,13 @@ namespace LaborUnion.Application.UseCases.User.Register
         private readonly IFarmerReadOnlyRepository _farmerReadOnlyRepository;   
         public readonly IPasswordEncrypter _passwordEncrypter;
         private readonly IMapper _mapper;
+        private readonly ILoggedUser _loggedUser;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAccessTokenGenerate _accessTokenGenerate;
         private readonly IRefreshTokenGenerator _refreshTokenGenerator;
         private readonly ITokenRepository _tokenRepository;
 
-        public RegisterUserUseCase(IUserWriteOnlyRepository writeOnlyRepository, IUserReadOnlyRepository readOnlyRepository,IFarmerReadOnlyRepository farmerReadOnlyRepository, IPasswordEncrypter passwordEncrypter, IMapper mapper, IUnitOfWork unitOfWork, IAccessTokenGenerate accessTokenGenerate, IRefreshTokenGenerator refreshTokenGenerator,
+        public RegisterUserUseCase(IUserWriteOnlyRepository writeOnlyRepository, IUserReadOnlyRepository readOnlyRepository,IFarmerReadOnlyRepository farmerReadOnlyRepository, IPasswordEncrypter passwordEncrypter, IMapper mapper, ILoggedUser loggedUser, IUnitOfWork unitOfWork, IAccessTokenGenerate accessTokenGenerate, IRefreshTokenGenerator refreshTokenGenerator,
             ITokenRepository tokenRepository)
         {
             _writeOnlyRepository = writeOnlyRepository;
@@ -34,6 +36,7 @@ namespace LaborUnion.Application.UseCases.User.Register
             _farmerReadOnlyRepository = farmerReadOnlyRepository;
             _passwordEncrypter = passwordEncrypter;
             _mapper = mapper;
+            _loggedUser = loggedUser;
             _unitOfWork = unitOfWork;
             _accessTokenGenerate = accessTokenGenerate;
             _refreshTokenGenerator = refreshTokenGenerator;
@@ -43,7 +46,8 @@ namespace LaborUnion.Application.UseCases.User.Register
 
         public async Task<ResponseRegisteredUserJson> Execute(RequestRegisterUserJson request)
         {
-            await Validate(request);
+            var loggedUser = await _loggedUser.GetUser();
+            await Validate(request, loggedUser);
             var user = _mapper.Map<Domain.Entities.User>(request);
 
             user.Password = _passwordEncrypter.Encrypt(request.Password);
@@ -83,13 +87,16 @@ namespace LaborUnion.Application.UseCases.User.Register
             return refreshToken.Value;
 
         }
-        private async Task Validate(RequestRegisterUserJson request)
+        private async Task Validate(RequestRegisterUserJson request, Domain.Entities.User loggedUser)
         {
             var validator = new RegisterUserValidator();
             var result = await validator.ValidateAsync(request);
 
-            //if (Enum.IsDefined(typeof(PrivilegedUserRoles), (int)request.Role))
-            //    throw new NotFoundException(ResourceMessagesException.USER_ROLE_NOT_SUPPORTED);
+            if ((int)request.Role == (int)UserRoles.Developer)
+                throw new NotFoundException(ResourceMessagesException.USER_ROLE_NOT_SUPPORTED);
+
+            else if (Enum.IsDefined(typeof(PrivilegedUserRoles), (int)request.Role) && loggedUser.Role == UserRoles.Administrator) 
+                throw new NotFoundException(ResourceMessagesException.USER_ROLE_NOT_SUPPORTED); 
 
             var emailExists = await _readOnlyRepository.ExistActiveUserWithEmailAsync(request.Email);
             var emailExistsInFarmers = await _farmerReadOnlyRepository.ExistActiveFarmerWithEmail(request.Email);

@@ -1,7 +1,4 @@
-﻿using LaborUnion.Application.UseCases.Farmer.Delete;
-using LaborUnion.Application.UseCases.Farmer.GetById;
-using LaborUnion.Application.UseCases.Farmer.Update;
-using LaborUnion.Application.UseCases.User.ChangePassword;
+﻿using LaborUnion.Application.UseCases.User.ChangePassword;
 using LaborUnion.Application.UseCases.User.Delete;
 using LaborUnion.Application.UseCases.User.Filter;
 using LaborUnion.Application.UseCases.User.GetById;
@@ -21,6 +18,7 @@ namespace LaborUnion.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseRegisteredUserJson), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Administrator, Developer")]
         public async Task<IActionResult> Register(
             [FromBody] RequestRegisterUserJson request,
             [FromServices] IRegisterUserUseCase useCase
@@ -48,7 +46,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(typeof(ResponseUserJson), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator, Developer")]
         public async Task<IActionResult> GetById(
             [FromServices] IGetUserByIdUseCase useCase,
             [FromRoute] int id)
@@ -62,7 +60,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator, Developer")]
         public async Task<IActionResult> Delete(
             [FromServices] IDeleteUserUseCase useCase,
             [FromRoute] int id)
@@ -87,7 +85,7 @@ namespace LaborUnion.API.Controllers
         [HttpPost("Filter")]
         [ProducesResponseType(typeof(ResponseUsersJson), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator, Developer")]
         public async Task<IActionResult> Filter(
             [FromBody] RequestFilterUserJson request,
             [FromServices] IFilterUserUseCase useCase
@@ -107,7 +105,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator, Developer")]
         public async Task<IActionResult> Update(
             [FromServices] IUpdateUserUseCase useCase,
             [FromRoute] int id,
@@ -122,7 +120,7 @@ namespace LaborUnion.API.Controllers
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator, Developer")]
         public async Task<IActionResult> UpdateProfile(
             [FromServices] IUpdateUserProfileUseCase useCase,
             [FromBody] RequestUpdateUserProfileJson request

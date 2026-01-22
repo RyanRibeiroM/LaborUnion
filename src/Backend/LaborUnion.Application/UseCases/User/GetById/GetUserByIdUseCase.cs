@@ -12,16 +12,21 @@ namespace LaborUnion.Application.UseCases.User.GetById
     {
         private readonly IUserReadOnlyRepository _repository;
         private readonly IMapper _mapper;
-        public GetUserByIdUseCase(IUserReadOnlyRepository repository, IMapper mapper)
+        private readonly ILoggedUser _loggedUser;
+        public GetUserByIdUseCase(IUserReadOnlyRepository repository, IMapper mapper, ILoggedUser loggedUser)
         {
             _repository = repository;
             _mapper = mapper;
+            _loggedUser = loggedUser;
         }
         public async Task<ResponseUserJson> Execute(int id)
         {
+            var loggedUser = await _loggedUser.GetUser();
             var user = await _repository.GetById(id) ?? throw new NotFoundException(ResourceMessagesException.USER_NOT_FOUND);
 
-            if(Enum.IsDefined(typeof(PrivilegedUserRoles), (int)user.Role))
+            if(user.Role == UserRoles.Developer)
+                throw new NotFoundException(ResourceMessagesException.USER_NOT_FOUND);
+            else if (Enum.IsDefined(typeof(PrivilegedUserRoles), (int)user.Role) && loggedUser.Role == UserRoles.Administrator)
                 throw new NotFoundException(ResourceMessagesException.USER_NOT_FOUND);
 
             return _mapper.Map<ResponseUserJson>(user);

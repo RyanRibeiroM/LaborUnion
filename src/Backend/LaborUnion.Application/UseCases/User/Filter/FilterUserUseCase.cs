@@ -2,9 +2,9 @@
 using LaborUnion.Communication.Requests;
 using LaborUnion.Communication.Responses;
 using LaborUnion.Domain.Dtos;
-using LaborUnion.Domain.Entities;
 using LaborUnion.Domain.Enums;
 using LaborUnion.Domain.Repositories.User;
+using LaborUnion.Domain.Services.LoggedUser;
 
 namespace LaborUnion.Application.UseCases.User.Filter
 {
@@ -12,13 +12,16 @@ namespace LaborUnion.Application.UseCases.User.Filter
     {
         private readonly IUserReadOnlyRepository _userReadOnlyRepository;
         private readonly IMapper _mapper;
-        public FilterUserUseCase(IUserReadOnlyRepository userReadOnlyRepository, IMapper mapper)
+        private readonly ILoggedUser _loggedUser;
+        public FilterUserUseCase(IUserReadOnlyRepository userReadOnlyRepository, IMapper mapper, ILoggedUser loggedUser)
         {
             _userReadOnlyRepository = userReadOnlyRepository;
             _mapper = mapper;
+            _loggedUser = loggedUser;
         }
         public async Task<ResponseUsersJson> Execute(RequestFilterUserJson request)
         {
+            var loggedUser = await _loggedUser.GetUser();
             var filter = new FilterUserDto() { 
                 Name = request.Name,
                 Email = request.Email,
@@ -33,15 +36,20 @@ namespace LaborUnion.Application.UseCases.User.Filter
                 return new ResponseUsersJson { Users = new List<ResponseUserShortJson>() };
             }
 
-            var filteredUsers = users
-                .Where(user => !Enum.IsDefined(typeof(PrivilegedUserRoles), (int)user.Role))
-                .ToList();
+            var filteredUsers = users;
+            if (loggedUser.Role == UserRoles.Developer)
+            {
+                filteredUsers = [.. users.Where(user => user.Role != UserRoles.Developer)];
+            }
+            else
+            {
+                 filteredUsers = [.. users.Where(user => !Enum.IsDefined(typeof(PrivilegedUserRoles), (int)user.Role))];
+            }
 
-            return new ResponseUsersJson() { 
+            return new ResponseUsersJson()
+            {
                 Users = _mapper.Map<IList<ResponseUserShortJson>>(filteredUsers)
             };
-
-
         }
     }
 }

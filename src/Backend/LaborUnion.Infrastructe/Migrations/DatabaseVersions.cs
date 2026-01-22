@@ -14,5 +14,6 @@
         public const int SECTOR_TABLE = 10;
         public const int ADD_SECTOR_ID_IN_THE_SERVICE_TYPE_TABLE = 11;
         public const int DOCUMENT_TABLE = 12;
+        public const int ADD_DEFAULT_USER = 13;
     }
 }

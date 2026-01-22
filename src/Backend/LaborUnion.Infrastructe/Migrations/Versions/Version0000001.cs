@@ -18,7 +18,7 @@ namespace GymManager.Infrastructure.Migrations.Versions
                  .WithColumn("UserIdentifier").AsGuid().NotNullable()
                  .WithColumn("PasswordResetToken").AsString(200).Nullable()
                  .WithColumn("PasswordResetTokenExpires").AsDateTime().Nullable()
-                 .WithColumn("Role").AsInt32().NotNullable().WithDefaultValue(UserRoles.Administrator);
+                 .WithColumn("Role").AsInt32().NotNullable();
 
             CreateTable("Farmers")
                 .WithColumn("Name").AsString(200).NotNullable()

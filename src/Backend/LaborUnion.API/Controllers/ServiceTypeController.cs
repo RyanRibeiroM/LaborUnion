@@ -17,7 +17,7 @@ namespace LaborUnion.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseRegisteredServiceTypeJson), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status400BadRequest)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator, Developer")]
         public async Task<IActionResult> Register(
             [FromBody] RequestRegisterServiceTypeJson request,
             [FromServices] IRegisterServiceTypeUseCase useCase
@@ -32,7 +32,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(typeof(ResponseServiceTypeJson), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator, Developer")]
         public async Task<IActionResult> GetById(
             [FromServices] IGetServiceTypeByIdUseCase useCase,
             [FromRoute] int id)
@@ -46,7 +46,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator, Developer")]
         public async Task<IActionResult> Delete(
             [FromServices] IDeleteServiceTypeUseCase useCase,
             [FromRoute] int id)
@@ -60,7 +60,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator, Attendant")]
+        [Authorize(Roles = "Administrator, Developer")]
         public async Task<IActionResult> Update(
             [FromServices] IUpdateServiceTypeUseCase useCase,
             [FromRoute] int id,
@@ -75,7 +75,7 @@ namespace LaborUnion.API.Controllers
         [HttpPost("filter")]
         [ProducesResponseType(typeof(ResponseServicesTypesJson), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator, Developer")]
         public async Task<IActionResult> Filter(
             [FromServices] IFilterServiceTypeUseCase useCase,
             [FromBody] RequestFilterServiceTypeJson request)

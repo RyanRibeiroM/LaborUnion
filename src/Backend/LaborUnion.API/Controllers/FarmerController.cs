@@ -15,7 +15,7 @@ namespace LaborUnion.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseRegisteredFarmerJson), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status400BadRequest)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         public async Task<IActionResult> Register(
             [FromBody] RequestRegisterFarmerJson request,
             [FromServices] IRegisterFarmerUseCase useCase
@@ -30,7 +30,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(typeof(ResponseFarmerJson), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         public async Task<IActionResult> GetById(
             [FromServices] IGetFarmerByIdUseCase useCase,
             [FromRoute] int id)
@@ -43,7 +43,7 @@ namespace LaborUnion.API.Controllers
         [HttpPost("filter")]
         [ProducesResponseType(typeof(ResponseFarmersJson), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         public async Task<IActionResult> Filter(
             [FromServices] IFilterFarmerUseCase useCase,
             [FromBody] RequestFilterFarmerJson request)
@@ -62,7 +62,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         public async Task<IActionResult> Update(
             [FromServices] IUpdateFarmerUseCase useCase,
             [FromRoute] int id,
@@ -78,7 +78,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         public async Task<IActionResult> Delete(
             [FromServices] IDeleteFarmerUseCase useCase,
             [FromRoute] int id)

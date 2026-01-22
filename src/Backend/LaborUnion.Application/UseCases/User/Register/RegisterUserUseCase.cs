@@ -52,7 +52,6 @@ namespace LaborUnion.Application.UseCases.User.Register
 
             user.Password = _passwordEncrypter.Encrypt(request.Password);
 
-            user.Role = UserRoles.Administrator;
             user.UserIdentifier = Guid.NewGuid();
 
             var token = _accessTokenGenerate.Generate(user);

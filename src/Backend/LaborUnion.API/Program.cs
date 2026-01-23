@@ -71,11 +71,11 @@ var app = builder.Build();
 app.MapHealthChecks("/health");
 app.UseCors(CORSSpecifcOrigins);
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors(CORSSpecifcOrigins);
 }
 
 app.UseMiddleware<LaborUnion.API.Middlewares.UnauthorizedHandlerMiddleware>();

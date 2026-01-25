@@ -10,7 +10,7 @@ export async function getProfile() {
 
 /**
  * Atualiza o perfil
- * @param {object} data - { name, email, password? }
+ * @param {object} data
  * @returns {Promise<void>}
  */
 export async function updateProfile(data) {

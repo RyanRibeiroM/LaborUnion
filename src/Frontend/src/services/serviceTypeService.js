@@ -2,7 +2,7 @@ import { get, post } from './api';
 
 /**
  * Lista todos os tipos de serviço/atendimento
- * @param {object} filters - { name, sectorId }
+ * @param {object} filters
  * @returns {Promise<{servicesTypes: Array}>}
  */
 export async function filterServiceTypes(filters = {}) {
@@ -20,7 +20,7 @@ export async function getServiceTypeById(id) {
 
 /**
  * Cria um novo tipo de serviço
- * @param {object} data - { name, description, sectorId }
+ * @param {object} data
  * @returns {Promise<{name: string}>}
  */
 export async function createServiceType(data) {

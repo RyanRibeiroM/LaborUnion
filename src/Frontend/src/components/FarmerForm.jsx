@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Check, X } from 'lucide-react';
 
 /**
  * FarmerForm - Componente de formulário para cadastro/edição de agricultor
@@ -48,7 +48,7 @@ const FarmerForm = ({
                     <h3 className="section-title">Dados Pessoais</h3>
 
                     <div className="form-group full-width">
-                        <label>Nome Completo</label>
+                        <label className="required">Nome Completo</label>
                         <input
                             type="text"
                             name="nome"
@@ -60,24 +60,37 @@ const FarmerForm = ({
 
                     <div className="form-row">
                         <div className="form-group half-width">
-                            <label>CPF</label>
-                            <input
-                                type="text"
-                                name="cpf"
-                                className={`form-input ${cpfError === 'valido' ? 'input-success' : cpfError === 'invalido' ? 'input-error' : ''}`}
-                                placeholder="000.000.000-00"
-                                value={formData.cpf}
-                                onChange={onFieldChange}
-                                maxLength={14}
-                            />
-                            {cpfError === 'invalido' && <span className="error-msg">CPF Inválido</span>}
-                            {cpfError === 'valido' && <span className="success-msg">CPF Válido</span>}
+                            <label className="required">CPF</label>
+                            <div style={{ position: 'relative' }}>
+                                <input
+                                    type="text"
+                                    name="cpf"
+                                    className={`form-input ${cpfError === 'valido' ? 'input-success' : cpfError === 'invalido' ? 'input-error' : ''}`}
+                                    placeholder="000.000.000-00"
+                                    value={formData.cpf}
+                                    onChange={onFieldChange}
+                                    maxLength={14}
+                                    style={{ paddingRight: cpfError ? '40px' : '16px' }}
+                                />
+                                {cpfError === 'valido' && (
+                                    <Check
+                                        size={20}
+                                        className="cpf-validation-icon valid"
+                                    />
+                                )}
+                                {cpfError === 'invalido' && (
+                                    <X
+                                        size={20}
+                                        className="cpf-validation-icon invalid"
+                                    />
+                                )}
+                            </div>
                         </div>
                     </div>
 
                     <div className="form-row">
                         <div className="form-group half-width">
-                            <label>Data de Nascimento</label>
+                            <label className="required">Data de Nascimento</label>
                             <input
                                 type="date"
                                 name="dataNascimento"
@@ -87,7 +100,7 @@ const FarmerForm = ({
                             />
                         </div>
                         <div className="form-group half-width">
-                            <label>Matrícula</label>
+                            <label className="required">Matrícula</label>
                             <input
                                 type="text"
                                 name="matricula"
@@ -100,7 +113,7 @@ const FarmerForm = ({
 
                     <div className="form-row">
                         <div className="form-group half-width">
-                            <label>Estado Civil</label>
+                            <label className="required">Estado Civil</label>
                             <select
                                 name="estadoCivil"
                                 className="form-input form-select"
@@ -115,7 +128,7 @@ const FarmerForm = ({
                             </select>
                         </div>
                         <div className="form-group half-width">
-                            <label>Profissão</label>
+                            <label className="required">Profissão</label>
                             <input
                                 type="text"
                                 name="profissao"
@@ -150,7 +163,7 @@ const FarmerForm = ({
 
                         <div className="form-row">
                             <div className="form-group half-width">
-                                <label>Nome Completo do Cônjuge</label>
+                                <label className="required">Nome Completo do Cônjuge</label>
                                 <input
                                     type="text"
                                     name="nome"
@@ -160,18 +173,31 @@ const FarmerForm = ({
                                 />
                             </div>
                             <div className="form-group half-width">
-                                <label>CPF do Cônjuge</label>
-                                <input
-                                    type="text"
-                                    name="cpf"
-                                    className={`form-input ${cpfConjugeError === 'valido' ? 'input-success' : cpfConjugeError === 'invalido' ? 'input-error' : ''}`}
-                                    placeholder="000.000.000-00"
-                                    value={conjuge.cpf}
-                                    onChange={onConjugeChange}
-                                    maxLength={14}
-                                />
-                                {cpfConjugeError === 'invalido' && <span className="error-msg">CPF Inválido</span>}
-                                {cpfConjugeError === 'valido' && <span className="success-msg">CPF Válido</span>}
+                                <label className="required">CPF do Cônjuge</label>
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type="text"
+                                        name="cpf"
+                                        className={`form-input ${cpfConjugeError === 'valido' ? 'input-success' : cpfConjugeError === 'invalido' ? 'input-error' : ''}`}
+                                        placeholder="000.000.000-00"
+                                        value={conjuge.cpf}
+                                        onChange={onConjugeChange}
+                                        maxLength={14}
+                                        style={{ paddingRight: cpfConjugeError ? '40px' : '16px' }}
+                                    />
+                                    {cpfConjugeError === 'valido' && (
+                                        <Check
+                                            size={20}
+                                            className="cpf-validation-icon valid"
+                                        />
+                                    )}
+                                    {cpfConjugeError === 'invalido' && (
+                                        <X
+                                            size={20}
+                                            className="cpf-validation-icon invalid"
+                                        />
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -183,7 +209,7 @@ const FarmerForm = ({
 
                     <div className="form-row">
                         <div className="form-group half-width">
-                            <label>Telefone</label>
+                            <label className="required">Telefone</label>
                             <input
                                 type="text"
                                 name="telefone"
@@ -229,8 +255,8 @@ const FarmerForm = ({
 
                     {/* Linha 1: CEP | Número */}
                     <div className="form-row">
-                        <div className="form-group">
-                            <label>CEP</label>
+                        <div className="form-group half-width">
+                            <label className="required">CEP</label>
                             <div style={{ position: 'relative' }}>
                                 <input
                                     type="text"
@@ -251,8 +277,8 @@ const FarmerForm = ({
                             {cepError && cepError !== 'valido' && <span className="error-msg">{cepError}</span>}
                             {cepError === 'valido' && <span className="success-msg">CEP encontrado!</span>}
                         </div>
-                        <div className="form-group">
-                            <label>Número</label>
+                        <div className="form-group half-width">
+                            <label className="required">Número</label>
                             <input
                                 type="text"
                                 name="numero"
@@ -282,7 +308,7 @@ const FarmerForm = ({
                     {/* Linha 3: Bairro | Cidade | Estado */}
                     <div className="form-row">
                         <div className="form-group third-width">
-                            <label>Bairro</label>
+                            <label className="required">Bairro</label>
                             <input
                                 type="text"
                                 name="bairro"
@@ -292,7 +318,7 @@ const FarmerForm = ({
                             />
                         </div>
                         <div className="form-group third-width">
-                            <label>Cidade</label>
+                            <label className="required">Cidade</label>
                             <input
                                 type="text"
                                 name="cidade"
@@ -302,7 +328,7 @@ const FarmerForm = ({
                             />
                         </div>
                         <div className="form-group third-width">
-                            <label>Estado</label>
+                            <label className="required">Estado</label>
                             <select
                                 name="estado"
                                 className="form-input form-select"

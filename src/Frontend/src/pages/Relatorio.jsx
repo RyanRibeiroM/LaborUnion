@@ -58,7 +58,7 @@ const Relatorio = () => {
     const formatDateToBR = (dateString) => {
         if (!dateString) return '-';
         const date = new Date(dateString);
-        return date.toLocaleDateString('pt-BR');
+        return date.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
     };
 
     // Carregar setores para o dropdown
@@ -121,9 +121,9 @@ const Relatorio = () => {
                     data = response.services.map(service => ({
                         id: service.id,
                         data: formatDateToBR(service.createdOn || service.date),
-                        agricultor: service.farmerName || service.farmer?.name || '-',
-                        servico: service.serviceTypeName || service.serviceType?.name || '-',
-                        setor: service.sectorName || service.sector?.name || '-',
+                        agricultor: service.farmerName || service.FarmerName || service.farmer?.name || service.Farmer?.Name || '-',
+                        servico: service.serviceTypeName || service.ServiceTypeName || service.serviceType?.name || service.ServiceType?.Name || '-',
+                        setor: service.sectorName || service.SectorName || service.sector?.name || service.Sector?.Name || '-',
                         status: getStatusLabel(service.status)
                     }));
                 }
@@ -159,13 +159,27 @@ const Relatorio = () => {
 
     // Converter status numérico para label
     const getStatusLabel = (status) => {
-        const statusMap = {
+        const statusNumMap = {
             1: 'Pendente',
             2: 'Em Andamento',
             3: 'Concluído',
             4: 'Cancelado'
         };
-        return statusMap[status] || 'Pendente';
+
+        const statusTextMap = {
+            'pending': 'Pendente',
+            'inprogress': 'Em Andamento',
+            'in progress': 'Em Andamento',
+            'completed': 'Concluído',
+            'concluido': 'Concluído',
+            'cancelled': 'Cancelado',
+            'canceled': 'Cancelado'
+        };
+
+        if (typeof status === 'number') return statusNumMap[status] || 'Pendente';
+        if (typeof status === 'string') return statusTextMap[status.toLowerCase().trim()] || status;
+
+        return 'Pendente';
     };
 
     const handlePrint = () => {
@@ -279,7 +293,7 @@ const Relatorio = () => {
                     </table>
                     
                     <div class="footer">
-                        <p>Documento gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+                        <p>Documento gerado em ${new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })} às ${new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
                     </div>
                 </body>
             </html>
@@ -342,7 +356,7 @@ const Relatorio = () => {
                 </table>
                 
                 <div style="margin-top: 30px; text-align: center; color: #888; font-size: 10px; border-top: 1px solid #eee; padding-top: 15px;">
-                    <p>Documento gerado em ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+                    <p>Documento gerado em ${new Date().toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })} às ${new Date().toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
                 </div>
             </div>
         `;

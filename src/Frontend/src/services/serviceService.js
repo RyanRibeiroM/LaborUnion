@@ -2,7 +2,7 @@ import { get, post, put, del } from './api';
 
 /**
  * Filtra serviços/atendimentos
- * @param {object} filters - { startDate, endDate, sectorId, serviceTypeId, farmerId }
+ * @param {object} filters
  * @returns {Promise<{services: Array}>}
  */
 export async function filterServices(filters = {}) {

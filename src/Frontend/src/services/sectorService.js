@@ -2,7 +2,7 @@ import { get, post } from './api';
 
 /**
  * Lista todos os setores
- * @param {object} filters - { name, userId }
+ * @param {object} filters
  * @returns {Promise<{sectors: Array}>}
  */
 export async function filterSectors(filters = {}) {
@@ -20,7 +20,7 @@ export async function getSectorById(id) {
 
 /**
  * Cria um novo setor
- * @param {object} sectorData - { name, description }
+ * @param {object} sectorData
  * @returns {Promise<{name: string}>}
  */
 export async function createSector(sectorData) {

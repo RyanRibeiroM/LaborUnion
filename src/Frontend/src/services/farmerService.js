@@ -20,7 +20,7 @@ export const MaritalStatusLabels = {
 
 /**
  * Lista agricultores com filtros
- * @param {object} filters - { name, cpf, registration, addressCity, profission, maritalStatus, spouseName, isAlive }
+ * @param {object} filters
  * @returns {Promise<{farmers: Array}>}
  */
 export async function filterFarmers(filters = {}) {
@@ -114,9 +114,6 @@ export function formToApiData(formData, conjuge) {
     };
 }
 
-/**
- * Converte dados da API para o formato do formulário frontend
- */
 export function apiToFormData(apiData) {
     // Adiciona máscara ao CPF
     const formatCpf = (cpf) => {

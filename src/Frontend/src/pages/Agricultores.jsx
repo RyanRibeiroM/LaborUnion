@@ -217,8 +217,34 @@ const Agricultores = () => {
     };
 
     const handleSave = async () => {
-        if (!formData.nome || !formData.cpf) {
-            showToast('Por favor, preencha pelo menos Nome e CPF.', 'error');
+        // Validação de campos obrigatórios conforme API
+        const camposObrigatorios = [
+            { campo: formData.nome, nome: 'Nome Completo' },
+            { campo: formData.cpf, nome: 'CPF' },
+            { campo: formData.matricula, nome: 'Matrícula' },
+            { campo: formData.profissao, nome: 'Profissão' },
+            { campo: formData.estadoCivil, nome: 'Estado Civil' },
+            { campo: formData.dataNascimento, nome: 'Data de Nascimento' },
+            { campo: formData.telefone, nome: 'Telefone' },
+            { campo: formData.cep, nome: 'CEP' },
+            { campo: formData.numero, nome: 'Número do Endereço' },
+            { campo: formData.bairro, nome: 'Bairro' },
+            { campo: formData.cidade, nome: 'Cidade' },
+            { campo: formData.estado, nome: 'Estado (UF)' }
+        ];
+
+        const camposFaltando = camposObrigatorios
+            .filter(item => !item.campo || item.campo.trim() === '')
+            .map(item => item.nome);
+
+        if (camposFaltando.length > 0) {
+            showToast(`Por favor, preencha os campos obrigatórios: ${camposFaltando.join(', ')}`, 'error');
+            return;
+        }
+
+        // Validação adicional de CPF
+        if (cpfError === 'invalido') {
+            showToast('O CPF informado é inválido.', 'error');
             return;
         }
 
@@ -403,10 +429,18 @@ const Agricultores = () => {
         setEditingId(null);
     };
 
-    const agricultoresFiltrados = dadosAgricultores.filter((agricultor) =>
-        agricultor.nome.toLowerCase().includes(busca.toLowerCase()) ||
-        agricultor.cpf.includes(busca)
-    );
+    // Função para limpar CPF (remover máscara)
+    const limparCpfBusca = (cpf) => cpf.replace(/\D/g, '');
+
+    const agricultoresFiltrados = dadosAgricultores.filter((agricultor) => {
+        const buscaLimpa = limparCpfBusca(busca);
+        const cpfLimpo = limparCpfBusca(agricultor.cpf);
+
+        // Busca por nome OU por CPF (com ou sem máscara)
+        return agricultor.nome.toLowerCase().includes(busca.toLowerCase()) ||
+            cpfLimpo.includes(buscaLimpa) ||
+            agricultor.cpf.includes(busca);
+    });
 
     // LÃ³gica de PaginaÃ§Ã£o
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -544,44 +578,73 @@ const Agricultores = () => {
                                     placeholder="Buscar por Nome ou CPF ..."
                                     className="search-input"
                                     value={busca}
-                                    onChange={(e) => setBusca(e.target.value)}
+                                    onChange={(e) => {
+                                        const valor = e.target.value;
+                                        const apenasNumeros = valor.replace(/\D/g, '');
+                                        if (apenasNumeros.length > 0 && /^[\d.\-]+$/.test(valor)) {
+                                            const cpfMascarado = apenasNumeros
+                                                .replace(/(\d{3})(\d)/, '$1.$2')
+                                                .replace(/(\d{3})(\d)/, '$1.$2')
+                                                .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+                                                .replace(/(-\d{2})\d+?$/, '$1');
+                                            setBusca(cpfMascarado);
+                                        } else {
+                                            setBusca(valor);
+                                        }
+                                    }}
+                                    maxLength={14}
                                 />
                             </div>
 
                             {/* Renderização condicional: Cards no mobile, Tabela no desktop */}
                             {isMobile ? (
-                                <div className="mobile-cards-container">
-                                    {currentItems.map((item) => (
-                                        <MobileCard
-                                            key={item.id}
-                                            fields={[
-                                                { label: 'ID', value: item.id },
-                                                { label: 'Nome', value: item.nome, highlight: true },
-                                                { label: 'CPF', value: item.cpf },
-                                                { label: 'Matricula', value: item.matricula },
-                                                { label: 'Status', value: <span className={`status-badge ${item.status.toLowerCase()}`}>{item.status}</span> }
-                                            ]}
-                                            actions={
-                                                <>
-                                                    <button
-                                                        className="icon-action"
-                                                        onClick={() => handleView(item)}
-                                                        title="Visualizar"
-                                                    >
-                                                        <Eye size={20} />
-                                                    </button>
-                                                    <button
-                                                        className="icon-action danger"
-                                                        onClick={() => handleDelete(item.id)}
-                                                        title="Excluir"
-                                                    >
-                                                        <Trash2 size={20} />
-                                                    </button>
-                                                </>
-                                            }
-                                        />
-                                    ))}
-                                </div>
+                                currentItems.length === 0 ? (
+                                    <div className="empty-state">
+                                        <p className="empty-state-text">Nenhum agricultor encontrado.</p>
+                                        <button
+                                            className="btn-solid-green"
+                                            onClick={() => {
+                                                limparFormulario();
+                                                setActiveTab('cadastro');
+                                            }}
+                                        >
+                                            Realizar Cadastro
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="mobile-cards-container">
+                                        {currentItems.map((item) => (
+                                            <MobileCard
+                                                key={item.id}
+                                                fields={[
+                                                    { label: 'ID', value: item.id },
+                                                    { label: 'Nome', value: item.nome, highlight: true },
+                                                    { label: 'CPF', value: item.cpf },
+                                                    { label: 'Matricula', value: item.matricula },
+                                                    { label: 'Status', value: <span className={`status-badge ${item.status.toLowerCase()}`}>{item.status}</span> }
+                                                ]}
+                                                actions={
+                                                    <>
+                                                        <button
+                                                            className="icon-action"
+                                                            onClick={() => handleView(item)}
+                                                            title="Visualizar"
+                                                        >
+                                                            <Eye size={20} />
+                                                        </button>
+                                                        <button
+                                                            className="icon-action danger"
+                                                            onClick={() => handleDelete(item.id)}
+                                                            title="Excluir"
+                                                        >
+                                                            <Trash2 size={20} />
+                                                        </button>
+                                                    </>
+                                                }
+                                            />
+                                        ))}
+                                    </div>
+                                )
                             ) : (
                                 <div className="table-responsive">
                                     <table className="farmers-table">
@@ -596,39 +659,57 @@ const Agricultores = () => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {currentItems.map((item) => (
-                                                <tr key={item.id}>
-                                                    <td><strong>{item.id}</strong></td>
-                                                    <td><strong>{item.nome}</strong></td>
-                                                    <td>{item.cpf}</td>
-                                                    <td>{item.matricula}</td>
-                                                    <td><span className={`status-badge ${item.status.toLowerCase()}`}>{item.status}</span></td>
-                                                    <td>
-                                                        <div className="action-buttons-row">
+                                            {currentItems.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan="6">
+                                                        <div className="empty-state">
+                                                            <p className="empty-state-text">Nenhum agricultor encontrado.</p>
                                                             <button
-                                                                className="icon-btn view"
-                                                                onClick={() => handleView(item)}
-                                                                title="Visualizar"
+                                                                className="btn-solid-green"
+                                                                onClick={() => {
+                                                                    limparFormulario();
+                                                                    setActiveTab('cadastro');
+                                                                }}
                                                             >
-                                                                <Eye size={18} />
-                                                            </button>
-                                                            <button
-                                                                className="icon-btn delete"
-                                                                onClick={() => handleDelete(item.id)}
-                                                                title="Excluir"
-                                                            >
-                                                                <Trash2 size={18} />
+                                                                Realizar Cadastro
                                                             </button>
                                                         </div>
                                                     </td>
                                                 </tr>
-                                            ))}
+                                            ) : (
+                                                currentItems.map((item) => (
+                                                    <tr key={item.id}>
+                                                        <td><strong>{item.id}</strong></td>
+                                                        <td><strong>{item.nome}</strong></td>
+                                                        <td>{item.cpf}</td>
+                                                        <td>{item.matricula}</td>
+                                                        <td><span className={`status-badge ${item.status.toLowerCase()}`}>{item.status}</span></td>
+                                                        <td>
+                                                            <div className="action-buttons-row">
+                                                                <button
+                                                                    className="icon-btn view"
+                                                                    onClick={() => handleView(item)}
+                                                                    title="Visualizar"
+                                                                >
+                                                                    <Eye size={18} />
+                                                                </button>
+                                                                <button
+                                                                    className="icon-btn delete"
+                                                                    onClick={() => handleDelete(item.id)}
+                                                                    title="Excluir"
+                                                                >
+                                                                    <Trash2 size={18} />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
                                         </tbody>
                                     </table>
                                 </div>
                             )}
 
-                            {/* Controles de PaginaÃ§Ã£o */}
                             {totalPages > 1 && (
                                 <div className="pagination-container">
                                     <button

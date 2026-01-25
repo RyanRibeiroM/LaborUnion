@@ -7,7 +7,7 @@ export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // Carrega usuário do localStorage na inicialização
+
     useEffect(() => {
         const storedUser = authService.getStoredUser();
         if (storedUser && authService.isAuthenticated()) {

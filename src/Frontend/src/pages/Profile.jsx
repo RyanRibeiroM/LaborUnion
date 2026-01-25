@@ -1,17 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-    User,
-    Mail,
-    Phone,
-    MapPin,
-    Calendar,
-    Shield,
-    Camera,
-    Save,
-    Lock,
-    Clock,
-    Loader2
-} from 'lucide-react';
+import {User, Mail, Phone, MapPin, Calendar, Shield, Camera,Save, Lock, Clock, Loader2} from 'lucide-react';
 import '../assets/css/Profile.css';
 import Toast from '../components/Toast';
 import { getProfile, updateProfile } from '../services/userService';
@@ -31,20 +19,16 @@ const Profile = () => {
         avatar: null
     });
 
-    // Estado editável
     const [editData, setEditData] = useState({ ...userData });
 
-    // Estatísticas do usuário - agora carregadas da API
     const [stats, setStats] = useState({
         atendimentosHoje: 0,
         atendimentosMes: 0,
         cadastrosRealizados: 0
     });
 
-    // Atividades recentes - será carregado da API
     const [atividades, setAtividades] = useState([]);
 
-    // Toast functions
     const showToast = (message, type = 'info') => {
         setToast({ show: true, message, type });
     };
@@ -53,10 +37,8 @@ const Profile = () => {
         setToast({ show: false, message: '', type: 'info' });
     };
 
-    // Carregar estatísticas do usuário da API
     const loadUserStats = async () => {
         try {
-            // Usa o mesmo endpoint do dashboard que já tem os dados
             const response = await get('/dashboard/accountants');
 
             console.log('📊 Stats do Profile:', response);
@@ -164,7 +146,7 @@ const Profile = () => {
     const formatDateTime = (dateTimeString) => {
         if (!dateTimeString) return '-';
         const date = new Date(dateTimeString);
-        return date.toLocaleString('pt-BR');
+        return date.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
     };
 
     const getInitials = (name) => {

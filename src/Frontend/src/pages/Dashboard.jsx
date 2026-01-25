@@ -1,33 +1,12 @@
-// ============================================================
-// 📚 DASHBOARD CONECTADO COM API - GUIA DIDÁTICO
-// ============================================================
-// Este arquivo foi atualizado para conectar com a API real.
-// Vou explicar cada parte com comentários detalhados.
-// ============================================================
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, UserPlus } from 'lucide-react';
 import '../assets/css/Dashboard.css';
 
-// ============================================================
-// 📦 PASSO 1: IMPORTAR OS SERVICES
-// ============================================================
-// Importamos a função 'get' do api.js para fazer requisições GET.
-// Essa função já cuida de:
-//   - Adicionar o token de autenticação
-//   - Renovar o token automaticamente se expirar (refresh token)
-//   - Tratar erros da API
 import { get } from '../services/api';
 
 const Dashboard = () => {
     const navigate = useNavigate();
-
-    // ============================================================
-    // 📊 PASSO 2: CRIAR STATES PARA OS DADOS DA API
-    // ============================================================
-    // Antes usávamos dados "hardcoded" (fixos no código).
-    // Agora criamos states vazios que serão preenchidos pela API.
 
     // Estados para controlar os períodos selecionados
     const [periodoAtendimento, setPeriodoAtendimento] = useState('30dias');
@@ -50,67 +29,26 @@ const Dashboard = () => {
     const [dadosServicos, setDadosServicos] = useState([]);
     const [documentosVencendo, setDocumentosVencendo] = useState([]);
 
-    // ============================================================
-    // 🔄 PASSO 3: CRIAR FUNÇÕES PARA BUSCAR DADOS DA API
-    // ============================================================
-    // Cada função busca um tipo de dado específico.
-    // Usamos try/catch para tratar erros sem quebrar a aplicação.
+    // States para dados brutos da API
+    const [rawDadosSetor, setRawDadosSetor] = useState([]);
+    const [rawDadosServicos, setRawDadosServicos] = useState([]);
 
-    /**
-     * Busca os dados de atendimentos por setor
-     * Endpoint: GET /dashboard/sector
-     */
     const loadDadosSetor = async () => {
         try {
-            // A função 'get' faz um GET para o endpoint
-            // Ela já adiciona o token automaticamente!
             const response = await get('/dashboard/sector');
-
-            // Verifica se a resposta tem os dados esperados
-            if (response && response.sectors) {
-                // Mapeia os dados da API para o formato que usamos no gráfico
-                const dados = response.sectors.map(item => ({
-                    setor: item.name || item.sectorName,
-                    valor: item.count || item.total || 0,
-                    // Calcula o percentual baseado no maior valor
-                    percentual: 0 // Será calculado depois
-                }));
-
-                // Calcula o percentual relativo ao maior valor
-                const maxValor = Math.max(...dados.map(d => d.valor), 1);
-                dados.forEach(d => {
-                    d.percentual = Math.round((d.valor / maxValor) * 100);
-                });
-
-                setDadosAtendimentoSetor(dados);
+            if (response && response.chartData) {
+                setRawDadosSetor(response.chartData);
             }
         } catch (error) {
             console.error('Erro ao carregar dados de setor:', error);
-            // Se der erro, mantém array vazio - não quebra a página
         }
     };
 
-    /**
-     * Busca os dados de serviços mais solicitados
-     * Endpoint: GET /dashboard/servicetype
-     */
     const loadDadosServicos = async () => {
         try {
             const response = await get('/dashboard/servicetype');
-
-            if (response && response.serviceTypes) {
-                const dados = response.serviceTypes.map(item => ({
-                    servico: item.name || item.serviceTypeName,
-                    valor: item.count || item.total || 0,
-                    percentual: 0
-                }));
-
-                const maxValor = Math.max(...dados.map(d => d.valor), 1);
-                dados.forEach(d => {
-                    d.percentual = Math.round((d.valor / maxValor) * 100);
-                });
-
-                setDadosServicos(dados);
+            if (response && response.chartData) {
+                setRawDadosServicos(response.chartData);
             }
         } catch (error) {
             console.error('Erro ao carregar dados de serviços:', error);
@@ -147,18 +85,6 @@ const Dashboard = () => {
         }
     };
 
-    /**
-     * Busca estatísticas gerais
-     * Endpoint: GET /dashboard/accountants
-     * 
-     * Resposta da API:
-     * - numberOfServicesProvided: total de serviços realizados
-     * - numberOfServicesProvidedThisMonth: serviços realizados este mês
-     * - numberOfExpiredDocuments: documentos expirados
-     * - numberOfDocumentsExpiringThisMonth: documentos vencendo este mês
-     * - numberOfFarmers: total de agricultores
-     * - numberOfFarmersThisMonth: novos agricultores este mês
-     */
     const loadStats = async () => {
         try {
             const response = await get('/dashboard/accountants');
@@ -181,18 +107,8 @@ const Dashboard = () => {
             console.error('Erro ao carregar estatísticas:', error);
         }
     };
-
-    // ============================================================
-    // 🚀 PASSO 4: CHAMAR AS FUNÇÕES QUANDO O COMPONENTE CARREGA
-    // ============================================================
-    // O useEffect com array vazio [] executa apenas uma vez,
-    // quando o componente é montado na tela.
-
     useEffect(() => {
-        // Função assíncrona para carregar todos os dados
         const loadAllData = async () => {
-            // Promise.all executa todas as chamadas em PARALELO
-            // Isso é mais rápido que fazer uma de cada vez!
             await Promise.all([
                 loadStats(),
                 loadDadosSetor(),
@@ -200,23 +116,51 @@ const Dashboard = () => {
                 loadDocumentosVencendo()
             ]);
 
-            // Só depois que TODOS os dados carregarem,
-            // removemos o loading
             setIsLoading(false);
         };
 
         loadAllData();
-    }, []); // Array vazio = executa só uma vez
+    }, []);
 
-    // ============================================================
-    // 🛠️ FUNÇÕES AUXILIARES
-    // ============================================================
+    useEffect(() => {
+        if (rawDadosSetor.length > 0) {
+            const dados = rawDadosSetor.map(item => ({
+                setor: item.name,
+                valor: periodoAtendimento === '30dias' ? item.monthCount : item.yearCount,
+                percentual: 0
+            }));
 
-    // Formata data para o padrão brasileiro
+            const maxValor = Math.max(...dados.map(d => d.valor), 1);
+            dados.forEach(d => {
+                d.percentual = Math.round((d.valor / maxValor) * 100);
+            });
+
+            setDadosAtendimentoSetor(dados);
+        }
+    }, [rawDadosSetor, periodoAtendimento]);
+
+    // 🔄 Efeito para atualizar Gráfico de Serviços quando o período muda
+    useEffect(() => {
+        if (rawDadosServicos.length > 0) {
+            const dados = rawDadosServicos.map(item => ({
+                servico: item.name,
+                valor: periodoServicos === '30dias' ? item.monthCount : item.yearCount,
+                percentual: 0
+            }));
+
+            const maxValor = Math.max(...dados.map(d => d.valor), 1);
+            dados.forEach(d => {
+                d.percentual = Math.round((d.valor / maxValor) * 100);
+            });
+
+            setDadosServicos(dados);
+        }
+    }, [rawDadosServicos, periodoServicos]);
+
     const formatDate = (dateString) => {
         if (!dateString) return '-';
         const date = new Date(dateString);
-        return date.toLocaleDateString('pt-BR');
+        return date.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
     };
 
     // Handlers para o tooltip dos gráficos
@@ -234,11 +178,6 @@ const Dashboard = () => {
         setTooltip({ ...tooltip, show: false });
     };
 
-    // ============================================================
-    // ⏳ TELA DE LOADING
-    // ============================================================
-    // Enquanto isLoading for true, mostra o spinner
-
     if (isLoading) {
         return (
             <div className="dashboard-content" role="main" aria-busy="true">
@@ -249,11 +188,6 @@ const Dashboard = () => {
             </div>
         );
     }
-
-    // ============================================================
-    // 🎨 PASSO 5: USAR OS DADOS DA API NO JSX
-    // ============================================================
-    // Onde antes tinha dados fixos, agora usamos os states
 
     return (
         <div className="dashboard-content" role="main">
@@ -290,12 +224,9 @@ const Dashboard = () => {
                 </button>
             </div>
 
-            {/* Cards de Estatísticas - AGORA COM DADOS DA API! */}
             <div className="stats-grid">
                 <div className="card stat-card">
                     <span>Total de atendimentos</span>
-                    {/* Antes: <strong>128</strong> (valor fixo) */}
-                    {/* Agora: usa o valor do state */}
                     <strong>{stats.totalAtendimentos}</strong>
                 </div>
                 <div className="card stat-card">
@@ -339,11 +270,7 @@ const Dashboard = () => {
                             <span>Abaixo de 10<br />atendimentos</span>
                         </div>
                         <div className="bars-container bg-lines">
-                            {/* 
-                              Antes: dadosAtendimentoSetor[periodoAtendimento].map(...)
-                              Agora: dadosAtendimentoSetor.map(...) 
-                              (o state já é um array)
-                            */}
+
                             {dadosAtendimentoSetor.length > 0 ? (
                                 dadosAtendimentoSetor.map((item, index) => (
                                     <div className="bar-group" key={index}>
@@ -469,28 +396,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-// ============================================================
-// 📝 RESUMO DO QUE FOI FEITO:
-// ============================================================
-//
-// 1. IMPORTAMOS o service 'get' do api.js
-//
-// 2. CRIAMOS STATES para armazenar os dados da API:
-//    - stats (totais/contadores)
-//    - dadosAtendimentoSetor (gráfico 1)
-//    - dadosServicos (gráfico 2)
-//    - documentosVencendo (tabela)
-//
-// 3. CRIAMOS FUNÇÕES para buscar cada tipo de dado:
-//    - loadStats() -> GET /dashboard/accountants
-//    - loadDadosSetor() -> GET /dashboard/sector
-//    - loadDadosServicos() -> GET /dashboard/servicetype
-//    - loadDocumentosVencendo() -> GET /dashboard/document
-//
-// 4. USAMOS useEffect para carregar os dados quando a página abre
-//    - Promise.all() carrega tudo em paralelo (mais rápido!)
-//
-// 5. SUBSTITUÍMOS os dados fixos pelos states no JSX
-//
-// ============================================================

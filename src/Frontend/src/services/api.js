@@ -1,12 +1,11 @@
-const API_BASE_URL = '';
+const API_BASE_URL = '/api';
 
-// Flag para evitar múltiplas tentativas de refresh simultâneas
 let isRefreshing = false;
 let refreshPromise = null;
 
 /**
- * Tenta renovar o token de acesso usando o refresh token
- * @returns {Promise<string>} - Novo access token
+ * 
+ * @returns {Promise<string>}
  */
 async function tryRefreshToken() {
     const refreshToken = localStorage.getItem('refreshToken');
@@ -15,40 +14,53 @@ async function tryRefreshToken() {
         throw new Error('Nenhum refresh token disponível');
     }
 
-    const response = await fetch('/token/refresh-token', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ refreshToken }),
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/token/refresh-token`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ refreshToken }),
+        });
 
-    if (!response.ok) {
-        // Refresh token inválido ou expirado - limpa tudo e redireciona
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        throw new Error('Sessão expirada. Faça login novamente.');
+        if (!response.ok) {
+            throw new Error('Falha na renovação do token');
+        }
+
+        const data = await response.json();
+
+        if (data.accessToken) {
+            localStorage.setItem('accessToken', data.accessToken);
+        }
+        if (data.refreshToken) {
+            localStorage.setItem('refreshToken', data.refreshToken);
+        }
+
+        return data.accessToken;
+    } catch (error) {
+        // Se falhar a renovação (token expirado ou inválido), limpa tudo
+        handleSessionExpiration();
+        throw error;
     }
-
-    const data = await response.json();
-
-    if (data.accessToken) {
-        localStorage.setItem('accessToken', data.accessToken);
-    }
-    if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken);
-    }
-
-    return data.accessToken;
 }
 
 /**
- * Faz uma requisição para a API
- * @param {string} endpoint - O endpoint da API (ex: '/login')
- * @param {object} options - Opções do fetch
- * @param {boolean} isRetry - Se é uma tentativa após refresh do token
- * @returns {Promise<any>} - Resposta da API
+ * Limpa o storage e redireciona para o login
+ */
+function handleSessionExpiration() {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    // Redireciona para a raiz ou tela de login
+    window.location.href = '/';
+}
+
+/**
+ *
+ * @param {string} endpoint
+ * @param {object} options
+ * @param {boolean} isRetry
+ * @returns {Promise<any>}
  */
 export async function apiRequest(endpoint, options = {}, isRetry = false) {
     const token = localStorage.getItem('accessToken');
@@ -71,32 +83,21 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
 
     const fullUrl = `${API_BASE_URL}${endpoint}`;
 
-    // 🔍 DEBUG: Mostra detalhes da requisição
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('🔍 DEBUG API REQUEST');
-    console.log('📍 URL Completa:', fullUrl);
-    console.log('📍 Endpoint:', endpoint);
-    console.log('📍 Método:', config.method || 'GET');
-    console.log('📍 Retry:', isRetry);
-    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    if (import.meta.env.DEV) {
+        console.log(`📡 [API] ${config.method || 'GET'} ${endpoint}`, isRetry ? '(Retry)' : '');
+    }
 
     let response;
     try {
         response = await fetch(fullUrl, config);
     } catch (fetchError) {
-        // ❌ Erro de conexão - API não alcançável
-        console.error('❌ ERRO DE CONEXÃO COM A API:', fetchError.message);
-        throw new Error(`Erro de conexão com a API. Verifique se o servidor está rodando.`);
+        console.error('❌ Erro de conexão:', fetchError.message);
+        throw new Error(`Servidor indisponível. Verifique sua conexão.`);
     }
 
-    // 🔍 DEBUG: Mostra detalhes da resposta
-    console.log('📥 RESPONSE STATUS:', response.status, response.statusText);
+    const isAuthEndpoint = endpoint.startsWith('/login') || endpoint.startsWith('/token');
 
-    // 🔄 Se receber 401 (Unauthorized) e não for retry, tenta renovar o token
-    if (response.status === 401 && !isRetry) {
-        console.log('🔄 Token expirado, tentando renovar...');
-
-        // Evita múltiplas tentativas simultâneas de refresh
+    if (response.status === 401 && !isRetry && !isAuthEndpoint) {
         if (!isRefreshing) {
             isRefreshing = true;
             refreshPromise = tryRefreshToken()
@@ -108,73 +109,57 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
 
         try {
             await refreshPromise;
-            console.log('✅ Token renovado com sucesso! Refazendo requisição...');
-            // Refaz a requisição original com o novo token
             return apiRequest(endpoint, options, true);
         } catch (refreshError) {
-            console.error('❌ Falha ao renovar token:', refreshError.message);
-            // Redireciona para login se o refresh falhar
-            window.location.href = '/login';
-            throw new Error('Sessão expirada. Redirecionando para login...');
+            console.error('❌ Sessão expirada:', refreshError.message);
+            handleSessionExpiration();
+            throw new Error('Sessão expirada.');
         }
     }
 
-    // Se a resposta for 204 (No Content), retorna null
     if (response.status === 204) {
         return null;
     }
 
-    // Tenta fazer o parse do JSON
     let data = null;
     const contentType = response.headers.get('content-type');
+
     const text = await response.text();
 
     if (text && contentType && contentType.includes('application/json')) {
         try {
             data = JSON.parse(text);
         } catch (parseError) {
-            console.error('Erro ao fazer parse do JSON:', parseError);
-            if (!response.ok) {
-                throw new Error(`Erro ${response.status}: O servidor retornou uma resposta inválida`);
-            }
+            console.warn('⚠️ Resposta não é um JSON válido:', text);
         }
     }
 
+    // Tratamento de Erros da API
     if (!response.ok) {
-        // Se for erro 401 (não autorizado), redirecionar para login
-        if (response.status === 401) {
-            console.warn('🔒 Token expirado ou inválido. Redirecionando para login...');
-            // Limpar tokens
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            localStorage.removeItem('user');
-            // Redirecionar para login
-            window.location.href = '/';
-            throw new Error('Acesso não autorizado. Redirecionando para login...');
+        if (response.status === 401 && !isAuthEndpoint) {
+            handleSessionExpiration();
+            throw new Error('Acesso negado.');
         }
 
-        // Lança erro com mensagens da API (suporta diferentes formatos)
-        let errorMessage = 'Erro na requisição';
+        let errorMessage = 'Ocorreu um erro inesperado.';
 
-        if (data && data.errors) {
-            if (Array.isArray(data.errors)) {
-                errorMessage = data.errors.join(', ');
-            } else if (typeof data.errors === 'string') {
-                errorMessage = data.errors;
-            } else if (typeof data.errors === 'object') {
-                const messages = Object.values(data.errors).flat();
-                errorMessage = messages.join(', ');
+        if (data) {
+            if (data.errors) {
+                if (typeof data.errors === 'object') {
+                    errorMessage = Object.values(data.errors).flat().join(', ');
+                } else {
+                    errorMessage = JSON.stringify(data.errors);
+                }
             }
-        } else if (data && data.message) {
-            errorMessage = data.message;
-        } else if (data && data.title) {
-            errorMessage = data.title;
-        } else if (response.status === 401) {
-            errorMessage = 'Acesso não autorizado. Faça login novamente.';
-        } else if (response.status === 403) {
-            errorMessage = 'Você não tem permissão para acessar este recurso.';
+            else if (data.message) {
+                errorMessage = data.message;
+            }
+            else if (data.title) {
+                errorMessage = data.title;
+            }
+        } else if (text) {
+            errorMessage = `Erro ${response.status}: ${text.substring(0, 50)}...`;
         }
-
         const error = new Error(errorMessage);
         error.status = response.status;
         error.data = data;
@@ -184,16 +169,12 @@ export async function apiRequest(endpoint, options = {}, isRetry = false) {
     return data;
 }
 
-/**
- * Requisição GET
- */
+// --- Métodos Helper Exportados ---
+
 export function get(endpoint, options = {}) {
     return apiRequest(endpoint, { ...options, method: 'GET' });
 }
 
-/**
- * Requisição POST
- */
 export function post(endpoint, body, options = {}) {
     return apiRequest(endpoint, {
         ...options,
@@ -202,9 +183,6 @@ export function post(endpoint, body, options = {}) {
     });
 }
 
-/**
- * Requisição PUT
- */
 export function put(endpoint, body, options = {}) {
     return apiRequest(endpoint, {
         ...options,
@@ -213,9 +191,6 @@ export function put(endpoint, body, options = {}) {
     });
 }
 
-/**
- * Requisição DELETE
- */
 export function del(endpoint, options = {}) {
     return apiRequest(endpoint, { ...options, method: 'DELETE' });
 }

@@ -96,6 +96,24 @@ body {
     color: #888;
 }
 
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.password-toggle:hover {
+    color: #555;
+}
+
 .input-group input {
     width: 100%;
     padding: 15px 15px 15px 45px;
@@ -143,6 +161,39 @@ body {
     background-color: #357a44;
 }
 
+.btn-login:disabled {
+    background-color: #88b392;
+    cursor: not-allowed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.login-error {
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.spin-icon {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .btn-recovery {
     margin-top: 60px;
 }
@@ -151,6 +202,147 @@ body {
     margin-top: 30px;
 }
 
-.recovery-side-text h2{
+.recovery-side-text h2 {
     font-size: 1.9rem;
+}
+
+/* =========================================
+   RESPONSIVIDADE (MEDIA QUERIES)
+   ========================================= */
+
+/* Tablets (max-width: 992px) */
+@media (max-width: 992px) {
+    .login-card {
+        width: 90%;
+        max-width: 800px;
+        height: auto;
+        min-height: 500px;
+    }
+
+    .login-right {
+        padding: 30px 40px;
+    }
+}
+
+/* Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 20px;
+    }
+
+    .login-card {
+        flex-direction: column;
+        width: 100%;
+        max-width: 450px;
+        height: auto;
+        border-radius: 20px;
+    }
+
+    .login-left {
+        flex: none;
+        padding: 25px 20px;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .login-left h2 {
+        font-size: 1.5rem;
+    }
+
+    .login-left p {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .logo-img {
+        width: 60%;
+        max-width: 150px;
+    }
+
+    .login-right {
+        flex: none;
+        padding: 30px 25px;
+    }
+
+    .login-header {
+        margin-bottom: 25px;
+    }
+
+    .login-header h2 {
+        font-size: 1.5rem;
+    }
+
+    .subtitle {
+        font-size: 0.95rem;
+    }
+
+    .login-form {
+        gap: 15px;
+    }
+
+    .input-group input {
+        padding: 14px 14px 14px 45px;
+        font-size: 16px;
+        /* Evita zoom no iOS */
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 14px;
+        font-size: 1rem;
+    }
+
+    .btn-recovery {
+        margin-top: 30px;
+    }
+
+    .forgot-password {
+        font-size: 0.9rem;
+    }
+}
+
+/* Mobile pequeno (max-width: 480px) */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 15px;
+        padding-top: 20px;
+    }
+
+    .login-card {
+        border-radius: 16px;
+    }
+
+    .login-left {
+        padding: 20px 15px;
+        border-radius: 16px 16px 0 0;
+    }
+
+    .login-left h2 {
+        font-size: 1.3rem;
+    }
+
+    .logo-img {
+        width: 50%;
+        max-width: 120px;
+    }
+
+    .login-right {
+        padding: 25px 20px;
+    }
+
+    .login-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .subtitle {
+        font-size: 0.85rem;
+    }
+
+    .input-group input {
+        padding: 12px 12px 12px 42px;
+    }
+
+    .btn-login {
+        padding: 12px;
+        font-size: 0.95rem;
+    }
 }

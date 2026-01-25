@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom';
-import { 
-    LayoutDashboard, 
-    Users, 
-    Calendar, 
-    ClipboardList, 
-    Settings, 
-    Menu, 
+import {
+    LayoutDashboard,
+    Users,
+    Calendar,
+    ClipboardList,
+    Settings,
+    Menu,
     LogOut, CircleUser
 } from 'lucide-react';
 import '../assets/css/PaginaBase.css';
 import ModalConfirmacao from '../components/ModalConfirmacao';
+import { useAuth } from '../contexts/AuthContext';
 
 function PaginaBase() {
     const [isExpanded, setIsExpanded] = useState(true);
@@ -18,6 +19,7 @@ function PaginaBase() {
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const navigate = useNavigate();
+    const { logout } = useAuth();
 
     const toggleSidebar = () => {
         setIsExpanded(!isExpanded);
@@ -29,6 +31,7 @@ function PaginaBase() {
 
     const confirmLogout = () => {
         setShowLogoutModal(false);
+        logout();
         navigate('/');
     };
 
@@ -43,10 +46,10 @@ function PaginaBase() {
     return (
         <div className="main-layout">
             <aside className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}>
-                
+
                 <div className="sidebar-header">
                     {isExpanded && <h2 className="logo-text">Sindicato</h2>}
-                    
+
                     <button onClick={toggleSidebar} className="toggle-btn">
                         {isExpanded ? <Menu size={24} /> : <Menu size={24} />}
                     </button>
@@ -56,9 +59,9 @@ function PaginaBase() {
                     <ul>
                         {menuItems.map((item) => (
                             <li key={item.path}>
-                                <NavLink 
+                                <NavLink
                                     to={item.path}
-                                    className={({ isActive }) => 
+                                    className={({ isActive }) =>
                                         `nav-item ${isActive ? 'active' : ''}`
                                     }
                                 >
@@ -87,7 +90,7 @@ function PaginaBase() {
                 <Outlet />
             </main>
 
-            <ModalConfirmacao 
+            <ModalConfirmacao
                 isOpen={showLogoutModal}
                 onCancel={() => setShowLogoutModal(false)}
                 onConfirm={confirmLogout}

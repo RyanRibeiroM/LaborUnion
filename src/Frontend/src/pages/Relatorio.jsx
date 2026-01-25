@@ -3,8 +3,9 @@ import { FileText, Download, Calendar, Printer, Filter, Search } from 'lucide-re
 import html2pdf from 'html2pdf.js';
 import '../assets/css/Relatorio.css';
 import Toast from '../components/Toast';
-import { filterServices } from '../services/serviceService';
-import { filterFarmers } from '../services/farmerService';
+import { filterServices, getServiceById } from '../services/serviceService';
+import { filterServiceTypes } from '../services/serviceTypeService';
+import { filterFarmers, getFarmerById } from '../services/farmerService';
 import { filterSectors } from '../services/sectorService';
 
 const Relatorio = () => {
@@ -14,8 +15,9 @@ const Relatorio = () => {
     const [reportData, setReportData] = useState([]);
     const [isGenerating, setIsGenerating] = useState(false);
     const [sectors, setSectors] = useState([]);
+    const [serviceTypesMap, setServiceTypesMap] = useState({});
 
-    // Filtros
+    // ... (filters state)
     const [filters, setFilters] = useState({
         dataInicio: '',
         dataFim: '',
@@ -23,7 +25,7 @@ const Relatorio = () => {
         setor: ''
     });
 
-    // Tipos de relatórios disponíveis
+    // ... (reportTypes)
     const reportTypes = [
         {
             id: 'atendimentos',
@@ -61,22 +63,36 @@ const Relatorio = () => {
         return date.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
     };
 
-    // Carregar setores para o dropdown
-    const loadSectors = async () => {
+    // Carregar setores e tipos de serviço
+    const loadDependencies = async () => {
         try {
-            const response = await filterSectors({});
-            if (response && response.sectors) {
-                setSectors(response.sectors);
+            const [sectorsResponse, serviceTypesResponse] = await Promise.all([
+                filterSectors({}).catch(() => null),
+                filterServiceTypes({}).catch(() => null)
+            ]);
+
+            if (sectorsResponse && Array.isArray(sectorsResponse.sectors)) {
+                setSectors(sectorsResponse.sectors);
+            } else {
+                setSectors([]);
+            }
+
+            if (serviceTypesResponse && Array.isArray(serviceTypesResponse.servicesTypes)) {
+                const typesMap = {};
+                serviceTypesResponse.servicesTypes.forEach(t => {
+                    if (t && t.id) typesMap[t.id] = t.name;
+                });
+                setServiceTypesMap(typesMap);
             }
         } catch (error) {
-            console.error('Erro ao carregar setores:', error);
+            console.error('Erro ao carregar dependências:', error);
         }
     };
 
     // Carregar dados iniciais
     useEffect(() => {
         const init = async () => {
-            await loadSectors();
+            await loadDependencies();
             setIsLoading(false);
         };
         init();
@@ -101,45 +117,112 @@ const Relatorio = () => {
 
         setIsGenerating(true);
 
+        // Helper para resolver nome do serviço
+        const getServiceName = (s) => {
+            if (s.serviceTypeName) return s.serviceTypeName;
+            if (s.ServiceTypeName) return s.ServiceTypeName;
+            if (s.serviceType?.name) return s.serviceType.name;
+            if (s.ServiceType?.Name) return s.ServiceType.Name;
+
+            // Lookup no mapa se tiver ID
+            if (s.serviceTypeId && serviceTypesMap[s.serviceTypeId]) return serviceTypesMap[s.serviceTypeId];
+            if (s.ServiceTypeId && serviceTypesMap[s.ServiceTypeId]) return serviceTypesMap[s.ServiceTypeId];
+
+            return 'Outros';
+        };
+
         try {
             let data = [];
 
             if (activeReport === 'atendimentos' || activeReport === 'servicos') {
-                // Buscar serviços/atendimentos
                 const apiFilters = {
                     startDate: filters.dataInicio,
                     endDate: filters.dataFim
                 };
-
-                if (filters.setor) {
-                    apiFilters.sectorId = parseInt(filters.setor);
-                }
+                if (filters.setor) apiFilters.sectorId = parseInt(filters.setor);
 
                 const response = await filterServices(apiFilters);
 
                 if (response && response.services) {
-                    data = response.services.map(service => ({
-                        id: service.id,
-                        data: formatDateToBR(service.createdOn || service.date),
-                        agricultor: service.farmerName || service.FarmerName || service.farmer?.name || service.Farmer?.Name || '-',
-                        servico: service.serviceTypeName || service.ServiceTypeName || service.serviceType?.name || service.ServiceType?.Name || '-',
-                        setor: service.sectorName || service.SectorName || service.sector?.name || service.Sector?.Name || '-',
-                        status: getStatusLabel(service.status)
-                    }));
+                    let services = response.services;
+
+                    // Enriquecer com detalhes (necessário pois a lista não traz o serviceTypeId)
+                    try {
+                        const servicesDetails = await Promise.all(
+                            services.map(s => getServiceById(s.id).catch(() => null))
+                        );
+                        services = services.map((s, index) => {
+                            const detail = servicesDetails[index];
+                            return detail ? { ...s, ...detail } : s;
+                        });
+                    } catch (err) {
+                        console.error('Erro ao buscar detalhes', err);
+                    }
+
+                    if (activeReport === 'atendimentos') {
+                        data = services.map(service => ({
+                            id: service.id,
+                            data: formatDateToBR(service.createdOn || service.date),
+                            agricultor: service.farmerName || service.FarmerName || service.farmer?.name || service.Farmer?.Name || '-',
+                            servico: getServiceName(service),
+                            setor: service.sectorName || service.SectorName || service.sector?.name || service.Sector?.Name || '-',
+                            status: getStatusLabel(service.status)
+                        }));
+                    } else if (activeReport === 'servicos') {
+                        const totalServices = services.length;
+
+                        // Agrupar por nome do serviço
+                        const counts = {};
+                        services.forEach(s => {
+                            const name = getServiceName(s);
+                            counts[name] = (counts[name] || 0) + 1;
+                        });
+
+                        // Converter para array e ordenar
+                        data = Object.keys(counts).map((name, index) => ({
+                            id: index,
+                            servico: name,
+                            quantidade: counts[name],
+                            porcentagem: ((counts[name] / totalServices) * 100).toFixed(1) + '%'
+                        })).sort((a, b) => b.quantidade - a.quantidade);
+
+                        // Adicionar ranking
+                        data = data.map((item, idx) => ({ ...item, rank: idx + 1 }));
+                    }
                 }
             } else if (activeReport === 'agricultores') {
                 // Buscar agricultores
                 const response = await filterFarmers({});
 
                 if (response && response.farmers) {
-                    data = response.farmers.map(farmer => ({
-                        id: farmer.id,
-                        data: formatDateToBR(farmer.createdOn),
-                        agricultor: farmer.name || '-',
-                        servico: '-',
-                        setor: '-',
-                        status: farmer.isAlive ? 'Ativo' : 'Inativo'
-                    }));
+                    let farmers = response.farmers;
+
+                    // Enriquecer com detalhes (necessário pois a lista não traz todos os campos)
+                    try {
+                        const farmersDetails = await Promise.all(
+                            farmers.map(f => getFarmerById(f.id).catch(() => null))
+                        );
+                        farmers = farmers.map((f, index) => {
+                            const detail = farmersDetails[index];
+                            return detail ? { ...f, ...detail } : f;
+                        });
+                    } catch (err) {
+                        console.error('Erro ao buscar detalhes dos agricultores', err);
+                    }
+
+                    data = farmers.map(farmer => {
+                        // Check for isAlive (handle casing and undefined)
+                        const isAlive = farmer.isAlive !== undefined ? farmer.isAlive : (farmer.IsAlive !== undefined ? farmer.IsAlive : true);
+
+                        return {
+                            id: farmer.id,
+                            data: formatDateToBR(farmer.createdOn || farmer.CreatedOn),
+                            agricultor: farmer.name || farmer.Name || '-',
+                            cpf: farmer.cpf || farmer.CPF || farmer.Cpf || '-',
+                            cidade: farmer.addressCity || farmer.AddressCity || '-',
+                            status: isAlive ? 'Ativo' : 'Inativo'
+                        };
+                    });
                 }
             }
 
@@ -272,21 +355,47 @@ const Relatorio = () => {
                     <table>
                         <thead>
                             <tr>
-                                <th>Data</th>
-                                <th>Agricultor</th>
-                                <th>Serviço</th>
-                                <th>Setor</th>
-                                <th>Status</th>
+                                ${activeReport === 'servicos' ? `
+                                    <th>Ranking</th>
+                                    <th>Serviço</th>
+                                    <th>Quantidade</th>
+                                    <th>Porcentagem</th>
+                                ` : activeReport === 'agricultores' ? `
+                                    <th>Data Cadastro</th>
+                                    <th>Agricultor</th>
+                                    <th>CPF</th>
+                                    <th>Cidade</th>
+                                    <th>Status</th>
+                                ` : `
+                                    <th>Data</th>
+                                    <th>Agricultor</th>
+                                    <th>Serviço</th>
+                                    <th>Setor</th>
+                                    <th>Status</th>
+                                `}
                             </tr>
                         </thead>
                         <tbody>
                             ${reportData.map(item => `
                                 <tr>
-                                    <td>${item.data}</td>
-                                    <td>${item.agricultor}</td>
-                                    <td>${item.servico}</td>
-                                    <td>${item.setor}</td>
-                                    <td>${item.status}</td>
+                                    ${activeReport === 'servicos' ? `
+                                        <td style="text-align: center;"><strong>#${item.rank}</strong></td>
+                                        <td>${item.servico}</td>
+                                        <td style="text-align: center;">${item.quantidade}</td>
+                                        <td style="text-align: center;">${item.porcentagem}</td>
+                                    ` : activeReport === 'agricultores' ? `
+                                        <td>${item.data}</td>
+                                        <td>${item.agricultor}</td>
+                                        <td>${item.cpf}</td>
+                                        <td>${item.cidade}</td>
+                                        <td>${item.status}</td>
+                                    ` : `
+                                        <td>${item.data}</td>
+                                        <td>${item.agricultor}</td>
+                                        <td>${item.servico}</td>
+                                        <td>${item.setor}</td>
+                                        <td>${item.status}</td>
+                                    `}
                                 </tr>
                             `).join('')}
                         </tbody>
@@ -335,21 +444,47 @@ const Relatorio = () => {
                 <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                     <thead>
                         <tr>
-                            <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Data</th>
-                            <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Agricultor</th>
-                            <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Serviço</th>
-                            <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Setor</th>
-                            <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Status</th>
+                            ${activeReport === 'servicos' ? `
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Ranking</th>
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Serviço</th>
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: center; font-size: 11px;">Quantidade</th>
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: center; font-size: 11px;">Porcentagem</th>
+                            ` : activeReport === 'agricultores' ? `
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Data Cadastro</th>
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Agricultor</th>
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">CPF</th>
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Cidade</th>
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Status</th>
+                            ` : `
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Data</th>
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Agricultor</th>
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Serviço</th>
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Setor</th>
+                                <th style="background-color: #4a8b58; color: white; padding: 10px 6px; text-align: left; font-size: 11px;">Status</th>
+                            `}
                         </tr>
                     </thead>
                     <tbody>
                         ${reportData.map((item, index) => `
                             <tr style="background-color: ${index % 2 === 0 ? '#fff' : '#f9f9f9'};">
-                                <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.data}</td>
-                                <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.agricultor}</td>
-                                <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.servico}</td>
-                                <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.setor}</td>
-                                <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.status}</td>
+                                ${activeReport === 'servicos' ? `
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;"><strong>#${item.rank}</strong></td>
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.servico}</td>
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center;">${item.quantidade}</td>
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px; text-align: center;">${item.porcentagem}</td>
+                                ` : activeReport === 'agricultores' ? `
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.data}</td>
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.agricultor}</td>
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.cpf}</td>
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.cidade}</td>
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.status}</td>
+                                ` : `
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.data}</td>
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.agricultor}</td>
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.servico}</td>
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.setor}</td>
+                                    <td style="padding: 8px 6px; border-bottom: 1px solid #eee; font-size: 11px;">${item.status}</td>
+                                `}
                             </tr>
                         `).join('')}
                     </tbody>
@@ -523,26 +658,80 @@ const Relatorio = () => {
                                 <div className="table-responsive">
                                     <table className="report-table">
                                         <thead>
-                                            <tr>
-                                                <th>Data</th>
-                                                <th>Agricultor</th>
-                                                <th>Serviço</th>
-                                                <th>Setor</th>
-                                                <th>Status</th>
-                                            </tr>
+                                            {activeReport === 'servicos' ? (
+                                                <tr>
+                                                    <th style={{ width: '80px', textAlign: 'center' }}>Ranking</th>
+                                                    <th>Serviço</th>
+                                                    <th style={{ width: '120px', textAlign: 'center' }}>Quantidade</th>
+                                                    <th style={{ width: '120px', textAlign: 'center' }}>Porcentagem</th>
+                                                </tr>
+                                            ) : activeReport === 'agricultores' ? (
+                                                <tr>
+                                                    <th>Data Cadastro</th>
+                                                    <th>Agricultor</th>
+                                                    <th>CPF</th>
+                                                    <th>Cidade</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            ) : (
+                                                <tr>
+                                                    <th>Data</th>
+                                                    <th>Agricultor</th>
+                                                    <th>Serviço</th>
+                                                    <th>Setor</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            )}
                                         </thead>
                                         <tbody>
                                             {reportData.map((item) => (
                                                 <tr key={item.id}>
-                                                    <td>{item.data}</td>
-                                                    <td><strong>{item.agricultor}</strong></td>
-                                                    <td>{item.servico}</td>
-                                                    <td>{item.setor}</td>
-                                                    <td>
-                                                        <span className={`status-tag ${item.status.toLowerCase().replace(' ', '-')}`}>
-                                                            {item.status}
-                                                        </span>
-                                                    </td>
+                                                    {activeReport === 'servicos' ? (
+                                                        <>
+                                                            <td style={{ textAlign: 'center' }}>
+                                                                <span style={{
+                                                                    display: 'inline-block',
+                                                                    width: '30px',
+                                                                    height: '30px',
+                                                                    lineHeight: '30px',
+                                                                    backgroundColor: item.rank <= 3 ? '#4a8b58' : '#eee',
+                                                                    color: item.rank <= 3 ? 'white' : '#333',
+                                                                    borderRadius: '50%',
+                                                                    fontWeight: 'bold',
+                                                                    textAlign: 'center'
+                                                                }}>
+                                                                    {item.rank}
+                                                                </span>
+                                                            </td>
+                                                            <td><strong>{item.servico}</strong></td>
+                                                            <td style={{ textAlign: 'center', fontWeight: 'bold' }}>{item.quantidade}</td>
+                                                            <td style={{ textAlign: 'center' }}>{item.porcentagem}</td>
+                                                        </>
+                                                    ) : activeReport === 'agricultores' ? (
+                                                        <>
+                                                            <td>{item.data}</td>
+                                                            <td><strong>{item.agricultor}</strong></td>
+                                                            <td>{item.cpf}</td>
+                                                            <td>{item.cidade}</td>
+                                                            <td>
+                                                                <span className={`status-tag ${item.status === 'Ativo' ? 'completed' : 'cancelled'}`}>
+                                                                    {item.status}
+                                                                </span>
+                                                            </td>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <td>{item.data}</td>
+                                                            <td><strong>{item.agricultor}</strong></td>
+                                                            <td>{item.servico}</td>
+                                                            <td>{item.setor}</td>
+                                                            <td>
+                                                                <span className={`status-tag ${item.status ? item.status.toLowerCase().replace(' ', '-') : ''}`}>
+                                                                    {item.status}
+                                                                </span>
+                                                            </td>
+                                                        </>
+                                                    )}
                                                 </tr>
                                             ))}
                                         </tbody>

@@ -3,10 +3,13 @@ import { Eye, FileText, ArrowLeft, Printer, Plus, X, Download } from 'lucide-rea
 import '../assets/css/Atendimentos.css';
 import Toast from '../components/Toast';
 import { filterServices, createService, getServiceById, filterServiceTypes, createServiceType } from '../services/serviceService';
+import { createDocument } from '../services/documentService'; // Import createDocument
 import { filterSectors, createSector } from '../services/sectorService';
 import { filterFarmers, getFarmerById } from '../services/farmerService';
 import { pdf, PDFViewer } from '@react-pdf/renderer'; // Import react-pdf
 import AposentadoriaRuralPdf from '../templates/AposentadoriaRuralPdf'; // Import PDF component
+import DeclaracaoPossePdf from '../templates/DeclaracaoPossePdf'; // Import Declaração de Posse
+import TermoAutoDeclaracaoPossePdf from '../templates/TermoAutoDeclaracaoPossePdf'; // Import Auto Declaração
 import logoStraaf from '../assets/img/logo-straaf.svg'; // Import Logo
 
 const Atendimentos = () => {
@@ -21,6 +24,7 @@ const Atendimentos = () => {
     const [showDocumentPreview, setShowDocumentPreview] = useState(false);
     const [documentPreviewData, setDocumentPreviewData] = useState(null);
     const [logoPngUrl, setLogoPngUrl] = useState(null);
+    const [selectedTemplate, setSelectedTemplate] = useState('aposentadoria'); // Estado para seleção de template
 
     // Dados carregados da API
     const [historicoData, setHistoricoData] = useState([]);
@@ -40,6 +44,8 @@ const Atendimentos = () => {
         farmerName: '',
         sectorId: '',
         serviceTypeId: '',
+        startDate: '', // Novo campo: Data Início
+        dueDate: '',   // Novo campo: Vencimento
         observacoes: ''
     });
 
@@ -50,6 +56,100 @@ const Atendimentos = () => {
     const [newServiceTypeName, setNewServiceTypeName] = useState('');
     const [isSavingSector, setIsSavingSector] = useState(false);
     const [isSavingServiceType, setIsSavingServiceType] = useState(false);
+
+    // ... (omitted pagination logic) ...
+
+    // ... (omitted other handlers) ...
+
+    const handleLimpar = () => {
+        setFormData({
+            farmerId: '',
+            farmerName: '',
+            sectorId: '',
+            serviceTypeId: '',
+            startDate: '',
+            dueDate: '',
+            observacoes: ''
+        });
+        setFarmerSearch('');
+        showToast('Formulário limpo!', 'info');
+    };
+
+    const handleSalvar = async () => {
+        if (!formData.farmerId || !formData.sectorId || !formData.serviceTypeId) {
+            showToast('Preencha todos os campos obrigatórios!', 'error');
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            // Preparar observações com as datas se existirem
+            let notesToSave = formData.observacoes || '';
+            const dateInfo = [];
+
+            if (formData.startDate) {
+                const startDateFormatted = formData.startDate.split('-').reverse().join('/');
+                dateInfo.push(`Início: ${startDateFormatted}`);
+            }
+            if (formData.dueDate) {
+                const dueDateFormatted = formData.dueDate.split('-').reverse().join('/');
+                dateInfo.push(`Vencimento: ${dueDateFormatted}`);
+            }
+
+            if (dateInfo.length > 0) {
+                notesToSave += (notesToSave ? '\n\n' : '') + `[Período] ${dateInfo.join(' | ')}`;
+            }
+
+            const payload = {
+                farmerId: parseInt(formData.farmerId),
+                sectorId: parseInt(formData.sectorId),
+                serviceTypeId: parseInt(formData.serviceTypeId),
+                notes: notesToSave,
+                status: 1 // Pendente
+            };
+            console.log('📤 Enviando para API de Serviço:', payload);
+            await createService(payload);
+
+            // Se houver Data de Vencimento, criar também o Documento para controle
+            if (formData.dueDate) {
+                // Encontrar o nome do serviço para usar como nome do documento
+                const selectedServiceType = serviceTypes.find(s => s.id === parseInt(formData.serviceTypeId));
+                const documentName = selectedServiceType ? selectedServiceType.name : 'Novo Documento';
+
+                const documentPayload = {
+                    name: documentName,
+                    description: formData.observacoes || `Documento gerado em atendimento para ${formData.startDate || 'data atual'}`,
+                    dueDate: formData.dueDate,
+                    farmerId: parseInt(formData.farmerId)
+                };
+
+                console.log('📤 Enviando para API de Documento:', documentPayload);
+                await createDocument(documentPayload);
+                showToast('Atendimento e controle de documento registrados!', 'success');
+            } else {
+                showToast('Atendimento registrado com sucesso!', 'success');
+            }
+
+            // Limpa o formulário sem mostrar toast
+            setFormData({
+                farmerId: '',
+                farmerName: '',
+                sectorId: '',
+                serviceTypeId: '',
+                startDate: '',
+                dueDate: '',
+                observacoes: ''
+            });
+            setFarmerSearch('');
+
+            await loadHistorico(); // Recarrega a lista
+        } catch (error) {
+            console.error('Erro ao salvar:', error);
+            showToast('Erro ao registrar atendimento: ' + error.message, 'error');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     // Lógica de Paginação
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -318,55 +418,7 @@ const Atendimentos = () => {
         setFarmers([]);
     };
 
-    const handleLimpar = () => {
-        setFormData({
-            farmerId: '',
-            farmerName: '',
-            sectorId: '',
-            serviceTypeId: '',
-            observacoes: ''
-        });
-        setFarmerSearch('');
-        showToast('Formulário limpo!', 'info');
-    };
 
-    const handleSalvar = async () => {
-        if (!formData.farmerId || !formData.sectorId || !formData.serviceTypeId) {
-            showToast('Preencha todos os campos obrigatórios!', 'error');
-            return;
-        }
-
-        setIsSaving(true);
-        try {
-            const payload = {
-                farmerId: parseInt(formData.farmerId),
-                sectorId: parseInt(formData.sectorId),
-                serviceTypeId: parseInt(formData.serviceTypeId),
-                notes: formData.observacoes,
-                status: 1 // Pendente
-            };
-            console.log('📤 Enviando para API:', payload);
-            await createService(payload);
-
-            showToast('Atendimento registrado com sucesso!', 'success');
-
-            // Limpa o formulário sem mostrar toast
-            setFormData({
-                farmerId: '',
-                farmerName: '',
-                sectorId: '',
-                serviceTypeId: '',
-                observacoes: ''
-            });
-            setFarmerSearch('');
-
-            await loadHistorico(); // Recarrega a lista
-        } catch (error) {
-            showToast('Erro ao registrar atendimento: ' + error.message, 'error');
-        } finally {
-            setIsSaving(false);
-        }
-    };
 
     const handleSaveNewSector = async () => {
         if (!newSectorName.trim()) {
@@ -439,8 +491,23 @@ const Atendimentos = () => {
                 status: getStatusLabel(fullData?.status) || atendimento.status || 'Pendente',
                 atendente: fullData?.attendantName || atendimento.atendente || '-',
                 observacoes: fullData?.notes || atendimento.observacoes || '',
-                farmerId: fullData?.farmerId || fullData?.FarmerId || atendimento.farmerId
+                farmerId: fullData?.farmerId || fullData?.FarmerId || atendimento.farmerId,
+                startDateStr: '-',
+                dueDateStr: '-'
             };
+
+            // Tentar extrair datas das observações
+            const notes = completeAtendimento.observacoes;
+            if (notes && notes.includes('[Período]')) {
+                const periodMatch = notes.match(/\[Período\] (.*)/);
+                if (periodMatch) {
+                    const periodStr = periodMatch[1];
+                    const startMatch = periodStr.match(/Início: ([\d\/]+)/);
+                    const dueMatch = periodStr.match(/Vencimento: ([\d\/]+)/);
+                    if (startMatch) completeAtendimento.startDateStr = startMatch[1];
+                    if (dueMatch) completeAtendimento.dueDateStr = dueMatch[1];
+                }
+            }
 
             setViewingAtendimento(completeAtendimento);
             setActiveTab('visualizar');
@@ -550,6 +617,23 @@ const Atendimentos = () => {
 
             // 5. Mostrar preview
             setLogoPngUrl(convertedLogo || logoStraaf);
+
+            // Determinar template baseado no nome do serviço
+            if (viewingAtendimento && viewingAtendimento.servico) {
+                const serviceName = viewingAtendimento.servico.toLowerCase();
+                const cleanName = serviceName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+                if (cleanName.includes('auto') && cleanName.includes('declaracao')) {
+                    setSelectedTemplate('autodeclaracao');
+                } else if (cleanName.includes('posse')) {
+                    setSelectedTemplate('posse');
+                } else {
+                    setSelectedTemplate('aposentadoria');
+                }
+            } else {
+                setSelectedTemplate('aposentadoria');
+            }
+
             setDocumentPreviewData(templateData);
             setShowDocumentPreview(true);
 
@@ -563,8 +647,19 @@ const Atendimentos = () => {
         if (!documentPreviewData) return;
 
         try {
+            let DocumentComponent = AposentadoriaRuralPdf;
+            let fileNamePrefix = 'Requerimento';
+
+            if (selectedTemplate === 'posse') {
+                DocumentComponent = DeclaracaoPossePdf;
+                fileNamePrefix = 'Declaracao_Posse';
+            } else if (selectedTemplate === 'autodeclaracao') {
+                DocumentComponent = TermoAutoDeclaracaoPossePdf;
+                fileNamePrefix = 'Termo_Auto_Declaracao_Posse';
+            }
+
             const blob = await pdf(
-                <AposentadoriaRuralPdf
+                <DocumentComponent
                     data={documentPreviewData}
                     logoUrl={logoPngUrl}
                 />
@@ -573,7 +668,7 @@ const Atendimentos = () => {
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `Requerimento_${documentPreviewData.agricultor.nome.replace(/\s+/g, '_')}.pdf`;
+            link.download = `${fileNamePrefix}_${documentPreviewData.agricultor.nome.replace(/\s+/g, '_')}.pdf`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -1019,6 +1114,29 @@ const Atendimentos = () => {
                         </div>
 
                         <div className="form-row">
+                            <div className="form-group" style={{ flex: 1 }}>
+                                <label>Data Início (Opcional)</label>
+                                <input
+                                    type="date"
+                                    name="startDate"
+                                    className="form-input"
+                                    value={formData.startDate}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="form-group" style={{ flex: 1 }}>
+                                <label>Vencimento (Gera Documento)</label>
+                                <input
+                                    type="date"
+                                    name="dueDate"
+                                    className="form-input"
+                                    value={formData.dueDate}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-row">
                             <div className="form-group full-width">
                                 <label>Detalhe / Observações</label>
                                 <textarea
@@ -1221,6 +1339,16 @@ const Atendimentos = () => {
                                     <span className="info-value">{viewingAtendimento.setor}</span>
                                 </div>
                             </div>
+                            <div className="info-grid-2">
+                                <div className="info-item">
+                                    <span className="info-label">Data Início</span>
+                                    <span className="info-value">{viewingAtendimento.startDateStr || '-'}</span>
+                                </div>
+                                <div className="info-item">
+                                    <span className="info-label">Vencimento</span>
+                                    <span className="info-value">{viewingAtendimento.dueDateStr || '-'}</span>
+                                </div>
+                            </div>
                             <div className="info-grid">
                                 <div className="info-item">
                                     <span className="info-label">Atendente</span>
@@ -1347,10 +1475,22 @@ const Atendimentos = () => {
                         </div>
                         <div className="modal-body" style={{ flex: 1, overflow: 'hidden', padding: 0 }}>
                             <PDFViewer width="100%" height="100%" style={{ border: 'none' }}>
-                                <AposentadoriaRuralPdf
-                                    data={documentPreviewData}
-                                    logoUrl={logoPngUrl}
-                                />
+                                {selectedTemplate === 'posse' ? (
+                                    <DeclaracaoPossePdf
+                                        data={documentPreviewData}
+                                        logoUrl={logoPngUrl}
+                                    />
+                                ) : selectedTemplate === 'autodeclaracao' ? (
+                                    <TermoAutoDeclaracaoPossePdf
+                                        data={documentPreviewData}
+                                        logoUrl={logoPngUrl}
+                                    />
+                                ) : (
+                                    <AposentadoriaRuralPdf
+                                        data={documentPreviewData}
+                                        logoUrl={logoPngUrl}
+                                    />
+                                )}
                             </PDFViewer>
                         </div>
                         <div className="modal-footer" style={{ justifyContent: 'space-between' }}>
@@ -1364,13 +1504,15 @@ const Atendimentos = () => {
                                 className="btn-solid-green"
                                 onClick={handleDownloadDocument}
                             >
-                                <Download size={18} /> Baixar PDF
+                                <Download size={18} style={{ marginRight: '8px' }} />
+                                Baixar PDF
                             </button>
                         </div>
                     </div>
                 </div>
             )}
-        </div>
+
+        </div >
     );
 };
 

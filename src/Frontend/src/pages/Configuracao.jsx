@@ -1117,7 +1117,7 @@ const Configuracao = () => {
                                         <div key={servico.id} className="setor-item">
                                             <div className="setor-info">
                                                 <h4>{servico.nome}</h4>
-                                                <p>{servico.descricao || 'Sem descrição'}</p>
+                                                <p>{servico.description || 'Sem descrição'}</p>
                                                 <small style={{ color: '#666' }}>
                                                     Setor: {setores.find(s => s.id === servico.sectorId)?.nome || 'Não definido'}
                                                 </small>

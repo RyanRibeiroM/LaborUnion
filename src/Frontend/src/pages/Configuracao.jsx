@@ -111,38 +111,60 @@ const Configuracao = () => {
         const loadUsuarios = async () => {
             try {
                 const response = await post('/user/filter', {});
+                const usersList = response?.users || response?.Users || [];
 
-                console.log("Dados brutos da API:", response.users);
-
-                if (response && response.users) {
-                    // Correção aplicada na listagem (CamelCase ou PascalCase)
-                    const usuariosFormatados = response.users.map(u => ({
+                if (Array.isArray(usersList)) {
+                    const usuariosFormatados = usersList.map(u => ({
                         id: u.id || u.Id,
                         name: u.name || u.Name,
                         email: u.email || u.Email || '',
                         role: u.role || u.Role
                     }));
-
                     setUsuarios(usuariosFormatados);
                 }
             } catch (error) {
                 console.error('Erro ao carregar usuários:', error);
-                showToast('Erro ao carregar lista de usuários', 'error');
+                // Evitar toast se for apenas erro de acesso/não implementado
+                if (error.status !== 403 && error.status !== 404) {
+                    showToast('Erro ao carregar lista de usuários', 'error');
+                }
             }
         };
 
         const loadServicos = async () => {
             try {
-                const response = await post('/servicetype/filter', {});
-                if (response && response.servicesTypes) {
-                    const servicosFormatados = response.servicesTypes.map(s => ({
-                        id: s.id || s.Id,
+                // 1. Buscar tipos de serviço
+                const responseTypes = await post('/servicetype/filter', {});
+                const types = responseTypes?.servicesTypes || responseTypes?.ServicesTypes || [];
+
+                // 2. Tentar buscar histórico de atendimentos para descobrir o mapeamento de setores
+                // (Já que o backend não retorna o SectorId no filter de ServiceType)
+                let serviceToSectorMap = {};
+                try {
+                    const servicesResponse = await post('/service/filter', { pageSize: 50 });
+                    const recentAtendimentos = servicesResponse?.services || servicesResponse?.Services || [];
+
+                    recentAtendimentos.forEach(at => {
+                        const sTypeId = at.serviceTypeId || at.ServiceTypeId;
+                        const sId = at.sectorId || at.SectorId;
+                        if (sTypeId && sId) {
+                            serviceToSectorMap[sTypeId] = sId;
+                        }
+                    });
+                } catch (e) {
+                    console.warn("Não foi possível carregar histórico para mapeamento de setores", e);
+                }
+
+                const servicosFormatados = types.map(s => {
+                    const id = s.id || s.Id;
+                    return {
+                        id,
                         nome: s.name || s.Name,
                         descricao: s.description || s.Description || '',
-                        sectorId: s.sectorId || s.SectorId
-                    }));
-                    setServicos(servicosFormatados);
-                }
+                        sectorId: s.sectorId || s.SectorId || serviceToSectorMap[id]
+                    };
+                });
+                setServicos(servicosFormatados);
             } catch (error) {
                 console.error('Erro ao carregar serviços:', error);
             }
@@ -961,7 +983,7 @@ const Configuracao = () => {
                                             <>
                                                 <div className="setor-info">
                                                     <h4>{setor.nome}</h4>
-                                                    <p>{setor.descricao || 'Sem descrição'}</p>
+                                                    <p>{setor.descricao || `Setor dedicado ao atendimento de ${servicos.filter(s => s.sectorId === setor.id).map(s => s.nome).join(', ') || 'diversas demandas'}.`}</p>
                                                 </div>
                                                 <div className="setor-actions">
                                                     <button
@@ -1016,15 +1038,15 @@ const Configuracao = () => {
                             {/* Modal de Edição de Serviço */}
                             {showServicoEditModal && editingServico && (
                                 <div className="modal-overlay">
-                                    <div className="modal-content" style={{ maxWidth: '500px', textAlign: 'left' }}>
+                                    <div className="modal-content">
                                         <div className="modal-header">
                                             <h3>Editar Tipo de Serviço</h3>
                                             <button className="modal-close" onClick={handleCancelEditServico}>
                                                 <X size={24} />
                                             </button>
                                         </div>
-                                        <div className="modal-body" style={{ padding: '0', marginBottom: '20px' }}>
-                                            <div className="form-group" style={{ marginBottom: '16px' }}>
+                                        <div className="modal-body">
+                                            <div className="form-group" style={{ marginBottom: '20px' }}>
                                                 <label>Nome do Serviço <span style={{ color: 'red' }}>*</span></label>
                                                 <input
                                                     type="text"
@@ -1034,25 +1056,37 @@ const Configuracao = () => {
                                                     placeholder="Nome do serviço"
                                                 />
                                             </div>
+
+                                            <div className="form-group" style={{ marginBottom: '20px' }}>
+                                                <label>Setor Responsável</label>
+                                                <div className="form-value" style={{ color: '#2e7d32', fontWeight: 600 }}>
+                                                    {setores.find(s => s.id === (typeof editingServico.sectorId === 'string' ? parseInt(editingServico.sectorId) : editingServico.sectorId))?.nome || 'Não definido'}
+                                                </div>
+                                            </div>
+
                                             <div className="form-group">
                                                 <label>Descrição</label>
                                                 <textarea
                                                     className="form-input"
-                                                    style={{ minHeight: '120px', paddingTop: '12px', resize: 'vertical' }}
+                                                    style={{ minHeight: '100px', paddingTop: '12px', resize: 'vertical' }}
                                                     value={editingServico.descricao}
                                                     onChange={(e) => setEditingServico({ ...editingServico, descricao: e.target.value })}
                                                     placeholder="Descrição do serviço"
                                                 ></textarea>
                                             </div>
-                                            <p style={{ fontSize: '13px', color: '#888', marginTop: '15px', fontStyle: 'italic' }}>
-                                                Nota: O setor responsável não pode ser alterado após a criação.
-                                            </p>
+
+                                            <div className="info-alert">
+                                                <Shield size={20} color="#1976d2" style={{ flexShrink: 0 }} />
+                                                <p className="info-alert-text">
+                                                    <strong>Nota:</strong> O setor responsável não pode ser alterado após a criação para manter a integridade dos registros.
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div className="modal-footer" style={{ borderTop: '1px solid #eee', paddingTop: '15px', justifyContent: 'flex-end' }}>
+                                        <div className="modal-footer">
                                             <button className="btn-modal-cancel" onClick={handleCancelEditServico}>
                                                 Cancelar
                                             </button>
-                                            <button className="btn-solid-green" onClick={handleSaveEditServico} style={{ margin: '0' }}>
+                                            <button className="btn-solid-green" onClick={handleSaveEditServico}>
                                                 <Save size={18} />
                                                 Salvar Alterações
                                             </button>
@@ -1117,9 +1151,9 @@ const Configuracao = () => {
                                         <div key={servico.id} className="setor-item">
                                             <div className="setor-info">
                                                 <h4>{servico.nome}</h4>
-                                                <p>{servico.description || 'Sem descrição'}</p>
+                                                <p>{servico.descricao || `Processo de solicitação para ${servico.nome}.`}</p>
                                                 <small style={{ color: '#666' }}>
-                                                    Setor: {setores.find(s => s.id === servico.sectorId)?.nome || 'Não definido'}
+                                                    Setor: <strong style={{ color: '#2e7d32' }}>{setores.find(s => s.id === (typeof servico.sectorId === 'string' ? parseInt(servico.sectorId) : servico.sectorId))?.nome || 'Não definido'}</strong>
                                                 </small>
                                             </div>
                                             <div className="setor-actions">

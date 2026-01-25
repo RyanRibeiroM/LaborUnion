@@ -66,10 +66,11 @@ const Dashboard = () => {
             if (response && response.documents) {
                 const docs = response.documents.map(doc => ({
                     id: doc.id,
+                    serviceId: doc.serviceId || doc.atendimentoId,
+                    farmerId: doc.farmerId || doc.farmer?.id,
                     agricultor: doc.farmerName || doc.farmer?.name || '-',
                     documento: doc.name || doc.documentType || '-',
-                    vencimento: formatDate(doc.expirationDate || doc.dueDate),
-                    acoes: 'Ver'
+                    vencimento: formatDate(doc.expirationDate || doc.dueDate)
                 }));
 
                 setDocumentosVencendo(docs);
@@ -355,7 +356,7 @@ const Dashboard = () => {
                                 <th>Agricultor</th>
                                 <th>Documento</th>
                                 <th>Data de Vencimento</th>
-                                <th>Ações</th>
+                                {/* <th>Ações</th> */}
                             </tr>
                         </thead>
                         <tbody>
@@ -371,8 +372,13 @@ const Dashboard = () => {
                                                 className="action-link"
                                                 onClick={(e) => {
                                                     e.preventDefault();
-                                                    // Aqui você pode navegar para detalhes
-                                                    console.log('Ver documento:', row.id);
+                                                    // Navegar para Atendimentos, focando no serviço que gerou o documento
+                                                    navigate('/atendimentos', {
+                                                        state: {
+                                                            viewServiceId: row.serviceId,
+                                                            farmerId: row.farmerId
+                                                        }
+                                                    });
                                                 }}
                                             >
                                                 {row.acoes}

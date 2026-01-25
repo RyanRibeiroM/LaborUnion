@@ -7,6 +7,7 @@ import Toast from '../components/Toast';
 import MobileCard from '../components/MobileCard';
 import FarmerForm from '../components/FarmerForm';
 import { filterFarmers, createFarmer, updateFarmer, deleteFarmer, getFarmerById, formToApiData, apiToFormData } from '../services/farmerService';
+import { filterDocuments } from '../services/documentService';
 
 const Agricultores = () => {
     const location = useLocation();
@@ -94,6 +95,8 @@ const Agricultores = () => {
     const [editingId, setEditingId] = useState(null);
     const [viewingAgricultor, setViewingAgricultor] = useState(null);
     const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
+    const [documents, setDocuments] = useState([]);
+    const [loadingDocuments, setLoadingDocuments] = useState(false);
 
     const showToast = (message, type = 'info') => {
         setToast({ show: true, message, type });
@@ -527,8 +530,42 @@ const Agricultores = () => {
     useEffect(() => {
         if (location.state?.openCadastro) {
             setActiveTab('cadastro');
+        } else if (location.state?.viewFarmerId) {
+            const loadFarmer = async () => {
+                try {
+                    const fullData = await getFarmerById(location.state.viewFarmerId);
+                    const formattedData = apiToFormData(fullData);
+                    setViewingAgricultor(formattedData);
+                    setActiveTab('visualizar');
+                } catch (error) {
+                    showToast('Erro ao carregar agricultor: ' + error.message, 'error');
+                }
+            };
+            loadFarmer();
         }
     }, [location]);
+
+    // Carregar documentos ao visualizar agricultor
+    useEffect(() => {
+        const loadDocs = async () => {
+            if (activeTab === 'visualizar' && viewingAgricultor?.id) {
+                setLoadingDocuments(true);
+                try {
+                    const response = await filterDocuments({ farmerId: viewingAgricultor.id });
+                    if (response && response.documents) {
+                        setDocuments(response.documents);
+                    } else {
+                        setDocuments([]);
+                    }
+                } catch (error) {
+                    console.error('Erro ao carregar documentos:', error);
+                } finally {
+                    setLoadingDocuments(false);
+                }
+            }
+        };
+        loadDocs();
+    }, [activeTab, viewingAgricultor]);
 
     if (isLoading) {
         return (
@@ -909,13 +946,13 @@ const Agricultores = () => {
                                 <h3 className="section-title">Endereço</h3>
 
                                 <div className="form-row">
-                                    <div className="form-group">
+                                    <div className="form-group half-width">
                                         <label>CEP</label>
                                         <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
                                             {viewingAgricultor.cep || '-'}
                                         </div>
                                     </div>
-                                    <div className="form-group">
+                                    <div className="form-group half-width">
                                         <label>Número</label>
                                         <div className="form-input" style={{ backgroundColor: '#f5f5f5', cursor: 'default' }}>
                                             {viewingAgricultor.numero || '-'}
@@ -952,24 +989,60 @@ const Agricultores = () => {
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Documentos */}
+                                <div className="form-section no-border">
+                                    <h3 className="section-title">Documentos</h3>
+                                    {loadingDocuments ? (
+                                        <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>Carregando documentos...</div>
+                                    ) : documents.length > 0 ? (
+                                        <div className="table-responsive">
+                                            <table className="farmers-table" style={{ marginTop: '10px' }}>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Nome</th>
+                                                        <th>Vencimento</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {documents.map((doc) => {
+                                                        const isExpired = new Date(doc.dueDate) < new Date();
+                                                        return (
+                                                            <tr key={doc.id}>
+                                                                <td><strong>{doc.name}</strong></td>
+                                                                <td>{formatDateToBR(doc.dueDate)}</td>
+                                                                <td>
+                                                                    <span className={`status-badge ${isExpired ? 'bloqueado' : 'regular'}`}>
+                                                                        {isExpired ? 'Vencido' : 'Em Dia'}
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    ) : (
+                                        <div style={{ padding: '15px', background: '#f9f9f9', borderRadius: '4px', textAlign: 'center', color: '#666' }}>
+                                            Nenhum documento cadastrado.
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    )
-                    }
-
-                </div >
-
-                {/* Modal de Exclusão */}
-                < ModalConfirmacao
-                    isOpen={showDeleteModal}
-                    onCancel={cancelDelete}
-                    onConfirm={confirmDelete}
-                    title="Confirmar Exclusão"
-                    message="Tem certeza que deseja excluir este agricultor? Esta ação não pode ser desfeita."
-                    confirmText="Excluir"
-                    tipo="delete"
-                />
-            </div >
+                    )}
+                    <ModalConfirmacao
+                        isOpen={showDeleteModal}
+                        onCancel={cancelDelete}
+                        onConfirm={confirmDelete}
+                        title="Confirmar Exclusão"
+                        message="Tem certeza que deseja excluir este agricultor? Esta ação não pode ser desfeita."
+                        confirmText="Excluir"
+                        tipo="delete"
+                    />
+                </div>
+            </div>
         </>
     );
 };

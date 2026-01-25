@@ -1,4 +1,5 @@
 ﻿﻿import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Eye, FileText, ArrowLeft, Printer, Plus, X, Download } from 'lucide-react';
 import '../assets/css/Atendimentos.css';
 import Toast from '../components/Toast';
@@ -13,6 +14,7 @@ import TermoAutoDeclaracaoPossePdf from '../templates/TermoAutoDeclaracaoPossePd
 import logoStraaf from '../assets/img/logo-straaf.svg'; // Import Logo
 
 const Atendimentos = () => {
+    const location = useLocation();
     const [activeTab, setActiveTab] = useState('registrar');
     const [isLoading, setIsLoading] = useState(true);
     const [toast, setToast] = useState({ show: false, message: '', type: 'info' });
@@ -380,6 +382,47 @@ const Atendimentos = () => {
         };
         init();
     }, []);
+
+    // Efeito para lidar com navegação vinda do Dashboard
+    useEffect(() => {
+        if (!isLoading) {
+            if (location.state?.viewServiceId) {
+                // Se temos um ID de serviço, vamos direto para a visualização
+                const service = historicoData.find(s => s.id === location.state.viewServiceId);
+
+                if (service) {
+                    handleView(service);
+                } else {
+                    // Se não estiver no cache da primeira página, buscar na API
+                    const fetchAndOpen = async () => {
+                        try {
+                            const fullData = await getServiceById(location.state.viewServiceId);
+                            if (fullData) {
+                                // Formatar conforme esperado pelo handleView (atendimento simplificado)
+                                const simplified = {
+                                    id: fullData.id,
+                                    data: formatDateToBR(fullData.createdOn || fullData.date),
+                                    hora: formatTimeToBR(fullData.createdOn || fullData.date),
+                                    agricultor: fullData.farmerName || '-',
+                                    servico: fullData.serviceTypeName || '-',
+                                    setor: fullData.sectorName || '-',
+                                    status: getStatusLabel(fullData.status),
+                                    farmerId: fullData.farmerId,
+                                    observacoes: fullData.notes || ''
+                                };
+                                handleView(simplified);
+                            }
+                        } catch (error) {
+                            console.error('Erro ao abrir serviço do dashboard:', error);
+                        }
+                    };
+                    fetchAndOpen();
+                }
+            } else if (location.state?.farmerId && !location.state?.viewServiceId) {
+                setActiveTab('historico');
+            }
+        }
+    }, [location, isLoading, historicoData]);
 
     const handleFarmerSearch = (e) => {
         let value = e.target.value;

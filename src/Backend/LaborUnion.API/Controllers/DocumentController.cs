@@ -15,7 +15,7 @@ namespace LaborUnion.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseRegisteredDocumentJson), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status400BadRequest)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         public async Task<IActionResult> Register(
             [FromBody] RequestRegisterDocumentJson request,
             [FromServices] IRegisterDocumentUseCase useCase
@@ -30,7 +30,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         public async Task<IActionResult> Delete(
             [FromServices] IDeleteDocumentUseCase useCase,
             [FromRoute] int id)
@@ -41,9 +41,9 @@ namespace LaborUnion.API.Controllers
         }
 
         [HttpPost("filter")]
-        [ProducesResponseType(typeof(ResponseFarmersJson), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseDocumentsJson), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         public async Task<IActionResult> Filter(
             [FromServices] IFilterDocumentUseCase useCase,
             [FromBody] RequestFilterDocumentJson request)
@@ -62,7 +62,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         public async Task<IActionResult> Update(
             [FromServices] IUpdateDocumentUseCase useCase,
             [FromRoute] int id,
@@ -76,9 +76,9 @@ namespace LaborUnion.API.Controllers
 
         [HttpGet]
         [Route("{id}")]
-        [ProducesResponseType(typeof(ResponseFarmerJson), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResponseDocumentJson), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator")]
+        [Authorize]
         public async Task<IActionResult> GetById(
             [FromServices] IGetDocumentByIdUseCase useCase,
             [FromRoute] int id)

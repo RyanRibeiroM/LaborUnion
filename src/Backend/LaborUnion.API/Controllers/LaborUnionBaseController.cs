@@ -2,7 +2,7 @@
 
 namespace LaborUnion.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public abstract class LaborUnionBaseController : ControllerBase
     {

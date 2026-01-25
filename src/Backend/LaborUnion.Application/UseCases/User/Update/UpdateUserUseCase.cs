@@ -16,7 +16,9 @@ namespace LaborUnion.Application.UseCases.User.Update
         private readonly IUserUpdateOnlyRepository _userUpdateOnlyRepository;
         private readonly IUserReadOnlyRepository _userReadOnlyRepository;
         private readonly IPasswordEncrypter _passwordEncrypter;
+        private readonly ILoggedUser _loggedUser;
         private readonly IUnitOfWork _unitOfWork;
+
         public UpdateUserUseCase(
             IFarmerReadOnlyRepository farmerReadOnlyRepository,
             IUserUpdateOnlyRepository userUpdateOnlyRepository,
@@ -29,17 +31,20 @@ namespace LaborUnion.Application.UseCases.User.Update
             _userUpdateOnlyRepository = userUpdateOnlyRepository;
             _userReadOnlyRepository = userReadOnlyRepository;
             _passwordEncrypter = passwordEncrypter;
+            _loggedUser = loggedUser;
             _unitOfWork = unitOfWork;
         }
         public async Task Execute(int id, RequestUpdateUserJson request)
         {
             var user = await _userUpdateOnlyRepository.GetById(id) ?? throw new NotFoundException(ResourceMessagesException.USER_NOT_FOUND);
-
-            await Validate(request, user);
+            var loggedUser = await _loggedUser.GetUser();
+            await Validate(request, user, loggedUser);
 
             user.Name = request.Name;
             user.Email = request.Email;
-            user.Role = (UserRoles)request.Role;
+
+            if(user.Role != UserRoles.Developer)
+                user.Role = (UserRoles)request.Role;
 
             if (!string.IsNullOrWhiteSpace(request.Password))
             {
@@ -50,10 +55,15 @@ namespace LaborUnion.Application.UseCases.User.Update
             await _unitOfWork.Commit();
         }
 
-        private async Task Validate(RequestUpdateUserJson request, Domain.Entities.User user)
+        private async Task Validate(RequestUpdateUserJson request, Domain.Entities.User user, Domain.Entities.User loggedUser)
         {
             var validator = new UpdateUserValidator();
             var result = validator.Validate(request);
+
+            if ((int)request.Role == (int)UserRoles.Developer)
+                throw new NotFoundException(ResourceMessagesException.USER_ROLE_NOT_SUPPORTED);
+            else if (Enum.IsDefined(typeof(PrivilegedUserRoles), (int)request.Role) && loggedUser.Role == UserRoles.Administrator)
+                throw new NotFoundException(ResourceMessagesException.USER_ROLE_NOT_SUPPORTED);
 
             if (request.Email != user.Email)
             {
@@ -66,12 +76,6 @@ namespace LaborUnion.Application.UseCases.User.Update
                     result.Errors.Add(new FluentValidation.Results.ValidationFailure(nameof(request.Email), ResourceMessagesException.EMAIL_ALREADY_EXISTS));
                 }
             }
-
-            if (Enum.IsDefined(typeof(PrivilegedUserRoles), (int)user.Role))
-                throw new NotFoundException(ResourceMessagesException.USER_NOT_FOUND);
-
-            if (Enum.IsDefined(typeof(PrivilegedUserRoles), (int)request.Role))
-                throw new NotFoundException(ResourceMessagesException.USER_ROLE_NOT_SUPPORTED);
 
             if (!result.IsValid)
             {

@@ -15,7 +15,7 @@ namespace LaborUnion.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ResponseRegisteredServiceJson), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status400BadRequest)]
-        [Authorize(Roles = "Administrator, Attendant")]
+        [Authorize]
         public async Task<IActionResult> Register(
             [FromBody] RequestRegisterServiceJson request,
             [FromServices] IRegisterServiceUseCase useCase
@@ -30,7 +30,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(typeof(ResponseServiceJson), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator, Attendant")]
+        [Authorize]
         public async Task<IActionResult> GetById(
             [FromServices] IGetServiceByIdUseCase useCase,
             [FromRoute] int id)
@@ -43,7 +43,7 @@ namespace LaborUnion.API.Controllers
         [HttpPost("filter")]
         [ProducesResponseType(typeof(ResponseServicesJson), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [Authorize(Roles = "Administrator, Attendant")]
+        [Authorize]
         public async Task<IActionResult> Filter(
             [FromServices] IFilterServiceUseCase useCase,
             [FromBody] RequestFilterServiceJson request)
@@ -62,7 +62,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator, Attendant")]
+        [Authorize]
         public async Task<IActionResult> Delete(
             [FromServices] IDeleteServiceUseCase useCase,
             [FromRoute] int id)
@@ -76,7 +76,7 @@ namespace LaborUnion.API.Controllers
         [Route("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ResponseErrorJson), StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Administrator, Attendant")]
+        [Authorize]
         public async Task<IActionResult> Update(
             [FromServices] IUpdateServiceUseCase useCase,
             [FromRoute] int id,
